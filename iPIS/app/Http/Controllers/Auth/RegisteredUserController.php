@@ -33,12 +33,17 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'valid_id' => 'required|file|mimes:jpg,jpeg,png|max:15360',    // added for a pic to be pass by coach
         ]);
+        if ($request->hasFile('valid_id')) {
+            $validIdPath = $request->file('valid_id')->store('valid_ids', 'public');
+        }
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'valid_id_path' => $validIdPath ?? null,
         ]);
 
         event(new Registered($user));
