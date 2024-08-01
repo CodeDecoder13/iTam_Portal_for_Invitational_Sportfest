@@ -121,7 +121,7 @@
             </a>
         </li>
         <li>
-            <a href="{{ route('my-documents') }}" class="nav-link text-white">
+            <a href="{{ route('documents') }}" class="nav-link text-white">
                 <ion-icon name="document"></ion-icon>
                 Documents
             </a>
@@ -155,7 +155,7 @@
                 </a>
             </li>
             <li>
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('admin.logout') }}">
                     @csrf
                     <button type="submit" class="nav-link text-white"
                         style="background: none; border: none; padding: 0; cursor: pointer;">
