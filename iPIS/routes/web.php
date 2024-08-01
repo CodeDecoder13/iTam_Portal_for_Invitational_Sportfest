@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TestingController;
+use App\Http\Controllers\RolesAndPermissionController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -43,6 +44,8 @@ Route::post('/testing-site', [TestingController::class, 'test'])->name('test.');
 
 //Route for save team
 Route::post('/save-team', [TestingController::class, 'addteam'])->name('test.addteam');
+//testing roles
+Route::get('/add-permissions', [RolesAndPermissionController::class, 'addPermissions']);
 
 require __DIR__.'/auth.php';
 require __DIR__.'/admin-auth.php';
