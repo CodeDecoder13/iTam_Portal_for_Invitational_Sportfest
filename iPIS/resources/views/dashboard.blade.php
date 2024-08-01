@@ -1,7 +1,13 @@
 <x-app-layout>
     <div class="flex-grow px-4 py-6">
+        
         <h1 class="text-2xl">Dashboard</h1>
-        <h3 class="text-lg mb-8">Welcome, <span class="underline">Coach Erik Spoelstra</span></h3>
+        <!-- Fetch Current User Login -->
+        @if (Auth::check())
+            <h3 class="text-lg mb-8">Welcome, Coach <span class="underline">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</span></h3>
+        @endif
+    
+
         <section class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <div class="rounded-lg shadow-md">
                 <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
@@ -36,7 +42,7 @@
                                 </div>
                                 <div><img width="15" class="img-fluid" src="/images/userlogo.png" /></div>
                             </div>
-                            <div class="w-4 /12 text-end">
+                            <div class="w-4/12 text-end">
                                 <p class="font-bold">Sept. 11, 2024</p>
                             </div>
                         </li>

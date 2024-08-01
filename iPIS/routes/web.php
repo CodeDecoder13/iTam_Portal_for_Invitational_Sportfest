@@ -1,8 +1,10 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TestingController;
-use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -18,7 +20,29 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('/testing-site', [TestingController::class, 'test'])->name('test.');
+// added for sidebar routes
+Route::middleware(['auth','verified'])->group(function () {
+    Route::get('dashboard', [UserController::class, 'dashboard'])->name('dashboard');
+    Route::get('/my-documents', [UserController::class, 'myDocuments'])->name('my-documents');
+    Route::get('/my-documents/{type}', [UserController::class, 'myDocuments_sub'])->name('my-documents_sub');
+    Route::get('/my-calendar', [UserController::class, 'myCalendar'])->name('my-calendar');
+    Route::get('/my-players', [UserController::class, 'myPlayers'])->name('my-players');
+});
+
+// added for admin sidebar
+Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/documents', [AdminController::class, 'documents'])->name('admin.documents');
+    Route::get('/calendar', [AdminController::class, 'calendar'])->name('admin.calendar');
+    Route::get('/players-teams', [AdminController::class, 'playersTeams'])->name('admin.players-teams');
+    Route::get('/user-management', [AdminController::class, 'usersManagement'])->name('admin.user-management');
+    Route::get('/coach-approval', [AdminController::class, 'coachApproval'])->name('admin.coach-approval');
+});
+
+Route::post('/testing-site', [TestingController::class, 'test'])->name('test.');
+
+//Route for save team
+Route::post('/save-team', [TestingController::class, 'addteam'])->name('test.addteam');
 
 require __DIR__.'/auth.php';
 require __DIR__.'/admin-auth.php';

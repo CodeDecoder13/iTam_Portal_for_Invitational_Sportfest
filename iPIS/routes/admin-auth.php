@@ -1,8 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\RegisteredUserController;
-use Illuminate\Support\Facades\Route;
 
 
 Route::prefix('admin')->middleware('guest:admin')->group(function () {
@@ -23,3 +24,7 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
 
     Route::post('logout', [LoginController::class, 'destroy']) ->name('admin.logout');
 });
+
+// routes/web.php
+
+

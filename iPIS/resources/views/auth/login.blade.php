@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
+    <title>Coach Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -83,15 +83,15 @@
     </div>
 
     <!-- Left Side Text -->
-    <div class="absolute inset-y-0 left-0  items-center hidden lg:flex"  style="pointer-events:none">
-        <div class="rotate-[270deg] translate-y-[50px] transform translate-x-[-50%] text-white font-bold text-5xl tracking-wider ml-7 hidden lg:block skew-x-12 ">
-            <span class="p-3 bg-green-500">INVITATIONALS</span><span class="p-3 bg-yellow-500"> INVITATIONALS</span>
+    <div class="absolute inset-y-0 left-0  items-center hidden lg:flex "  style="pointer-events:none">
+        <div class="rotate-[270deg] translate-y-[50px] transform translate-x-[-50%] text-white font-bold text-5xl xl:text-7xl tracking-wider ml-7 hidden lg:block skew-x-12 transition duration-300">
+            <span class="p-3 bg-green-500 ">INVITATIONALS</span><span class="p-3 bg-yellow-500"> INVITATIONALS</span>
         </div>
     </div>
 
     <!-- Right Side Text -->
-    <div class="absolute inset-y-0 right-0 translate-y-[-50px]  items-center hidden lg:flex"  style="pointer-events:none">
-        <div class="rotate-90 transform translate-x-1/2 text-white font-bold text-5xl tracking-wider mr-7 skew-x-12" >
+    <div class="absolute inset-y-0 right-0   items-center hidden lg:flex "  style="pointer-events:none">
+        <div class="rotate-90 transform translate-x-1/2 text-white font-bold text-5xl xl:text-7xl tracking-wider mr-7 skew-x-12" >
             <span class="p-3 bg-green-500">INVITATIONALS</span><span class="p-3 bg-yellow-500"> INVITATIONALS</span>
         </div>
     </div>

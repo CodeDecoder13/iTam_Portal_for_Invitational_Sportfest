@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
+    <title>Sado Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -31,7 +31,7 @@
                 <h3 class="text-center mb-3 text-xl font-bold">Login to your account</h3>
                 <p class="text-center mb-6">To continue, please sign in</p>
                 
-                <form method="POST" action="{{ route('login') }}" class="form-container mx-auto">
+                <form method="POST" action="{{ route('admin.login') }}" class="form-container mx-auto">
                     @csrf
 
                     <!-- Email Address -->

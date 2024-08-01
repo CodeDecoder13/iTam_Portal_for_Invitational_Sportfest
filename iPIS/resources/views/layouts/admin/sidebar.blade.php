@@ -13,6 +13,7 @@
         background-repeat: no-repeat;
         /* Prevent repeating */
         height: 100vh;
+        width: 100%;
         /* Full width for smaller screens */
         /* Maximum width for larger screens */
         position: ;
@@ -112,20 +113,9 @@
         <span class="fs-4">ITAM INVITATIONAL SPORTFEST COMPILER</span>
     </a>
     <ul class="nav nav-pills flex-column mb-auto">
+        
         <li class="nav-item">
-            <div class="sm:col-span-3" style="margin-bottom: 30px">
-                <label for="team" class="block text-sm font-medium leading-6 text-white">Select team</label>
-                <div class="mt-2">
-                    <select id="team" name="team" autocomplete="team-name"
-                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                        <option>FTIC</option>
-                        <option>Dunno</option>
-                    </select>
-                </div>
-            </div>
-        </li>
-        <li class="nav-item">
-            <a href="/dashboard" class="nav-link active" aria-current="page">
+            <a href="#" class="nav-link active" aria-current="page">
                 <ion-icon name="home"></ion-icon>
                 Home
             </a>
@@ -133,19 +123,25 @@
         <li>
             <a href="{{ route('my-documents') }}" class="nav-link text-white">
                 <ion-icon name="document"></ion-icon>
-                My Documents
+                Documents
             </a>
         </li>
         <li>
             <a href="{{ route('my-calendar') }}" class="nav-link text-white">
                 <ion-icon name="people"></ion-icon>
-                My Calendar
+                Calendar
             </a>
         </li>
         <li>
             <a href="{{ route('my-players') }}" class="nav-link text-white">
                 <ion-icon name="people"></ion-icon>
-                My Players
+                Players & Teams
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('my-players') }}" class="nav-link text-white">
+                <ion-icon name="people"></ion-icon>
+                Users
             </a>
         </li>
     </ul>
