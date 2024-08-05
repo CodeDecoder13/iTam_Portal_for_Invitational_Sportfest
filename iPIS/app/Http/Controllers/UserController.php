@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
@@ -12,6 +14,17 @@ class UserController extends Controller
     {
         return view('dashboard');
     }
+    // fetch current teams
+    public function getTeams()
+{
+    try {
+        $teams = Team::select('acronym', 'sport_category')->get();
+        return response()->json($teams);
+    } catch (\Exception $e) {
+        Log::error('Error fetching teams: '.$e->getMessage());
+        return response()->json(['message' => $e->getMessage(), 'code' => $e->getCode()], 500);
+    }
+}
     public function NotActiveUser()
     {
         if (!Auth::user()->is_active) {
