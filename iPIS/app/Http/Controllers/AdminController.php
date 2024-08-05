@@ -33,32 +33,39 @@ class AdminController extends Controller
      //   return view('admin.admin-sidebar.coach-approval');
    // }
    public function coachApproval(Request $request)
-    {
-        try {
-            $users = User::select('users.id', 'users.first_name', 'users.last_name', 'users.is_active')
-                ->leftJoin('teams', 'users.id', '=', 'teams.coach_id')
-                ->get();
+{
+    try {
+        $users = User::select('users.id', 'users.first_name', 'users.last_name', 'users.is_active')
+            ->leftJoin('teams', 'users.id', '=', 'teams.coach_id')
+            ->get();
 
-            $teams = Team::select('teams.id', 'teams.acronym', 'teams.sport_category', 'teams.created_at', 'teams.coach_id')
-                ->get();
+        $teams = Team::select('teams.id', 'teams.acronym', 'teams.sport_category', 'teams.created_at', 'teams.coach_id')
+            ->get();
 
-            $data = [
-                'users' => $users,
-                'teams' => $teams
-            ];
+        Log::info('Fetched users: ', $users->toArray());
+        Log::info('Fetched teams: ', $teams->toArray());
 
-            return view('admin.admin-sidebar.coach-approval', compact('data'));
-        } catch (\Exception $e) {
-            Log::error('Error fetching coach approval data: '.$e->getMessage());
-            return response()->json(['message' => $e->getMessage(), 'code' => $e->getCode()], 500);
-        }
+        $data = [
+            'users' => $users,
+            'teams' => $teams
+        ];
+
+        return view('admin.admin-sidebar.coach-approval', compact('data'));
+    } catch (\Exception $e) {
+        Log::error('Error fetching coach approval data: '.$e->getMessage());
+        return response()->json(['message' => $e->getMessage(), 'code' => $e->getCode()], 500);
     }
+}
 
-    public function updateStatus($id, Request $request)
+public function updateStatus($id, Request $request)
 {
     try {
         $user = User::findOrFail($id);
-        $user->is_active = $request->status === 'activate';
+        if ($request->action === 'activate') {
+            $user->is_active = 1;
+        } elseif ($request->action === 'deactivate') {
+            $user->is_active = 0;
+        }
         $user->save();
 
         return response()->json([
@@ -73,6 +80,10 @@ class AdminController extends Controller
         ], 500);
     }
 }
+
+
+
+
    
    
 }
