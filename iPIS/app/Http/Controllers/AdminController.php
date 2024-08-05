@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+
+
+use App\Models\Player;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -9,24 +12,51 @@ use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
-    public function dashboard() {
+    public function dashboard()
+    {
         return view('admin.dashboard');
     }
 
-    public function documents() {
+    public function documents()
+    {
         return view('admin.admin-sidebar.documents');
     }
 
-    public function calendar() {
+    public function calendar()
+    {
         return view('admin.admin-sidebar.calendar');
     }
 
-    public function playersTeams() {
-        return view('admin.admin-sidebar.players-teams');
+    public function playersTeams(Request $request)
+    {
+        $query = Team::query();
+
+        if ($request->has('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%')
+                ->orWhere('acronym', 'like', '%' . $request->search . '%')
+                ->orWhere('sport_category', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->has('sport')) {
+            $query->where('sport_category', $request->sport);
+        }
+        if ($request->has('team')) {
+            $query->where('acronym', $request->team);
+        }
+        /*if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }*/
+
+        $teams = $query->paginate(10);
+
+        return view('admin.admin-sidebar.players-teams', compact('teams'));
     }
 
-    public function usersManagement() {
-        return view('admin.admin-sidebar.user-management');
+
+    public function usersManagement()
+    {
+        $users = User::all();
+        return view('admin.admin-sidebar.user-management', compact('users'));
     }
 
     //public function coachApproval() {
@@ -54,6 +84,23 @@ class AdminController extends Controller
     } catch (\Exception $e) {
         Log::error('Error fetching coach approval data: '.$e->getMessage());
         return response()->json(['message' => $e->getMessage(), 'code' => $e->getCode()], 500);
+
+    public function coachApproval()
+    {
+        return view('admin.admin-sidebar.coach-approval');
+    }
+
+    public function showteam($id)
+    {
+        $team = Team::find($id);
+        $coach = User::find($team->coach_id);
+        $players = Player::where('team_id', $id)->get();
+
+        return response()->json([
+            'team' => $team,
+            'coach' => $coach,
+            'players' => $players
+        ]);
     }
 }
 
