@@ -21,6 +21,7 @@ return new class extends Migration
             $table->date('birth_date')->nullable();
             $table->string('gender')->nullable();
             $table->string('password');
+            $table->boolean('is_active')->default(false); // Replace status_at with is_active
             $table->rememberToken();
             $table->timestamps();
         });

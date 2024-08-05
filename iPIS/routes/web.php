@@ -37,6 +37,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/players-teams', [AdminController::class, 'playersTeams'])->name('admin.players-teams');
     Route::get('/user-management', [AdminController::class, 'usersManagement'])->name('admin.user-management');
     Route::get('/coach-approval', [AdminController::class, 'coachApproval'])->name('admin.coach-approval');
+    Route::post('/update-status/{id}', [AdminController::class, 'updateStatus'])->name('admin.update-status');=======
     Route::get('/teams/{id}', [AdminController::class, 'showteam'])->name('admin.showteams');
 });
 

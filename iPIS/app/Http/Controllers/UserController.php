@@ -2,12 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
     public function dashboard()
     {
+        return view('dashboard');
+    }
+    public function NotActiveUser()
+    {
+        if (!Auth::user()->is_active) {
+            Auth::logout();
+            return redirect()->route('login')->withErrors(['Your account is not active yet.']);
+        }
+
+        // Your logic for the dashboard goes here
         return view('dashboard');
     }
     public function myDocuments()
@@ -47,4 +59,5 @@ class UserController extends Controller
     {
         return view('user-sidebar.my-players');
     }
+    
 }
