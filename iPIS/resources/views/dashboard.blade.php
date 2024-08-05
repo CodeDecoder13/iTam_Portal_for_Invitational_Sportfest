@@ -7,7 +7,7 @@
             <h3 class="text-lg mb-8">Welcome, Coach <span class="underline">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</span></h3>
         @endif
     
-
+        @if (Auth::check(is_active))
         <section class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <div class="rounded-lg shadow-md">
                 <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
@@ -80,5 +80,7 @@
                 <h3 class="text-xl font-bold mb-2">Document Requirements</h3>
             </div>
         </section>
-    </div>
+
+    @endif
+        </div>
 </x-app-layout>

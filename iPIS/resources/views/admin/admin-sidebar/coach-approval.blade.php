@@ -46,28 +46,5 @@
             <div class="text-center text-gray-500 py-10">No data available.</div>
         @endif
     </div>
-    <script>
-        function updateStatus(userId, status) {
-    $.ajax({
-        url: `/update-user-status/${userId}`,
-        type: 'POST',
-        data: {
-            status: status,
-            _token: '{{ csrf_token() }}'
-        },
-        success: function(response) {
-            if (response.success) {
-                $(`#status-${userId}`).text(response.user.status);
-            } else {
-                console.error('Error updating status:', response.message);
-                alert('An error occurred while updating the status.');
-            }
-        },
-        error: function(xhr, status, error) {
-            console.error('Error updating status:', error);
-            alert('An unexpected error occurred. Please try again.');
-        }
-    });
-}
-    </script>
+
 </x-app-layout>
