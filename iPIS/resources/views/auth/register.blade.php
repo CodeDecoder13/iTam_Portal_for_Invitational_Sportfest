@@ -143,7 +143,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body h-[500px] overflow-scroll">
-                    <div class="h-[700px] ">This is content</div>
+                    <img src="{{ asset('/images/dataprivacy.png') }}" alt="Data Privacy Policy" class="w-full h-full object-cover">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
