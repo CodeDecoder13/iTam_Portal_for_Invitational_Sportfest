@@ -8,16 +8,16 @@
                     @csrf
                     <div class="mb-3">
                         <label for="team-name" class="form-label">Team Name</label>
-                        <input type="text" class="form-control" id="team-name" name="team_name" placeholder="Enter Team Name">
+                        <input type="text" class="form-control" id="team-name" name="team_name" placeholder="Enter Team Name" required>
                     </div>
                     <div class="mb-3">
                         <label for="team-acronym" class="form-label">Team Name Acronym (Max of 5 letters ex. FITEC)</label>
-                        <input type="text" class="form-control" id="team-acronym" name="team_acronym" placeholder="Enter Team Acronym">
+                        <input type="text" class="form-control" id="team-acronym" name="team_acronym" placeholder="Enter Team Acronym" required>
                     </div>
                     <div class="mb-3">
                         <label for="sport" class="form-label">Sports</label>
-                        <select class="form-select" id="sport" name="sport">
-                            <option selected>Select Sport</option>
+                        <select class="form-select" id="sport" name="sport" required>
+                            <option selected disabled>Select Sport</option>
                             <option value="Men's Basketball Developmental (D)">Men's Basketball Developmental (D)</option>
                             <option value="Men's Basketball Competitive (C)">Men's Basketball Competitive (C)</option>
                             <option value="Men's Volleyball Developmental (D)">Men's Volleyball Developmental (D)</option>
@@ -40,26 +40,33 @@
 
     <script>
         document.getElementById('team-create-form').addEventListener('submit', function(e) {
-            e.preventDefault();
+    e.preventDefault();
 
-            var formData = new FormData(this);
+    var formData = new FormData(this);
 
-            fetch("{{ route('store.team') }}", {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                window.location.href = "{{ route('dashboard') }}";
-            })
-            .catch(error => {
-                alert('An error occurred while creating the team.');
-                console.error(error);
+    fetch("{{ route('store.team') }}", {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                throw new Error(JSON.stringify(data.errors));
             });
-        });
+        }
+        return response.json();
+    })
+    .then(data => {
+        alert(data.message);
+        window.location.href = "{{ route('dashboard') }}";
+    })
+    .catch(error => {
+        console.error('There was an error with the request:', error);
+        alert('Validation errors occurred: ' + error.message);
+    });
+});
     </script>
 </x-app-layout>

@@ -105,7 +105,6 @@
         }
     }
 </style>
-
 <div id="sidebar" class="flex flex-col flex-grow min-h-screen p-3 text-white sticky">
     <a href="/" class="d-flex side-head align-items-center mb-3 mb-md-3 me-md-auto text-white text-decoration-none">
         <img width="50" height="32" class="img-fluid" src="/images/userlogo.png" />
@@ -116,14 +115,18 @@
             <div class="sm:col-span-3" style="margin-bottom: 30px">
                 <label for="team" class="block text-sm font-medium leading-6 text-white">Select team</label>
                 <div class="mt-2">
-                    <select id="team" name="team" autocomplete="team-name"
-                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-                        <option>FTIC</option>
-                        <option>Dunno</option>
-                    </select>
+                    <select id="team" name="team" autocomplete="team-name" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm   
+                    sm:leading-6">
+                             <option value="" selected>Select Team</option>
+                             @foreach($teams as $team)
+                               <option value="{{ $team->id }}" {{ isset($newTeam) && $newTeam->id === $team->id ? 'selected' : '' }}>{{ $team->acronym }} - {{ $team->sport_category }}</option>
+                             @endforeach
+                             <option value="add-new-team">Add New Team</option>
+                           </select>
                 </div>
             </div>
         </li>
+        
         <li class="nav-item">
             <a href="/dashboard" class="nav-link active" aria-current="page">
                 <ion-icon name="home"></ion-icon>
@@ -170,6 +173,15 @@
         </ul>
     </div>
 </div>
+
+<script>
+    const teamSelect = document.getElementById('team');
+    teamSelect.addEventListener('change', (e) => {
+        if (e.target.value === 'add-new-team') {
+            window.location.href = '/add-teams'; 
+        }
+    });
+</script>
 <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
 
 
