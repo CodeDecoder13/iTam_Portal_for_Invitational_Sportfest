@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\Team;
+use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use App\Models\Player;
 use Illuminate\Support\Str;
@@ -63,51 +65,46 @@ class UserController extends Controller
         return view('user-sidebar.add-players');
     }
     public function storePlayers(Request $request)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'players' => 'array|required',
-                'players.*.firstName' => 'required|string|max:255',
-                'players.*.middleName' => 'nullable|string|max:255',
-                'players.*.lastName' => 'required|string|max:255',
-                'players.*.birthday' => 'required|date',
-                'players.*.gender' => 'required|string|in:Male,Female',
-                'players.*.jersey_no' => 'required|integer|min:1|max:99',
-            ]);
+{
+    try {
+        $validator = Validator::make($request->all(), [
+            'players' => 'array|required',
+            'players.*.firstName' => 'required|string|max:255',
+            'players.*.middleName' => 'nullable|string|max:255',
+            'players.*.lastName' => 'required|string|max:255',
+            'players.*.birthday' => 'required|date',
+            'players.*.gender' => 'required|string|in:Male,Female',
+            'players.*.jersey_no' => 'required|integer|min:1|max:99',
+        ]);
 
-            if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors()], 422);
-            }
-
-            
-            $teamId = auth()->user()->id;
-
-            foreach ($request->input('players') as $playerData) {
-                Player::updateOrCreate(
-                    [
-                        'team_id' => $teamId,
-                        'first_name' => $playerData['firstName'],
-                        'last_name' => $playerData['lastName']
-                    ],
-                    [
-                        'middle_name' => $playerData['middleName'] ?? null,
-                        'birthday' => $playerData['birthday'] ?? null,
-                        'gender' => $playerData['gender'] ?? null,
-                        'jersey_no' => $playerData['jersey_no']
-                    ]
-                );
-            }
-
-            return response()->json(['message' => 'Players saved successfully!']);
-
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'An error occurred while saving players.'], 500);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
         }
+
+        $teamId = auth()->user()->team_id;
+
+        foreach ($request->input('players') as $playerData) {
+            Player::updateOrCreate(
+                [
+                    'team_id' => $teamId,
+                    'first_name' => $playerData['firstName'],
+                    'last_name' => $playerData['lastName']
+                ],
+                [
+                    'middle_name' => $playerData['middleName'] ?? null,
+                    'birthday' => $playerData['birthday'] ?? null,
+                    'gender' => $playerData['gender'] ?? null,
+                    'jersey_no' => $playerData['jersey_no']
+                ]
+            );
+        }
+
+        return response()->json(['message' => 'Players saved successfully!']);
+
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'An error occurred while saving players.'], 500);
     }
-
-    
-    
-
+}
 
     public function myCalendar()
     {
@@ -118,5 +115,56 @@ class UserController extends Controller
     {
         return view('user-sidebar.my-players');
     }
-    
+    public function addTeams()
+    {
+        return view('user-sidebar.add-Teams');
+    }
+    public function storeTeam(Request $request)
+    {
+
+        // Validate the incoming request
+        $validator = Validator::make($request->all(), [
+            'team_name' => 'required|string|max:255',
+            'team_acronym' => 'required|string|max:5',
+            'sport' => 'required|string',
+            'team_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:25600',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Handle the team logo upload
+        if ($request->hasFile('team_logo')) {
+            $teamLogoPath = $request->file('team_logo')->store('public/team_logos');
+            $teamLogoPath = str_replace('public/', '', $teamLogoPath);
+        } else {
+            $teamLogoPath = null;
+        }
+
+        
+        // Retrieve the newly created or updated team
+       // $team = Team::where('name', $request->input('team_name'))->firstOrFail();
+
+        // Get the currently signed-in user's ID
+        $coachId = auth()->user()->id;
+
+        // Create or find the team
+        $team = Team::updateOrCreate(
+            ['name' => $request->input('team_name')],
+            [
+                'acronym' => $request->input('team_acronym'),
+                'sport_category' => $request->input('sport'),
+                'coach_id' => $coachId,
+                'logo_path' => $teamLogoPath,
+            ]
+        );
+        
+        // Return a response
+        //return response()->json(['message' => 'Team saved successfully!']);
+        return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
+    }
 }
+    
+    
+
