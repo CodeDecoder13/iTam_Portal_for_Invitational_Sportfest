@@ -144,6 +144,12 @@
                 Users
             </a>
         </li>
+        <li>
+            <a href="{{ route('admin.coach-approval') }}" class="nav-link text-white">
+                <ion-icon name="people"></ion-icon>
+                Coaches
+            </a>
+        </li>
     </ul>
     <hr />
     <div class="m">

@@ -1,9 +1,9 @@
 <x-app-layout>
 
-        <h1 class="text-2xl">Dashboard</h1>
+    <h1 class="text-2xl font-bold">Admin Dashboard</h1>
              <!-- Fetch Current User Login -->
         @if (Auth::guard('admin')->check())
-            <h3 class="text-lg mb-8">Welcome, Sado Admin <span class="underline">{{ Auth::guard('admin')->user()->name }}</span></h3>
+            <h3 class="text-lg mb-8">Welcome, Sado <span class="underline">{{ Auth::guard('admin')->user()->name }}</span></h3>
         @endif
 
     
