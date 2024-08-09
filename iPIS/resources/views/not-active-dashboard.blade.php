@@ -5,4 +5,5 @@
     @if (Auth::check())
         <h3 class="text-lg mb-8">Welcome, Coach <span class="underline">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</span></h3>
     @endif
+    
 </x-app-layout>
