@@ -141,5 +141,10 @@ class AdminController extends Controller
             ], 500);
         }
     }
+    public function teamdocuments()
+    {
+        return view('admin.admin-sidebar.players-team-documents');
+    }
+    
 
 }

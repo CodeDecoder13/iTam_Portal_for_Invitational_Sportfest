@@ -32,6 +32,7 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::post('/store/team', [UserController::class, 'storeTeam'])->name('store.team');
     Route::get('/add-players', [UserController::class, 'addPlayers'])->name('add-players');
     Route::post('/store-players', [UserController::class, 'storePlayers'])->name('store.players');
+    
    
 });
 
@@ -46,7 +47,10 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::post('/update-status/{id}', [AdminController::class, 'updateStatus'])->name('admin.update-status');
     Route::get('/teams/{id}', [AdminController::class, 'showteam'])->name('admin.showteams');
     Route::get('/sidebar', [UserController::class, 'getCurrentTeams'])->name('sidebar');
+    Route::get('/players-team-documents', [AdminController::class, 'teamdocuments'])->name('admin.playersTeamDocuments');
 });
+
+
 
 Route::post('/testing-site', [TestingController::class, 'test'])->name('test.');
 
