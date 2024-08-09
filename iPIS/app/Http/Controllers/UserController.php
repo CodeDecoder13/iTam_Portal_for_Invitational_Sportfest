@@ -42,24 +42,25 @@ class UserController extends Controller
 
         switch ($type) {
             case 'CertificateOfRegistration':
-                return view('user-sidebar.my-documents.CertificateOfRegistration');
+                return view('user-sidebar.my-documents.CerfiticateOfRegistration', compact('players'));
             case 'GalleryOfCoaches':
                 return view('user-sidebar.my-documents.GalleryOfCoaches');
             case 'GalleryOfPlayers':
-                return view('user-sidebar.my-documents.GalleryOfPlayers');
+                return view('user-sidebar.my-documents.GalleryOfPlayers', compact('players'));
             case 'ParentalConsent':
-                return view('user-sidebar.my-documents.ParentalConsent');
+                return view('user-sidebar.my-documents.ParentalConsent', compact('players'));
             case 'SummaryOfPlayers':
                 return view('user-sidebar.my-documents.SummaryOfPlayers', compact('players'));
             case 'PhotocopyOfVaccineCard':
-                return view('user-sidebar.my-documents.PhotocopyOfVaccineCard');
+                return view('user-sidebar.my-documents.PhotocopyOfVaccineCard', compact('players'));
             case 'PhotocopyOfSchoolID':
-                return view('user-sidebar.my-documents.PhotocopyOfSchoolID');
+                return view('user-sidebar.my-documents.PhotocopyOfSchoolID', compact('players'));
             default:
                 return redirect()->route('my-documents');
                 //return view('user-sidebar.my-documents.sub',compact('type'));
         }
     }
+   
     public function addPlayers()
     {
         return view('user-sidebar.add-players');
