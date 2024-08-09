@@ -3,10 +3,18 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TestingController;
+use App\Http\Controllers\PlayerController;
 
+
+
+Route::get('/players', [PlayerController::class, 'index'])->name('players.index');
+Route::post('/players', [PlayerController::class, 'store'])->name('players.store');
+Route::get('players/{id}/edit', [PlayerController::class, 'edit'])->name('players.edit');
+Route::put('players/{id}', [PlayerController::class, 'update'])->name('players.update');
+
+Route::resource('players', PlayerController::class);
 Route::get('/', function () {
     return view('auth.login');
 });
@@ -23,6 +31,8 @@ Route::middleware('auth')->group(function () {
 
 // added for sidebar routes
 Route::middleware(['auth','verified'])->group(function () {
+
+
     Route::get('dashboard', [UserController::class, 'dashboard'])->name('dashboard');
     Route::get('/my-documents', [UserController::class, 'myDocuments'])->name('my-documents');
     Route::get('/my-documents/{type}', [UserController::class, 'myDocuments_sub'])->name('my-documents_sub');
@@ -31,7 +41,7 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/add-teams', [UserController::class, 'addTeams'])->name('add-teams');
     Route::post('/store/team', [UserController::class, 'storeTeam'])->name('store.team');
     Route::get('/add-players', [UserController::class, 'addPlayers'])->name('add-players');
-    Route::post('/store-players', [UserController::class, 'storePlayers'])->name('store.players');
+    Route::post('/store-players', [UserController::class, 'storePlayers'])->name('store.players');  // This route should match your form action
    
 });
 
@@ -48,10 +58,10 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/sidebar', [UserController::class, 'getCurrentTeams'])->name('sidebar');
 });
 
-Route::post('/testing-site', [TestingController::class, 'test'])->name('test.');
-
-//Route for save team
+// Testing routes
+Route::post('/testing-site', [TestingController::class, 'test'])->name('test.site');
 Route::post('/save-team', [TestingController::class, 'addteam'])->name('test.addteam');
-
+Route::resource('players', PlayerController::class);
+// Authentication routes
 require __DIR__.'/auth.php';
 require __DIR__.'/admin-auth.php';

@@ -65,48 +65,36 @@ class UserController extends Controller
     {
         return view('user-sidebar.add-players');
     }
+    public function summaryOfPlayers()
+    {
+        $players = Player::all(); // Assuming you have a Player model to fetch players data
+        return view('summary-of-players', compact('players'));
+    }
+
     public function storePlayers(Request $request)
-{
-    try {
-        $validator = Validator::make($request->all(), [
-            'players' => 'array|required',
+    {
+        $request->validate([
             'players.*.firstName' => 'required|string|max:255',
-            'players.*.middleName' => 'nullable|string|max:255',
             'players.*.lastName' => 'required|string|max:255',
             'players.*.birthday' => 'required|date',
             'players.*.gender' => 'required|string|in:Male,Female',
             'players.*.jersey_no' => 'required|integer|min:1|max:99',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+        foreach ($request->players as $playerData) {
+            $player = new Player();
+            $player->first_name = $playerData['firstName'];
+            $player->middle_name = $playerData['middleName'];
+            $player->last_name = $playerData['lastName'];
+            $player->birthday = $playerData['birthday'];
+            $player->gender = $playerData['gender'];
+            $player->jersey_no = $playerData['jersey_no'];
+            $player->status = 'For Review'; // Default status
+            $player->save();
         }
 
-        $teamId = auth()->user()->team_id;
-
-        foreach ($request->input('players') as $playerData) {
-            Player::updateOrCreate(
-                [
-                    'team_id' => $teamId,
-                    'first_name' => $playerData['firstName'],
-                    'last_name' => $playerData['lastName']
-                ],
-                [
-                    'middle_name' => $playerData['middleName'] ?? null,
-                    'birthday' => $playerData['birthday'] ?? null,
-                    'gender' => $playerData['gender'] ?? null,
-                    'jersey_no' => $playerData['jersey_no']
-                ]
-            );
-        }
-
-        return response()->json(['message' => 'Players saved successfully!']);
-
-    } catch (\Exception $e) {
-        return response()->json(['message' => 'An error occurred while saving players.'], 500);
+        return response()->json(['message' => 'Players added successfully.']);
     }
-}
-
     public function myCalendar()
     {
         return view('user-sidebar.my-calendar');
