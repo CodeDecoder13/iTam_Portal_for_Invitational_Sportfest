@@ -1,187 +1,143 @@
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-    #sidebar {
-        background-image: url(''), linear-gradient(),
-        rgba(0, 0, 0, 0.5);
-        background-image: linear-gradient(rgba(30, 126, 65, 1),
-                       rgba(15, 98, 45, 0.3),rgba(30, 126, 65, .9)), url("{{ asset('images/Players1.png') }}");
-        background-size: cover;
-        /* Cover the entire container */
-        background-position: center;
-        /* Center the image */
-        #1E7E41, #0F622D
-        background-repeat: no-repeat;
-        /* Prevent repeating */
-        height: 100vh;
-        /* Full width for smaller screens */
-        /* Maximum width for larger screens */
-        position: ;
-        /* Fixed position for sidebar */
-        top: 0;
-        left: 0;
-        z-index: 1000;
-        /* Ensure it's on top */
-        overflow-y: auto;
-        /* Allow scrolling if content overflows */
-    }
+<x-app-layout>
+    <div class="flex-grow px-4 py-6">
+        <!-- Check if the user is active or not -->
+        @if (Auth::user()->is_active)
+            <!-- Main Dashboard for active users -->
+            <h1 class="text-2xl font-bold">Dashboard</h1>
+            @if (Auth::check())
+                <h3 class="text-lg mb-8">Welcome, Coach <span class="underline">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</span></h3>
+            @endif
 
-    .nav-link {
-        width: auto;
-        /* Auto width for better responsiveness */
-        font-family: 'Inter', sans-serif;
-        font-weight: 500;
-        font-size: 13px;
-        line-height: 24px;
-        color: #FFFFFF;
-        text-decoration: none;
-        /* Remove underline */
-        display: flex;
-        /* Flex display for better alignment */
-        align-items: center;
-        gap: 8px;
-        /* Gap between icon and text */
-        padding: 8px 16px;
-        /* Padding for better touch target */
-    }
+            <section class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div class="rounded-lg shadow-md">
+                    <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
+                        <h3 class="text-xl font-bold mb-2">Recent Activities</h3>
+                    </div>
+                    <div class="rounded-b-lg p-4 py-2">
+                        <ul>
+                            <li class="border text-xs p-2 flex">
+                                <div class="text-green-700 text-xl">
+                                    <ion-icon name="document"></ion-icon>
+                                </div>
+                                <div>
+                                    <span class="font-bold">Document Comment:</span> "Full name and address doesn’t match ID
+                                    details” - RAC Representative"
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="rounded-lg shadow-md">
+                    <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
+                        <h3 class="text-xl font-bold mb-2">Recent Activities</h3>
+                    </div>
+                    <div class="rounded-b-lg p-4 py-2">
+                        <ul>
+                            <li class="border text-xs p-2 flex">
+                                <div class="w-8/12 border-e-2 flex-grow flex">
+                                    <div><img width="15" class="img-fluid" src="/images/userlogo.png" /></div>
+                                    <div class="text-center">
+                                        <div><span>FITGC</span> VS <span>MPTGC</span></div>
+                                        <div class="text-xs">Men’s Basketball (D)</div>
+                                    </div>
+                                    <div><img width="15" class="img-fluid" src="/images/userlogo.png" /></div>
+                                </div>
+                                <div class="w-4/12 text-end">
+                                    <p class="font-bold">Sept. 11, 2024</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="rounded-lg shadow-md">
+                    <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
+                        <h3 class="text-xl font-bold mb-2">Standing</h3>
+                    </div>
+                    <div class="rounded-b-lg p-4 py-2">
+                        <ol type="1">
+                            <li type="1" class="border text-xs flex w-full">
+                                <div class="bg-yellow-100 p-2 w-1/12">1</div>
+                                <div class="my-2 ps-2 w-6/12 border-e-2">FTICGC</div>
+                                <div class="p-2 w-3/12">Wins</div>
+                                <div class="p-2 w-2/12 font-bold">06</div>
+                            </li>
+                            <li type="1" class="border text-xs flex w-full">
+                                <div class="bg-slate-300 p-2 w-1/12">1</div>
+                                <div class="my-2 ps-2 w-6/12 border-e-2">FTICGC</div>
+                                <div class="p-2 w-3/12">Wins</div>
+                                <div class="p-2 w-2/12 font-bold">06</div>
+                            </li>
+                            <li type="1" class="border text-xs flex w-full">
+                                <div class="bg-red-100 p-2 w-1/12">1</div>
+                                <div class="my-2 ps-2 w-6/12 border-e-2">FTICGC</div>
+                                <div class="p-2 w-3/12">Wins</div>
+                                <div class="p-2 w-2/12 font-bold">06</div>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
 
-    .side-head {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        /* Space between image and text */
-        align-items: center;
-        padding: 15px;
-        gap: 15px;
-        flex-shrink: 0;
-        /* Prevent shrinking */
-    }
+            <!-- Sidebar Script -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Enable sidebar functionality for active users
+                    let sidebarLinks = document.querySelectorAll('.sidebar a');
+                    sidebarLinks.forEach(function (link) {
+                        link.classList.remove('disabled-link');
+                        link.addEventListener('click', function (event) {
+                            if (link.classList.contains('disabled-link')) {
+                                event.preventDefault();
+                            }
+                        });
+                    });
+                });
+            </script>
+        @else
+            <!-- Hold message for inactive users -->
+            <h1 class="text-3xl font-bold mb-4">Dashboard</h1>
+            <h3 class="text-xl mb-8">Welcome, Coach <span class="underline">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</span></h3>
+            <div class="flex flex-col items-center justify-center min-h-screen">
+                <div class="text-center">
+                    <div class="mb-6">
+                        <img src="{{ asset('/images/search-magnifying.png') }}" alt="Approval Icon" class="w-24 h-24 mx-auto">
+                    </div>
+                    <h1 class="text-xl font-semibold mb-4">Your account is temporarily on hold for approval by our admins.</h1>
+                    <p class="text-gray-600 mb-8">Please allow 24-48 hours for the approval process. We appreciate your patience.</p>
 
-    .side-head img {
-        width: 50px;
-        height: 32px;
-    }
+                    <!-- Disable sidebar functionality for inactive users -->
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            let sidebarLinks = document.querySelectorAll('.sidebar a');
+                            sidebarLinks.forEach(function (link) {
+                                link.classList.add('disabled-link');
+                                link.addEventListener('click', function (event) {
+                                    if (link.classList.contains('disabled-link')) {
+                                        event.preventDefault();
+                                    }
+                                });
+                            });
+                        });
+                    </script>
 
-    .side-head span {
-        font-size: 1.25rem;
-    }
-
-    ul {
-        list-style: none;
-        /* Remove default list styling */
-        padding: 0;
-        /* Remove default padding */
-    }
-
-    li {
-        margin-bottom: 10px;
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        #sidebar {
-            width: 100%;
-            /* Full width on smaller screens */
-            max-width: none;
-            /* Remove max-width */
-            height: auto;
-            /* Auto height to fit content */
-        }
-
-        .side-head {
-            flex-direction: column;
-            /* Stack image and text vertically */
-            align-items: flex-start;
-            /* Align items to start */
-        }
-
-        .side-head span {
-            font-size: 1rem;
-            /* Adjust font size for smaller screens */
-        }
-
-        .nav-link {
-            font-size: 12px;
-            /* Adjust font size for smaller screens */
-        }
-    }
-</style>
-<div id="sidebar" class="flex flex-col flex-grow min-h-screen p-3 text-white sticky">
-    <a href="/" class="d-flex side-head align-items-center mb-3 mb-md-3 me-md-auto text-white text-decoration-none">
-        <img width="50" height="32" class="img-fluid" src="/images/userlogo.png" />
-        <span class="fs-4">ITAM INVITATIONAL SPORTFEST COMPILER</span>
-    </a>
-    <ul class="nav nav-pills flex-column mb-auto">
-        <li class="nav-item">
-            <div class="sm:col-span-3" style="margin-bottom: 30px">
-                <label for="team" class="block text-sm font-medium leading-6 text-white">Select team</label>
-                <div class="mt-2">
-                    <select id="team" name="team" autocomplete="team-name" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm   
-                    sm:leading-6">
-                             <option value="" selected>Select Team</option>
-                             @foreach($teams as $team)
-                               <option value="{{ $team->id }}" {{ isset($newTeam) && $newTeam->id === $team->id ? 'selected' : '' }}>{{ $team->acronym }} - {{ $team->sport_category }}</option>
-                             @endforeach
-                             <option value="add-new-team">Add New Team</option>
-                           </select>
+                    <!-- Logout Button -->
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="px-4 py-2 bg-green-700 text-white rounded-full hover:bg-green-800 focus:outline-none">
+                            Logout
+                        </button>
+                    </form>
                 </div>
             </div>
-        </li>
-        
-        <li class="nav-item">
-            <a href="/dashboard" class="nav-link active" aria-current="page">
-                <ion-icon name="home"></ion-icon>
-                Home
-            </a>
-        </li>
-        <li>
-            <a href="{{ route('my-documents') }}" class="nav-link text-white">
-                <ion-icon name="document"></ion-icon>
-                My Documents
-            </a>
-        </li>
-        <li>
-            <a href="{{ route('my-calendar') }}" class="nav-link text-white">
-                <ion-icon name="people"></ion-icon>
-                My Calendar
-            </a>
-        </li>
-        <li>
-            <a href="{{ route('my-players') }}" class="nav-link text-white">
-                <ion-icon name="people"></ion-icon>
-                My Players
-            </a>
-        </li>
-    </ul>
-    <hr />
-    <div class="m">
-        <ul class="nav nav-pills flex-column">
-            <li>
-                <a href="#" class="nav-link text-white">
-                    <ion-icon name="settings"></ion-icon>
-                    Settings
-                </a>
-            </li>
-            <li>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="nav-link text-white"
-                        style="background: none; border: none; padding: 0; cursor: pointer;">
-                        <ion-icon name="log-out"></ion-icon>Logout
-                    </button>
-                </form>
-            </li>
-        </ul>
+        @endif
     </div>
-</div>
+</x-app-layout>
 
-<script>
-    const teamSelect = document.getElementById('team');
-    teamSelect.addEventListener('change', (e) => {
-        if (e.target.value === 'add-new-team') {
-            window.location.href = '/add-teams'; 
-        }
-    });
-</script>
-<script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
-
-
+<!-- Common CSS for disabling links -->
+<style>
+    .disabled-link {
+        pointer-events: none;
+        color: gray;
+        cursor: not-allowed;
+    }
+</style>

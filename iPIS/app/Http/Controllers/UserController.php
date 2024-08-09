@@ -16,8 +16,9 @@ class UserController extends Controller
 {
     public function dashboard()
     {
+        
         return view('dashboard');
-    }
+    }   
         
    
     public function NotActiveUser()
@@ -34,11 +35,19 @@ class UserController extends Controller
     {
         return view('user-sidebar.my-documents');
     }
+    public function selectTeam()
+    {
+        $coachId = Auth::user()->id;
+        $teams = Team::where('coach_id', $coachId)->get();
+        return view('layouts.sidebar', compact('teams'));
+    }
 
 
     public function myDocuments_sub($type)
     {
-        $players = Player::all();
+        $coachId = Auth::user()->id;
+        //$players = Player::all();
+        $teams = Team::where('coach_id', $coachId)->get();
 
         switch ($type) {
             case 'CertificateOfRegistration':

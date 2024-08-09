@@ -32,6 +32,7 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::post('/store/team', [UserController::class, 'storeTeam'])->name('store.team');
     Route::get('/add-players', [UserController::class, 'addPlayers'])->name('add-players');
     Route::post('/store-players', [UserController::class, 'storePlayers'])->name('store.players');
+    Route::get('/select-team', [UserController::class, 'selectTeam'])->name('select-team');
     
    
 });
