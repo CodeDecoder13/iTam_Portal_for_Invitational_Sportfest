@@ -1,5 +1,11 @@
 <x-app-layout>
 
+    <h1 class="text-2xl font-bold">Admin Dashboard</h1>
+             <!-- Fetch Current User Login -->
+        @if (Auth::guard('admin')->check())
+            <h3 class="text-lg mb-8">Welcome, Sado <span class="underline">{{ Auth::guard('admin')->user()->name }}</span></h3>
+        @endif
+
     
     <div class="container mx-auto p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <div class=" bg-white hover:bg-green-700 hover:text-white p-4 rounded-lg transition duration-300">

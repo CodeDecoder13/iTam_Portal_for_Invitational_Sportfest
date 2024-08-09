@@ -14,11 +14,14 @@ return new class extends Migration
         Schema::create('players', function (Blueprint $table) {
             $table->id();
             $table->foreignId('team_id')->constrained()->onDelete('cascade');
+            $table->foreignId('coach_id')->constrained('users')->onDelete('cascade'); // Adding the coach_id foreign key
+            $table->string('jersey_no', 10);
             $table->string('first_name', 255);
             $table->string('middle_name', 255)->nullable();
             $table->string('last_name', 255);
             $table->date('birthday')->nullable();
             $table->enum('gender', ['Male', 'Female'])->nullable();
+            $table->enum('status', ['Approved', 'For Review', 'Rejected', 'No File Attached'])->default('No File Attached');
             $table->timestamps();
         });
     }

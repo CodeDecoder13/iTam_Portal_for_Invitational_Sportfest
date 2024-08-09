@@ -115,33 +115,39 @@
     <ul class="nav nav-pills flex-column mb-auto">
         
         <li class="nav-item">
-            <a href="#" class="nav-link active" aria-current="page">
+            <a href="{{ route('admin.dashboard') }}" class="nav-link active" aria-current="page">
                 <ion-icon name="home"></ion-icon>
                 Home
             </a>
         </li>
         <li>
-            <a href="{{ route('documents') }}" class="nav-link text-white">
+            <a href="{{ route('admin.documents') }}" class="nav-link text-white">
                 <ion-icon name="document"></ion-icon>
                 Documents
             </a>
         </li>
         <li>
-            <a href="{{ route('my-calendar') }}" class="nav-link text-white">
+            <a href="{{ route('admin.calendar') }}" class="nav-link text-white">
                 <ion-icon name="people"></ion-icon>
                 Calendar
             </a>
         </li>
         <li>
-            <a href="{{ route('my-players') }}" class="nav-link text-white">
+            <a href="{{ route('admin.players-teams') }}" class="nav-link text-white">
                 <ion-icon name="people"></ion-icon>
                 Players & Teams
             </a>
         </li>
         <li>
-            <a href="{{ route('my-players') }}" class="nav-link text-white">
+            <a href="{{ route('admin.user-management') }}" class="nav-link text-white">
                 <ion-icon name="people"></ion-icon>
                 Users
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('admin.coach-approval') }}" class="nav-link text-white">
+                <ion-icon name="people"></ion-icon>
+                Coaches
             </a>
         </li>
     </ul>
