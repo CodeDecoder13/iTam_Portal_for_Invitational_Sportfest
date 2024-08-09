@@ -30,6 +30,22 @@
 
                 <form id="wizard-form" method="POST" action="">
                     @csrf
+
+                    @if (session('success'))
+                    <div class="alert alert-success mb-4">
+                        {{ session('success') }}
+                    </div>
+                    @endif
+            
+                    @if ($errors->any())
+                    <div class="alert alert-danger mb-4">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
                     <div class="wizard-step" id="step-1">
                         <div class="mb-4 flex space-x-4">
                             <!-- first_name -->

@@ -28,6 +28,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Check if the user is active
+        $user = Auth::user();
+        if ($user->is_active == 0) {
+            return redirect()->route('not-active-dashboard');
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
