@@ -2,15 +2,15 @@
 <style>
     #sidebar {
         background-image: url(''), linear-gradient(),
-        rgba(0, 0, 0, 0.5);
+            rgba(0, 0, 0, 0.5);
         background-image: linear-gradient(rgba(30, 126, 65, 1),
-                       rgba(15, 98, 45, 0.3),rgba(30, 126, 65, .9)), url("{{ asset('images/Players1.png') }}");
+                rgba(15, 98, 45, 0.3), rgba(30, 126, 65, .9)), url("{{ asset('images/Players1.png') }}");
         background-size: cover;
         /* Cover the entire container */
         background-position: center;
         /* Center the image */
-        #1E7E41, #0F622D
-        background-repeat: no-repeat;
+        #1E7E41,
+        #0F622D background-repeat: no-repeat;
         /* Prevent repeating */
         height: 100vh;
         /* Full width for smaller screens */
@@ -112,55 +112,64 @@
     </a>
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
-            <div class="sm:col-span-3" style="margin-bottom: 30px">
-                <label for="team" class="block text-sm font-medium leading-6 text-white">Select team</label>
-                <div class="mt-2">
-                    <select id="team" name="team" autocomplete="team-name" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm   
+            @if (Auth::user()->is_active)
+                <div class="sm:col-span-3" style="margin-bottom: 30px">
+                    <label for="team" class="block text-sm font-medium leading-6 text-white">Select team</label>
+                    <div class="mt-2">
+                        <select id="team" name="team" autocomplete="team-name"
+                            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm   
                     sm:leading-6">
-                             <option value="" selected>Select Team</option>
-                             @foreach($teams as $team)
-                               <option value="{{ $team->id }}" {{ isset($newTeam) && $newTeam->id === $team->id ? 'selected' : '' }}>{{ $team->acronym }} - {{ $team->sport_category }}</option>
-                             @endforeach
-                             <option value="add-new-team">Add New Team</option>
-                           </select>
+                            <option value="" selected>Select Team</option>
+                            @foreach ($teams as $team)
+                                <option value="{{ $team->id }}"
+                                    {{ isset($newTeam) && $newTeam->id === $team->id ? 'selected' : '' }}>
+                                    {{ $team->acronym }} - {{ $team->sport_category }}</option>
+                            @endforeach
+                            <option value="add-new-team">Add New Team</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
+            @endif
         </li>
-        
+
         <li class="nav-item">
             <a href="/dashboard" class="nav-link active" aria-current="page">
                 <ion-icon name="home"></ion-icon>
                 Home
             </a>
         </li>
-        <li>
-            <a href="{{ route('my-documents') }}" class="nav-link text-white">
-                <ion-icon name="document"></ion-icon>
-                My Documents
-            </a>
-        </li>
-        <li>
-            <a href="{{ route('my-calendar') }}" class="nav-link text-white">
-                <ion-icon name="people"></ion-icon>
-                My Calendar
-            </a>
-        </li>
-        <li>
-            <a href="{{ route('my-players') }}" class="nav-link text-white">
-                <ion-icon name="people"></ion-icon>
-                My Players
-            </a>
-        </li>
+        @if (Auth::user()->is_active)
+            <li>
+                <a href="{{ route('my-documents') }}" class="nav-link text-white">
+                    <ion-icon name="document"></ion-icon>
+                    My Documents
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('my-calendar') }}" class="nav-link text-white">
+                    <ion-icon name="people"></ion-icon>
+                    My Calendar
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('my-players') }}" class="nav-link text-white">
+                    <ion-icon name="people"></ion-icon>
+                    My Players
+                </a>
+            </li>
+        @endif
     </ul>
     <hr />
     <div class="m">
         <ul class="nav nav-pills flex-column">
-            <li>
-                <a href="#" class="nav-link text-white">
-                    <ion-icon name="settings"></ion-icon>
-                    Settings
-                </a>
-            </li>
+            @if (Auth::user()->is_active)
+                <li>
+                    <a href="#" class="nav-link text-white">
+                        <ion-icon name="settings"></ion-icon>
+                        Settings
+                    </a>
+                </li>
+            @endif
             <li>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -178,7 +187,7 @@
     const teamSelect = document.getElementById('team');
     teamSelect.addEventListener('change', (e) => {
         if (e.target.value === 'add-new-team') {
-            window.location.href = '/add-teams'; 
+            window.location.href = '/add-teams';
         }
     });
 </script>
