@@ -84,7 +84,7 @@
             <div class="flex flex-col items-center justify-center min-h-screen">
                 <div class="text-center">
                     <div class="mb-6">
-                        <img src="{{ asset('public/images/search-magnifying.png') }}" alt="Approval Icon" class="w-24 h-24 mx-auto">
+                        <img src="{{ asset('/images/search-magnifying.png') }}" alt="Approval Icon" class="w-24 h-24 mx-auto">
                     </div>
                     <h1 class="text-xl font-semibold mb-4">Your account is temporarily on hold for approval by our admins.</h1>
                     <p class="text-gray-600 mb-8">Please allow 24-48 hours for the approval process. We appreciate your patience.</p>
