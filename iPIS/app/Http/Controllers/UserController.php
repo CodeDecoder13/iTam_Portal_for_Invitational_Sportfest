@@ -20,17 +20,6 @@ class UserController extends Controller
         return view('dashboard');
     }   
         
-   
-    public function NotActiveUser()
-    {
-        if (!Auth::user()->is_active) {
-            Auth::logout();
-            return redirect()->route('login')->withErrors(['Your account is not active yet.']);
-        }
-
-        // Your logic for the dashboard goes here
-        return view('dashboard');
-    }
     public function myDocuments()
     {
         return view('user-sidebar.my-documents');

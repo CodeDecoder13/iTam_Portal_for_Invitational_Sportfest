@@ -25,7 +25,7 @@
         <div class="flex items-center justify-center w-full md:w-1/2 lg:w-1/2">
             <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md flex flex-col justify-center login-container">
                 <div class="flex justify-center mb-4">
-                    <img src="{{ asset('images/userlogo.png') }}" alt="Logo" width="120px">
+                    <img src="{{ asset('images/logorac.png') }}" alt="Logo" width="120px">
                 </div>
                 
                 <h3 class="text-center mb-3 text-xl font-bold">Login to your account</h3>
