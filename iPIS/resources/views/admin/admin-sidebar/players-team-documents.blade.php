@@ -16,13 +16,13 @@
             </div>
             @php
                 $array = [
-                    ['Summary of Players', 'August 1, 2024', 1],
+                    ['Summary of Players', 'August 1, 2024', 0],
                     ['Gallery of Players', 'May 15, 2024', 0],
-                    ['Gallery of Coaches', 'July 10, 2024', 1],
-                    ['Parental Consent', 'August 1, 2024', 1],
-                    ['Photocopy of School ID', 'August 1, 2024', 1],
-                    ['Certificate of Registration', 'June 30, 2024', 1],
-                    ['Photocopy of Vaccine Card', 'July 20, 2024', 1],
+                    ['Gallery of Coaches', 'July 10, 2024', 0],
+                    ['Parental Consent', 'August 1, 2024', 0],
+                    ['Photocopy of School ID', 'August 1, 2024', 0],
+                    ['Certificate of Registration', 'June 30, 2024', 0],
+                    ['Photocopy of Vaccine Card', 'July 20, 2024', 0],
                 ];
             @endphp
             @foreach ($array as $a)
