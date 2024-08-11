@@ -35,7 +35,7 @@ class UserController extends Controller
     public function myDocuments_sub($type)
     {
         $coachId = Auth::user()->id;
-        //$players = Player::all();
+        $players = Player::all();
         $teams = Team::where('coach_id', $coachId)->get();
 
         switch ($type) {
