@@ -89,9 +89,9 @@ class AdminController extends Controller
 {
     try {
         // Select all users with their corresponding team info (if available)
-        $users = User::select('users.id', 'users.first_name', 'users.last_name', 'users.is_active', 'users.created_at')
+        $users = User::select('users.id', 'users.first_name', 'users.last_name', 'users.school_name', 'users.role', 'users.is_active', 'users.created_at')
             ->leftJoin('teams', 'users.id', '=', 'teams.coach_id')
-            ->groupBy('users.id', 'users.first_name', 'users.last_name', 'users.is_active', 'users.created_at')
+            ->groupBy('users.id', 'users.first_name', 'users.last_name', 'users.school_name', 'users.role', 'users.is_active', 'users.created_at')
             ->get();
 
         // Fetch teams

@@ -16,10 +16,12 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->string('email')->unique();
-            $table->string('role')->default('user');
+            $table->string('is_role')->default('user');
             $table->timestamp('email_verified_at')->nullable();
             $table->date('birth_date')->nullable();
             $table->string('gender')->nullable();
+            $table->string('school_name')->nullable();
+            $table->string('role')->nullable();
             $table->string('password');
             $table->boolean('is_active')->default(false); // Replace status_at with is_active
             $table->rememberToken();
