@@ -49,8 +49,8 @@ class UserController extends Controller
                 return view('user-sidebar.my-documents.ParentalConsent', compact('players'));
             case 'SummaryOfPlayers':
                 return view('user-sidebar.my-documents.SummaryOfPlayers', compact('players'));
-            case 'PhotocopyOfVaccineCard':
-                return view('user-sidebar.my-documents.PhotocopyOfVaccineCard', compact('players'));
+            case 'BirthCertificate':
+                return view('user-sidebar.my-documents.BirthCertificate', compact('players'));
             case 'PhotocopyOfSchoolID':
                 return view('user-sidebar.my-documents.PhotocopyOfSchoolID', compact('players'));
             default:

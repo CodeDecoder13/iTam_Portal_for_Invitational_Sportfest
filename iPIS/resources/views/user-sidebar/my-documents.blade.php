@@ -17,12 +17,12 @@
             @php
                 $array = [
                     ['Summary of Players', 'August 1, 2024', 0],
-                    ['Gallery of Players', 'May 15, 2024', 0],
-                    ['Gallery of Coaches', 'July 10, 2024', 0],
+                    ['Official Gallery of Athletes', 'May 15, 2024', 0],
+                    ['Official Gallery of Coaches', 'July 10, 2024', 0],
                     ['Parental Consent', 'August 1, 2024', 0],
                     ['Photocopy of School ID', 'August 1, 2024', 0],
-                    ['Certificate of Registration', 'June 30, 2024', 0],
-                    ['Photocopy of Vaccine Card', 'July 20, 2024', 0],
+                    ['Athletes Certificate of Enrolment', 'June 30, 2024', 0],
+                    ['PSA Birth Certificate', 'July 20, 2024', 0],
                 ];
             @endphp
             @foreach ($array as $a)
@@ -73,8 +73,8 @@
                             <a href="{{ route('my-documents_sub', 'CertificateOfRegistration') }}">
                                 <ion-icon name="document"></ion-icon>
                             </a>
-                        @elseif ($a[0] == 'Photocopy of Vaccine Card')
-                            <a href="{{ route('my-documents_sub', 'PhotocopyOfVaccineCard') }}">
+                        @elseif ($a[0] == 'BirthCertificate')
+                            <a href="{{ route('my-documents_sub', 'BirthCertificate') }}">
                                 <ion-icon name="document"></ion-icon>
                             </a>
                         @else

@@ -10,6 +10,7 @@ use App\Models\Admin;
 use App\Models\Player;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
@@ -55,26 +56,31 @@ class AdminController extends Controller
 
 
     public function usersManagement()
-    {
-        try {
-            $users = User::select('users.first_name', 'users.last_name', 'users.email', 'users.is_active', 'users.created_at', 'users.role')
-                ->get();
+{
+    try {
+        $users = User::select('first_name', 'last_name', 'email', 'is_active', 'created_at', 'role')
+            ->get();
 
-            $admins = Admin::all(); // Fetch all teams if needed
+        $admins = Admin::select('name', 'email', 'is_active', 'created_at', 'role')
+            ->get();
 
-            Log::info('Fetched users: ', $users->toArray());
+        Log::info('Fetched users: ', $users->toArray());
+        Log::info('Fetched admins: ', $admins->toArray());
 
-            $data = [
-                'users' => $users,
-                'admins' => $admins,
-            ];
+        $data = [
+            'users' => $users,
+            'admins' => $admins,
+        ];
 
-            return view('admin.admin-sidebar.user-management', compact('data'));
-        } catch (\Exception $e) {
-            Log::error('Error fetching coach approval data: ' . $e->getMessage());
-            return response()->json(['message' => $e->getMessage(), 'code' => $e->getCode()], 500);
-        }
+        return view('admin.admin-sidebar.user-management', compact('data'));
+    } catch (\Exception $e) {
+        Log::error('Error fetching user management data: ' . $e->getMessage());
+        return response()->json(['message' => $e->getMessage(), 'code' => $e->getCode()], 500);
     }
+}
+
+
+
 
     //public function coachApproval() {
      //   return view('admin.admin-sidebar.coach-approval');
