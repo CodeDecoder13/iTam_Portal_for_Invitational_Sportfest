@@ -12,66 +12,24 @@
             <div class="col-span-2">Status</div>
             <div class="col-span-1">Actions</div>
         </div>
-        @if ($data['teams']->isNotEmpty())
-            @php
-                $coachIds = [];
-            @endphp
-            @foreach ($data['teams'] as $team)
+        @if ($data['users']->isNotEmpty())
+            @foreach ($data['users'] as $user)
                 @php
-                    $coachId = $team->coach_id;
-                    if (in_array($coachId, $coachIds)) {
-                        continue;
-                    }
-                    $coachIds[] = $coachId;
+                    $userTeams = $data['teams']->where('coach_id', $user->id);
+                    $sports = $userTeams->pluck('sport_category')->unique();
+                    $teams = $userTeams->pluck('acronym')->unique();
                 @endphp
                 <div class="grid grid-cols-12 px-4 py-3 bg-white rounded-lg border mt-3">
-                    <div class="col-span-2">{{ $team->created_at }}</div>
-                    <div class="col-span-2">
-                        @foreach ($data['users'] as $user)
-                            @if ($user->id == $coachId)
-                                {{ $user->first_name }} {{ $user->last_name }}
-                                @break
-                            @endif
-                        @endforeach
-                    </div>
-                    <div class="col-span-2">
-                        @php
-                            $sports = [];
-                            foreach ($data['teams'] as $t) {
-                                if ($t->coach_id == $coachId) {
-                                    $sports[] = $t->sport_category;
-                                }
-                            }
-                            echo implode(', ', array_unique($sports));
-                        @endphp
-                    </div>
-                    <div class="col-span-2">
-                        @php
-                            $teams = [];
-                            foreach ($data['teams'] as $t) {
-                                if ($t->coach_id == $coachId) {
-                                    $teams[] = $t->acronym;
-                                }
-                            }
-                            echo implode(', ', array_unique($teams));
-                        @endphp
-                    </div>
-                    <div class="col-span-2" id="status-{{ $coachId }}">
-                        @foreach ($data['users'] as $user)
-                            @if ($user->id == $coachId)
-                                <span class="status">{{ $user->is_active ? 'Verified' : 'Unverified' }}</span>
-                                @break
-                            @endif
-                        @endforeach
+                    <div class="col-span-2">{{ $user->created_at->format('Y-m-d H:i:s') }}</div>
+                    <div class="col-span-2">{{ $user->first_name }} {{ $user->last_name }}</div>
+                    <div class="col-span-2">{{ $sports->isNotEmpty() ? $sports->implode(', ') : 'N/A' }}</div>
+                    <div class="col-span-2">{{ $teams->isNotEmpty() ? $teams->implode(', ') : 'N/A' }}</div>
+                    <div class="col-span-2" id="status-{{ $user->id }}">
+                        <span class="status">{{ $user->is_active ? 'Activate' : 'Deactivate' }}</span>
                     </div>
                     <div class="col-span-1 flex space-x-2">
-                        @foreach ($data['users'] as $user)
-                            @if ($user->id == $coachId)
-                                <button class="bg-green-700 text-white px-4 py-2 rounded-lg" onclick="updateStatus({{ $user->id }}, 'activate')">Approve</button>
-                                <button class="bg-red-700 text-white px-4 py-2 rounded-lg" onclick="updateStatus({{ $user->id }}, 'deactivate')">Deactivate</button>
-                                @break
-                            @endif
-                        @endforeach
+                        <button class="bg-green-700 text-white px-4 py-2 rounded-lg" onclick="updateStatus({{ $user->id }}, 'activate')">Activate</button>
+                        <button class="bg-red-700 text-white px-4 py-2 rounded-lg" onclick="updateStatus({{ $user->id }}, 'deactivate')">Deactivate</button>
                     </div>
                 </div>
             @endforeach
@@ -90,21 +48,13 @@
                 },
                 body: JSON.stringify({ action: action })
             })
-            .then(response => response.text()) // Changed to text() to log the raw response
-            .then(text => {
-                try {
-                    const data = JSON.parse(text); // Attempt to parse the response as JSON
-                    if (data.success) {
-                        // Update the status display on the page
-                        const statusElement = document.querySelector(`#status-${userId} .status`);
-                        statusElement.textContent = data.user.is_active ? 'Verified' : 'Unverified';
-                    } else {
-                        alert(data.message);
-                    }
-                } catch (error) {
-                    // Log the raw response text
-                    console.error('Response was not valid JSON:', text);
-                    alert('An error occurred. Please try again.');
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const statusElement = document.querySelector(`#status-${userId} .status`);
+                    statusElement.textContent = data.user.is_active ? 'activate' : 'Deactivate';
+                } else {
+                    alert(data.message);
                 }
             })
             .catch(error => {
