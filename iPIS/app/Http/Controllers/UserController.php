@@ -143,7 +143,7 @@ class UserController extends Controller
 
         
         // Retrieve the newly created or updated team
-       // $team = Team::where('name', $request->input('team_name'))->firstOrFail();
+        //$team = Team::where('name', $request->input('team_name'))->firstOrFail();
 
         // Get the currently signed-in user's ID
         $coachId = auth()->user()->id;
