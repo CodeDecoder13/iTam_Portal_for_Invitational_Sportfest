@@ -28,7 +28,7 @@
 
                 <h3 class="text-center mb-3 text-xl font-bold">Account Details</h3>
 
-                <form id="wizard-form" method="POST" action="">
+                <form id="wizard-form" method="POST"  action="{{ route('register') }}">
                     @csrf
                     <div class="wizard-step" id="step-1">
                         <div class="mb-4 flex space-x-4">
@@ -85,6 +85,36 @@
                             </select>
                             <x-input-error :messages="$errors->get('gender')" class="mt-2" />
                         </div>
+                        <!-- School Name -->
+                        <div class="mb-4">
+                            <x-input-label for="school_name" :value="__('School Name')"
+                                class="block text-gray-700 text-sm font-bold mb-2" />
+                            <select id="school_name" name="school_name"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                required>
+                                <option value="" disabled selected>Select School</option>
+                                <option value="School A" {{ old('school_name') == 'School A' ? 'selected' : '' }}>School A</option>
+                                <option value="School B" {{ old('school_name') == 'School B' ? 'selected' : '' }}>School B</option>
+                                <option value="School C" {{ old('school_name') == 'School C' ? 'selected' : '' }}>School C</option>
+                            </select>
+                            <x-input-error :messages="$errors->get('school_name')" class="mt-2" />
+                        </div>
+
+                        <!-- Role -->
+                        <div class="mb-4">
+                            <x-input-label for="role" :value="__('Role')"
+                                class="block text-gray-700 text-sm font-bold mb-2" />
+                            <select id="role" name="role"
+                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                required>
+                                <option value="" disabled selected>Select Role</option>
+                                <option value="Captain" {{ old('role') == 'Captain' ? 'selected' : '' }}>Captain</option>
+                                <option value="Coach" {{ old('role') == 'Coach' ? 'selected' : '' }}>Coach</option>
+                                <option value="School Representative" {{ old('role') == 'School Representative' ? 'selected' : '' }}>School Representative</option>
+                            </select>
+                            <x-input-error :messages="$errors->get('role')" class="mt-2" />
+                        </div>
+
 
                         <!-- Password -->
                         <div class="mb-4">
