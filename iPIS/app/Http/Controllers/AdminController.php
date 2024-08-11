@@ -80,29 +80,33 @@ class AdminController extends Controller
      //   return view('admin.admin-sidebar.coach-approval');
    // }
    public function coachApproval(Request $request)
-    {
-        try {
-            $users = User::select('users.id', 'users.first_name', 'users.last_name', 'users.is_active')
-                ->leftJoin('teams', 'users.id', '=', 'teams.coach_id')
-                ->get();
+{
+    try {
+        // Select all users with their corresponding team info (if available)
+        $users = User::select('users.id', 'users.first_name', 'users.last_name', 'users.is_active', 'users.created_at')
+            ->leftJoin('teams', 'users.id', '=', 'teams.coach_id')
+            ->groupBy('users.id', 'users.first_name', 'users.last_name', 'users.is_active', 'users.created_at')
+            ->get();
 
-            $teams = Team::select('teams.id', 'teams.acronym', 'teams.sport_category', 'teams.created_at', 'teams.coach_id')
-                ->get();
+        // Fetch teams
+        $teams = Team::select('teams.id', 'teams.acronym', 'teams.sport_category', 'teams.created_at', 'teams.coach_id')
+            ->get();
 
-            Log::info('Fetched users: ', $users->toArray());
-            Log::info('Fetched teams: ', $teams->toArray());
+        Log::info('Fetched users: ', $users->toArray());
+        Log::info('Fetched teams: ', $teams->toArray());
 
-            $data = [
-                'users' => $users,
-                'teams' => $teams
-            ];
+        $data = [
+            'users' => $users,
+            'teams' => $teams
+        ];
 
-            return view('admin.admin-sidebar.coach-approval', compact('data'));
-        } catch (\Exception $e) {
-            Log::error('Error fetching coach approval data: '.$e->getMessage());
-            return response()->json(['message' => $e->getMessage(), 'code' => $e->getCode()], 500);
-        }
+        return view('admin.admin-sidebar.coach-approval', compact('data'));
+    } catch (\Exception $e) {
+        Log::error('Error fetching coach approval data: '.$e->getMessage());
+        return response()->json(['message' => $e->getMessage(), 'code' => $e->getCode()], 500);
     }
+}
+
 
     public function showteam($id)
     {
