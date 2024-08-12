@@ -21,7 +21,7 @@
                 @php
                     $userTeams = $data['teams']->where('coach_id', $user->id);
                     $sports = $userTeams->pluck('sport_category')->unique();
-                    $teams = $userTeams->pluck('acronym')->unique();
+                    $teams = $userTeams->pluck('name')->unique();
                 @endphp
                 <div class="grid grid-cols-12 px-4 py-3 bg-white rounded-lg border mt-3">
                     <div class="col-span-1">{{ $user->created_at->format('Y-m-d H:i:s') }}</div>

@@ -123,7 +123,7 @@
                             @foreach ($teams as $team)
                                 <option value="{{ $team->id }}"
                                     {{ isset($newTeam) && $newTeam->id === $team->id ? 'selected' : '' }}>
-                                    {{ $team->acronym }} - {{ $team->sport_category }}</option>
+                                    {{ $team->name }} - {{ $team->sport_category }}</option>
                             @endforeach
                             <option value="add-new-team">Add New Team</option>
                         </select>
