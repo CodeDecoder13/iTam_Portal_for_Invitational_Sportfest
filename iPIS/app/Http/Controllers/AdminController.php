@@ -32,18 +32,18 @@ class AdminController extends Controller
     public function playersTeams(Request $request)
     {
         $query = Team::query();
+       
 
         if ($request->has('search')) {
             $query->where('name', 'like', '%' . $request->search . '%')
-                ->orWhere('acronym', 'like', '%' . $request->search . '%')
                 ->orWhere('sport_category', 'like', '%' . $request->search . '%');
         }
 
         if ($request->has('sport')) {
             $query->where('sport_category', $request->sport);
         }
-        if ($request->has('team')) {
-            $query->where('acronym', $request->team);
+        if ($request->has('team_name')) {
+            $query->where('name', $request->name);
         }
         /*if ($request->has('status')) {
             $query->where('status', $request->status);
