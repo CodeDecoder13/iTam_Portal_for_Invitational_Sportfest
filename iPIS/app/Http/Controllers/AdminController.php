@@ -95,7 +95,7 @@ class AdminController extends Controller
             ->get();
 
         // Fetch teams
-        $teams = Team::select('teams.id', 'teams.acronym', 'teams.sport_category', 'teams.created_at', 'teams.coach_id')
+        $teams = Team::select('teams.id', 'teams.name','teams.sport_category', 'teams.created_at', 'teams.coach_id')
             ->get();
 
         Log::info('Fetched users: ', $users->toArray());

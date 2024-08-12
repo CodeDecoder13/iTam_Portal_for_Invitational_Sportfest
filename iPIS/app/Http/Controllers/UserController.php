@@ -123,9 +123,8 @@ class UserController extends Controller
 
         // Validate the incoming request
         $validator = Validator::make($request->all(), [
-            'team_name' => 'required|string|max:255',
-            'team_acronym' => 'required|string|max:5',
             'sport' => 'required|string',
+            'team_name' => 'required|string|max:255',
             'team_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:25600',
         ]);
 
@@ -152,7 +151,7 @@ class UserController extends Controller
         $team = Team::updateOrCreate(
             ['name' => $request->input('team_name')],
             [
-                'acronym' => $request->input('team_acronym'),
+                
                 'sport_category' => $request->input('sport'),
                 'coach_id' => $coachId,
                 'logo_path' => $teamLogoPath,
