@@ -16,14 +16,25 @@ class UserController extends Controller
 {
     public function dashboard()
     {
-        
         return view('dashboard');
     }   
         
     public function myDocuments()
-    {
-        return view('user-sidebar.my-documents');
-    }
+{
+    $coachId = Auth::user()->id;
+
+    // Fetch players associated with the logged-in coach
+    $players = Player::where('coach_id', $coachId)->get();
+
+    // Get the most recent updated_at value
+    $lastUpdated = $players->max('last_update');
+
+    // Determine the overall status
+    $status = $players->isNotEmpty() ? 'Approved' : 'No File Attached'; // Default status
+
+    return view('user-sidebar.my-documents', compact('lastUpdated', 'status'));
+}
+
     public function selectTeam()
     {
         $coachId = Auth::user()->id;
