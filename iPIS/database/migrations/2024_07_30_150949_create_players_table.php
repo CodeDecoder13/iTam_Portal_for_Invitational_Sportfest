@@ -22,6 +22,7 @@ return new class extends Migration
             $table->date('birthday')->nullable();
             $table->enum('gender', ['Male', 'Female'])->nullable();
             $table->enum('status', ['Approved', 'For Review', 'Rejected', 'No File Attached'])->default('No File Attached');
+            $table->timestamp('last_update')->useCurrent();
             $table->timestamps();
         });
     }

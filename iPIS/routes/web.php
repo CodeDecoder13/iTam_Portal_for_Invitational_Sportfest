@@ -34,6 +34,16 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::post('/store-players', [UserController::class, 'storePlayers'])->name('store.players');
     Route::get('/select-team', [UserController::class, 'selectTeam'])->name('select-team');
     
+    Route::get('/players', [PlayerController::class, 'index'])->name('players.index');
+    Route::post('/players', [PlayerController::class, 'store'])->name('players.store');
+    Route::get('players/{id}/edit', [PlayerController::class, 'edit'])->name('players.edit');
+    Route::put('players/{id}', [PlayerController::class, 'update'])->name('players.update');
+
+Route::resource('players', PlayerController::class);
+Route::get('/', function () {
+    return view('auth.login');
+});
+
    
 });
 
