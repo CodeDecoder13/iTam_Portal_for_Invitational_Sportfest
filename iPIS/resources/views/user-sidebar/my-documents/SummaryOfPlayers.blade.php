@@ -1,24 +1,46 @@
 <x-app-layout>
     <section class="grid grid-cols-1">
-           <!-- Success and Error Messages -->
-           @if (session('success'))
-           <div class="alert alert-success mb-4">
-               {{ session('success') }}
-           </div>
-           @endif
-   
-           @if ($errors->any())
-           <div class="alert alert-danger mb-4">
-               <ul>
-                   @foreach ($errors->all() as $error)
-                   <li>{{ $error }}</li>
-                   @endforeach
-               </ul>
-           </div>
-           @endif
-   
+        <!-- Success and Error Messages -->
+        @if (session('success'))
+            <div class="alert alert-success mb-4">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger mb-4">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <h1 class="font-bold mb-2 text-3xl">Summary Of Players</h1>
         <h3>Fill in player's summary to complete your requirements.</h3>
+
+        <!-- Filter Form -->
+        <form method="GET" action="{{ route('my-documents_sub', ['type' => 'SummaryOfPlayers']) }}" class="mb-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                    <label for="team_id" class="form-label">Filter by Team</label>
+                    <select id="team_id" name="team_id" class="form-select">
+                        <option value="">All Teams</option>
+                        @foreach($teams as $team)
+                            <option value="{{ $team->id }}" {{ request('team_id') == $team->id ? 'selected' : '' }}>
+                                {{ $team->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-primary mt-4">Filter</button>
+                </div>
+            </div>
+        </form>
+
+
         <div class="grid grid-cols-1 mt-5">
             <!-- Header row -->
             <div class="grid grid-cols-12 px-4 py-3 bg-green-700 text-white rounded-lg border">
@@ -29,38 +51,38 @@
             </div>
             <!-- Player rows -->
             @foreach ($players as $player)
-            <div class="grid grid-cols-12 px-4 py-3 bg-white rounded-lg border mt-3">
-                <div class="col-span-4">{{ $player->jersey_no }}</div>
-                <div class="col-span-4">{{ $player->first_name }} {{ $player->last_name }}</div>
-                <div class="col-span-3">
-                    @switch($player->status)
-                        @case('Approved')
-                            <span class="text-green-500">Approved</span>
-                            @break
-                        @case('For Review')
-                            <span class="text-yellow-500">For Review</span>
-                            @break
-                        @case('Rejected')
-                            <span class="text-red-500">Rejected</span>
-                            @break
-                        @case('No File Attached')
-                            <span class="text-gray-500">No File Attached</span>
-                            @break
-                    @endswitch
+                <div class="grid grid-cols-12 px-4 py-3 bg-white rounded-lg border mt-3">
+                    <div class="col-span-4">{{ $player->jersey_no }}</div>
+                    <div class="col-span-4">{{ $player->first_name }} {{ $player->last_name }}</div>
+                    <div class="col-span-3">
+                        @switch($player->status)
+                            @case('Approved')
+                                <span class="text-green-500">Approved</span>
+                                @break
+                            @case('For Review')
+                                <span class="text-yellow-500">For Review</span>
+                                @break
+                            @case('Rejected')
+                                <span class="text-red-500">Rejected</span>
+                                @break
+                            @case('No File Attached')
+                                <span class="text-gray-500">No File Attached</span>
+                                @break
+                        @endswitch
+                    </div>
+                    <div class="col-span-1">
+                        @if ($player->status == 'For Review')
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPlayerModal" onclick="editPlayer({{ $player->id }}, '{{ $player->first_name }}', '{{ $player->middle_name }}', '{{ $player->last_name }}', '{{ $player->birthday }}', '{{ $player->gender }}', '{{ $player->jersey_no }}', '{{ $player->team_id }}', '{{ $player->status }}')">
+                                Edit
+                            </button>
+                            <form action="{{ route('players.destroy', $player->id) }}" method="POST" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        @endif
+                    </div>
                 </div>
-                <div class="col-span-1">
-                    @if ($player->status == 'For Review')
-                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPlayerModal" onclick="editPlayer({{ $player->id }}, '{{ $player->first_name }}', '{{ $player->middle_name }}', '{{ $player->last_name }}', '{{ $player->birthday }}', '{{ $player->gender }}', '{{ $player->jersey_no }}', '{{ $player->team_id }}', '{{ $player->status }}')">
-                        Edit
-                    </button>
-                    <form action="{{ route('players.destroy', $player->id) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                    </form>
-                    @endif
-                </div>
-            </div>
             @endforeach
         </div>
         <!-- Add Player button -->
@@ -112,8 +134,11 @@
                     </div>
                     <div class="mb-3">
                         <label for="team_id" class="form-label">Team</label>
-                        <input type="text" class="form-select" id="team_id" name="team_id" required>
-                        <!-- Populate teams dynamically -->
+                        <select class="form-select" id="team_id" name="team_id" required>
+                            @foreach($teams as $team)
+                                <option value="{{ $team->id }}">{{ $team->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="mb-3">
                         <button type="submit" class="btn btn-primary">Add Player</button>
@@ -165,12 +190,11 @@
                     </div>
                     <div class="mb-3">
                         <label for="editTeamId" class="form-label">Team</label>
-                        <input type="text" class="form-select" id="editTeamId" name="team_id" required>
-                        <!-- Populate teams dynamically -->
-                    </div>
-                    <div class="mb-3">
-                        <label for="editStatus" class="form-label">Status</label>
-                        <input type="text" class="form-control" id="editStatus" name="status">
+                        <select class="form-select" id="editTeamId" name="team_id" required>
+                            @foreach($teams as $team)
+                                <option value="{{ $team->id }}">{{ $team->name }}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="mb-3">
                         <button type="submit" class="btn btn-primary">Update Player</button>
@@ -182,15 +206,15 @@
 </div>
 
 <script>
-function editPlayer(id, firstName, middleName, lastName, birthday, gender, jerseyNo, teamId, status) {
-    document.querySelector('#edit-player-form').action = `/players/${id}`;
-    document.querySelector('#editFirstName').value = firstName;
-    document.querySelector('#editMiddleName').value = middleName;
-    document.querySelector('#editLastName').value = lastName;
-    document.querySelector('#editBirthday').value = birthday;
-    document.querySelector('#editGender').value = gender;
-    document.querySelector('#editJerseyNo').value = jerseyNo;
-    document.querySelector('#editTeamId').value = teamId;
-    document.querySelector('#editStatus').value = status;
-}
+    function editPlayer(id, firstName, middleName, lastName, birthday, gender, jerseyNo, teamId, status) {
+        var form = document.getElementById('edit-player-form');
+        form.action = `/players/${id}`;
+        document.getElementById('editFirstName').value = firstName;
+        document.getElementById('editMiddleName').value = middleName;
+        document.getElementById('editLastName').value = lastName;
+        document.getElementById('editBirthday').value = birthday;
+        document.getElementById('editGender').value = gender;
+        document.getElementById('editJerseyNo').value = jerseyNo;
+        document.getElementById('editTeamId').value = teamId;
+    }
 </script>

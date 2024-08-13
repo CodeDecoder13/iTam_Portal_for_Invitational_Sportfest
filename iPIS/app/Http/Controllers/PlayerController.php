@@ -4,14 +4,35 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Player; // Make sure to import your Player model
-
+use App\Models\Team;
 class PlayerController extends Controller
 {
+
+
+    
+    public function summary(Request $request)
+    {
+        $team_id = $request->input('team_id'); // Retrieve the selected team_id from the request
+
+        // Fetch players based on the selected team
+        $players = Player::when($team_id, function($query, $team_id) {
+            return $query->where('team_id', $team_id);
+        })->get();
+
+        // Fetch teams for the dropdown
+        $teams = Team::where('coach_id', auth()->user()->id)->get();
+
+        return view('user-sidebar.my-documents.SummaryOfPlayers', compact('players', 'teams'));
+    }
     // Method to show the player list
     public function index()
     {
-        $players = Player::all(); // Fetch all players
-        return view('players.index', compact('players')); // Adjust path as necessary
+        // Fetch teams and players for the logged-in coach
+        $teams = Team::where('coach_id', auth()->user()->id)->get();
+        $players = Player::where('coach_id', auth()->user()->id)->get();
+
+        // Pass the data to the view
+        return view('my-documents.SummaryOfPlayers', compact('teams', 'players'));
     }
 
     // Method to handle adding a new player

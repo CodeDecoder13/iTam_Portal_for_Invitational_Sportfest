@@ -66,6 +66,8 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
 Route::post('/testing-site', [TestingController::class, 'test'])->name('test.site');
 Route::post('/save-team', [TestingController::class, 'addteam'])->name('test.addteam');
 Route::resource('players', PlayerController::class);
+
+Route::get('/players/summary', [PlayerController::class, 'summary'])->name('players.summary');
 // Authentication routes
 require __DIR__.'/auth.php';
 require __DIR__.'/admin-auth.php';

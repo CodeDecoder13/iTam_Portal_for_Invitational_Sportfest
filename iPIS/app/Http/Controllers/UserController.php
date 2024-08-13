@@ -35,11 +35,20 @@ class UserController extends Controller
         return view('user-sidebar.my-documents');
     }
 
-
     public function myDocuments_sub($type)
     {
+        // Fetch all players and teams
         $players = Player::all();
-
+        $teams = Team::where('coach_id', auth()->user()->id)->get();
+    
+        // Fetch players based on the selected team if 'SummaryOfPlayers' is the type
+        $team_id = request('team_id'); // Get team_id from query parameters if present
+        if ($type === 'SummaryOfPlayers') {
+            $players = Player::when($team_id, function($query, $team_id) {
+                return $query->where('team_id', $team_id);
+            })->get();
+        }
+    
         switch ($type) {
             case 'CertificateOfRegistration':
                 return view('user-sidebar.my-documents.CerfiticateOfRegistration', compact('players'));
@@ -50,17 +59,16 @@ class UserController extends Controller
             case 'ParentalConsent':
                 return view('user-sidebar.my-documents.ParentalConsent', compact('players'));
             case 'SummaryOfPlayers':
-                return view('user-sidebar.my-documents.SummaryOfPlayers', compact('players'));
+                return view('user-sidebar.my-documents.SummaryOfPlayers', compact('players', 'teams'));
             case 'PhotocopyOfVaccineCard':
                 return view('user-sidebar.my-documents.PhotocopyOfVaccineCard', compact('players'));
             case 'PhotocopyOfSchoolID':
                 return view('user-sidebar.my-documents.PhotocopyOfSchoolID', compact('players'));
             default:
                 return redirect()->route('my-documents');
-                //return view('user-sidebar.my-documents.sub',compact('type'));
         }
     }
-   
+    
     public function addPlayers()
     {
         return view('user-sidebar.add-players');
