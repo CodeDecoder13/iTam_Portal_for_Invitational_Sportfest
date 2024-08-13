@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Storage;
 
 class RegisteredUserController extends Controller
 {
@@ -53,6 +54,17 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
             'is_active' => false,
         ]);
+        // Fetch the school name from the user model
+        $schoolName = $user->school_name;
+
+        // Define the path for the school folder
+        $schoolFolderPath = "public/{$schoolName}";
+
+        // Check if the folder already exists
+        if (!Storage::exists($schoolFolderPath)) {
+            // Create the folder
+            Storage::makeDirectory($schoolFolderPath);
+        }
 
         event(new Registered($user));
 
