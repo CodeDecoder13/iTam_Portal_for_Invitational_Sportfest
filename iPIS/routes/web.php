@@ -26,6 +26,7 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('dashboard', [UserController::class, 'dashboard'])->name('dashboard');
     Route::get('/my-documents', [UserController::class, 'myDocuments'])->name('my-documents');
     Route::get('/my-documents/{type}', [UserController::class, 'myDocuments_sub'])->name('my-documents_sub');
+    Route::post('/upload/player/documents/{playerId}', [UserController::class, 'uploadPlayerDocuments'])->name('upload.player.documents');
     Route::get('/my-calendar', [UserController::class, 'myCalendar'])->name('my-calendar');
     Route::get('/my-players', [UserController::class, 'myPlayers'])->name('my-players');
     Route::get('/add-teams', [UserController::class, 'addTeams'])->name('add-teams');
@@ -33,16 +34,10 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/add-players', [UserController::class, 'addPlayers'])->name('add-players');
     Route::post('/store-players', [UserController::class, 'storePlayers'])->name('store.players');
     Route::get('/select-team', [UserController::class, 'selectTeam'])->name('select-team');
-    
-    Route::get('/players', [PlayerController::class, 'index'])->name('players.index');
-    Route::post('/players', [PlayerController::class, 'store'])->name('players.store');
-    Route::get('players/{id}/edit', [PlayerController::class, 'edit'])->name('players.edit');
-    Route::put('players/{id}', [PlayerController::class, 'update'])->name('players.update');
+    Route::post('/upload/player/{id}/birth_certificate', [UserController::class, 'uploadPlayerDocuments'])->name('upload.player.birth_certificate');
+    Route::post('/upload/player/{id}/parental_consent', [UserController::class, 'uploadPlayerDocuments'])->name('upload.player.parental_consent');
 
-Route::resource('players', PlayerController::class);
-Route::get('/', function () {
-    return view('auth.login');
-});
+    
 
    
 });

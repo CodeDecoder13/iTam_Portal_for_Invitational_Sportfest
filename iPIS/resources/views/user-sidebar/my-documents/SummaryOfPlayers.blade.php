@@ -4,125 +4,135 @@
         <h3>Fill in player's summary to complete your requirements.</h3>
         <div class="grid grid-cols-1 mt-5">
             <div class="grid grid-cols-12 px-4 py-3 bg-green-700 text-white rounded-lg border">
-                <div class="col-span-2">Jersey No.</div>
-                <div class="col-span-2">Given Name</div>
-                <div class="col-span-2">Status</div>
-                <div class="col-span-2">PAS Birth Certificate</div>
-                <div class="col-span-2">Parental Consent</div>
-                <div class="col-span-2">Action</div>
-                
+                <div class="font-bold col-span-2">Jersey No.</div>
+                <div class="font-bold col-span-2">Given Name</div>
+                <div class="font-bold col-span-2">Sport Category</div>
+                <div class="font-bold col-span-2">PSA Birth Certificate</div>
+                <div class="font-bold col-span-2">Parental Consent</div>
+                <div class="font-bold col-span-2">Status</div>
             </div>
             @foreach ($players as $player)
-            <div class="grid grid-cols-12 px-4 py-3 bg-white rounded-lg border mt-3">
-                <div class="col-span-4">{{ $player->jersey_no }}</div>
-                <div class="col-span-4">{{ $player->first_name }} {{ $player->last_name }}</div>
-                <div class="col-span-3">
-                    @switch($player->status)
-                        @case('Approved')
-                            <span class="text-green-500">Approved</span>
-                            @break
-                        @case('For Review')
-                            <span class="text-yellow-500">For Review</span>
-                            @break
-                        @case('Rejected')
-                            <span class="text-red-500">Rejected</span>
-                            @break
-                        @case('No File Attached')
-                            <span class="text-gray-500">No File Attached</span>
-                            @break
-                    @endswitch
+                <div class="grid grid-cols-12 px-4 py-3 bg-white rounded-lg border mt-3">
+                    <div class="col-span-2">{{ $player->jersey_no }}</div>
+                    <div class="col-span-2">{{ $player->first_name }} {{ $player->last_name }}</div>
+                    <div class="col-span-2">{{ $player->sport_category }}</div>
+                    <div class="col-span-2 text-green-700">
+                        @if($player->has_birth_certificate)
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#viewDocumentModal-{{ $player->id }}"> 
+                                <ion-icon name="eye"></ion-icon> View Birth Certificate
+                            </a>
+                        @else
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#uploadBirthCertificateModal-{{ $player->id }}"> 
+                                <ion-icon name="cloud-upload"></ion-icon> Upload Birth Certificate
+                            </a>
+                        @endif
+                    </div>
+                    <div class="col-span-2 text-green-700">
+                        @if($player->has_parental_consent)
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#viewDocumentModal-{{ $player->id }}"> 
+                                <ion-icon name="eye"></ion-icon> View Parental Consent
+                            </a>
+                        @else
+                            <a href="#" data-bs-toggle="modal" data-bs-target="#uploadParentalConsentModal-{{ $player->id }}"> 
+                                <ion-icon name="cloud-upload"></ion-icon> Upload Parental Consent
+                            </a>
+                        @endif
+                    </div>  
+                    <div class="col-span-2">
+                        @switch($player->status)
+                            @case('Approved')
+                                <span class="text-green-500">Approved</span>
+                                @break
+                            @case('For Review')
+                                <span class="text-yellow-500">For Review</span>
+                                @break
+                            @case('Rejected')
+                                <span class="text-red-500">Rejected</span>
+                                @break
+                            @case('No File Attached')
+                                <span class="text-gray-500">No File Attached</span>
+                                @break
+                        @endswitch
+                    </div>
                 </div>
-                <div class="col-span-1">
-                    @if ($player->status == 'For Review')
-                     <!-- <a href="{{ route('players.approve', $player->id) }}" class="btn btn-success btn-sm">Approve</a> -->
-                    <a href="" class="btn btn-success btn-sm">Approve</a>
-                    @endif
+
+                <!-- Modal for Uploading Birth Certificate -->
+                <div class="modal fade" id="uploadBirthCertificateModal-{{ $player->id }}" tabindex="-1" aria-labelledby="uploadBirthCertificateModalLabel-{{ $player->id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="uploadBirthCertificateModalLabel-{{ $player->id }}">Upload PSA Birth Certificate</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <p>No PSA Birth Certificate is currently attached. Please upload the necessary document to proceed.</p>
+                                <form action="{{ route('upload.player.birth_certificate', $player->id) }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label for="birthCertificate-{{ $player->id }}" class="form-label">PSA Birth Certificate</label>
+                                        <input class="form-control" type="file" id="birthCertificate-{{ $player->id }}" name="birth_certificate">
+                                    </div>
+                                    <button type="submit" class="btn btn-green">Upload</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+
+                <!-- Modal for Uploading Parental Consent -->
+                <div class="modal fade" id="uploadParentalConsentModal-{{ $player->id }}" tabindex="-1" aria-labelledby="uploadParentalConsentModalLabel-{{ $player->id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="uploadParentalConsentModalLabel-{{ $player->id }}">Upload Parental Consent</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <p>No Parental Consent is currently attached. Please upload the necessary document to proceed.</p>
+                                <form action="{{ route('upload.player.parental_consent', $player->id) }}" method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label for="parentalConsent-{{ $player->id }}" class="form-label">Parental Consent</label>
+                                        <input class="form-control" type="file" id="parentalConsent-{{ $player->id }}" name="parental_consent">
+                                    </div>
+                                    <button type="submit" class="btn btn-green">Upload</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View Document Modal -->
+                <div class="modal fade" id="viewDocumentModal-{{ $player->id }}" tabindex="-1" aria-labelledby="viewDocumentModalLabel-{{ $player->id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="viewDocumentModalLabel-{{ $player->id }}">View Documents</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <div class="scrollable-content mx-auto my-3">
+                                    @if($player->has_birth_certificate)
+                                        <div class="mb-3">
+                                            <img src="{{ asset('storage/birth_certificates/' . $player->birth_certificate) }}" alt="Birth Certificate">
+                                        </div>
+                                    @endif
+                                    @if($player->has_parental_consent)
+                                        <div class="mb-3">
+                                            <img src="{{ asset('storage/parental_consents/' . $player->parental_consent) }}" alt="Parental Consent">
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="d-flex justify-content-around mt-3">
+                                    <button type="button" class="btn btn-link" data-bs-dismiss="modal">Delete</button>
+                                    <button type="button" class="btn btn-green">Download PDF</button>
+                                    <button type="button" class="btn btn-link">Change</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             @endforeach
-        </div>
-        <div class="mt-5 text-center">
-            <!-- Button to trigger the modal -->
-            <button type="button" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:border-indigo-900 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150" data-toggle="modal" data-target="#addPlayerModal" id="addPlayerButton">
-                Add Player
-            </button>
         </div>
     </section>
 </x-app-layout>
-
-<script>
-    var players = [];
-    
-        document.getElementById('save-player-btn').addEventListener('click', function() {
-            // Get player details from the form
-            var firstName = document.getElementById('firstName').value;
-            var middleName = document.getElementById('middleName').value;
-            var lastName = document.getElementById('lastName').value;
-            var birthday = document.getElementById('birthday').value;
-            var gender = document.getElementById('gender').value;
-            var jersey_no = document.getElementById('jersey_no').value;
-    
-            // Validate required fields
-            if (!firstName || !lastName || !birthday || !gender || !jersey_no) {
-                alert('Please fill in all required fields.');
-                return;
-            }
-    
-            // Create a player object
-            var newPlayer = {
-                firstName: firstName,
-                middleName: middleName,
-                lastName: lastName,
-                birthday: birthday,
-                gender: gender,
-                jersey_no: jersey_no
-            };
-    
-            // Add the new player to the player array
-            players.push(newPlayer);
-    
-            // Send the player data to the server via AJAX
-            $.ajax({
-                url: '/store-players',
-                type: 'POST',
-                data: {
-                    players: players,
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function(response) {
-                    alert(response.message);
-                    // Clear the players array after successful save
-                    players = [];
-                    // Optionally reload the page or update the UI as needed
-                    location.reload();
-                },
-                error: function(xhr) {
-                    if (xhr.status === 422) {
-                        var errors = xhr.responseJSON.errors;
-                        var errorMessage = 'Validation Error:\n';
-                        for (var field in errors) {
-                            if (errors.hasOwnProperty(field)) {
-                                errorMessage += errors[field].join('\n') + '\n';
-                            }
-                        }
-                        alert(errorMessage);
-                    } else {
-                        alert('Error saving player data.');
-                    }
-                }
-            });
-    
-            // Close the modal
-            var modal = bootstrap.Modal.getInstance(document.getElementById('addPlayerModal'));
-            modal.hide();
-    
-            // Clear the form
-            document.getElementById('player-form').reset();
-        });
-    
-    document.getElementById('addPlayerButton').addEventListener('click', function() {
-        console.log('Add Player button clicked.');
-        $('#addPlayerModal').modal('show');
-    });
-    
-    </script>

@@ -1,8 +1,6 @@
 <x-app-layout>
     <section class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <!-- Content for the first section -->
     </section>
-
     <section class="grid grid-cols-1">
         <h1 class="font-bold mb-2 text-3xl">Team and Players</h1>
         <h3>Manage and Organize Teams</h3>
@@ -101,15 +99,15 @@
                         <p><strong>Name:</strong> ${team.name}</p>
                         <p><strong>Acronym:</strong> ${team.acronym}</p>
                         <p><strong>Sport Category:</strong> ${team.sport_category}</p>
-                        <p><strong>Coach:</strong> ${coach.name} (${coach.email}) </p>
+                        <p><strong>Coach:</strong> ${coach.first_name} ${coach.last_name} (${coach.email}) </p>
                         
-                        <h3>Players</h3>
+                        <h3 class="font-bold">Players</h3>
                         <ul>
                     `;
 
                         players.forEach(function(player) {
                             teamDetails += `
-                            <li>${player.first_name} ${player.middle_name} ${player.last_name}, ${player.gender}, ${player.birthday}</li>
+                            <li>${player.jersey_no} ${player.first_name} ${player.middle_name} ${player.last_name}, ${player.gender}, ${player.birthday}</li>
                         `;
                         });
 

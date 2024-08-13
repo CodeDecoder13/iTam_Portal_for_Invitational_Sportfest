@@ -5,7 +5,7 @@
             <!-- Main Dashboard for active users -->
             <h1 class="text-2xl font-bold">Dashboard</h1>
             @if (Auth::check())
-                <h3 class="text-lg mb-8">Welcome, Coach <span class="underline">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</span></h3>
+                <h3 class="text-lg mb-8">Welcome, <span class="underline">{{ Auth::user()->role }} {{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</span></h3>
             @endif
 
             <section class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
