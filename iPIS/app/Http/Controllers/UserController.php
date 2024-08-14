@@ -260,7 +260,8 @@ public function myDocuments_sub($type)
 
     public function myPlayers()
     {
-        return view('user-sidebar.my-players');
+        $players = Player::all();
+        return view('user-sidebar.my-players', compact('players'));
     }
     public function addTeams()
     {
