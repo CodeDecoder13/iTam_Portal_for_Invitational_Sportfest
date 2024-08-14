@@ -36,6 +36,11 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/select-team', [UserController::class, 'selectTeam'])->name('select-team');
     Route::post('/upload/player/{id}/birth_certificate', [UserController::class, 'uploadPlayerDocuments'])->name('upload.player.birth_certificate');
     Route::post('/upload/player/{id}/parental_consent', [UserController::class, 'uploadPlayerDocuments'])->name('upload.player.parental_consent');
+    Route::post('/player/{playerId}/upload-document', [UserController::class, 'uploadDocument'])->name('upload.player.document');
+    Route::delete('/delete/player/birth_certificate/{id}', [UserController::class, 'deleteBirthCertificate'])->name('delete.player.birth_certificate');
+    Route::delete('/delete/player/parental_consent/{id}', [UserController::class, 'deleteParentalConsent'])->name('delete.player.parental_consent');
+    Route::get('/player/{playerId}/download-document', [UserController::class, 'downloadDocument'])->name('download.player.document');
+
 
     
 

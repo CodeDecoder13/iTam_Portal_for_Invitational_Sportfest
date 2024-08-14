@@ -101,37 +101,73 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- View Document Modal -->
-                <div class="modal fade" id="viewDocumentModal-{{ $player->id }}" tabindex="-1" aria-labelledby="viewDocumentModalLabel-{{ $player->id }}" aria-hidden="true">
+                 <!-- Modal for Viewing Birth Certificate -->
+                 <div class="modal fade" id="viewBirthCertificateModal-{{ $player->id }}" tabindex="-1" aria-labelledby="viewBirthCertificateModalLabel-{{ $player->id }}" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="viewDocumentModalLabel-{{ $player->id }}">View Documents</h5>
+                                <h5 class="modal-title" id="viewBirthCertificateModalLabel-{{ $player->id }}">View PSA Birth Certificate</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body text-center">
                                 <div class="scrollable-content mx-auto my-3">
                                     @if($player->has_birth_certificate)
                                         <div class="mb-3">
-                                            <img src="{{ asset('storage/birth_certificates/' . $player->birth_certificate) }}" alt="Birth Certificate">
+                                            <img src="{{ asset('storage/birth_certificates/' . $player->birth_certificate) }}" alt="PSA Birth Certificate">
                                         </div>
-                                    @endif
-                                    @if($player->has_parental_consent)
-                                        <div class="mb-3">
-                                            <img src="{{ asset('storage/parental_consents/' . $player->parental_consent) }}" alt="Parental Consent">
-                                        </div>
+                                    @else
+                                        <p>No PSA Birth Certificate uploaded yet.</p>
                                     @endif
                                 </div>
                                 <div class="d-flex justify-content-around mt-3">
-                                    <button type="button" class="btn btn-link" data-bs-dismiss="modal">Delete</button>
-                                    <button type="button" class="btn btn-green">Download PDF</button>
-                                    <button type="button" class="btn btn-link">Change</button>
+                                    <form action="{{ route('delete.player.birth_certificate', $player->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-link">Delete</button>
+                                    </form>
+                                    <a href="{{ asset('storage/birth_certificates/' . $player->birth_certificate) }}" class="btn btn-green" download>Download PDF</a>
+                                    <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#uploadBirthCertificateModal-{{ $player->id }}">Change</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Modal for Viewing Parental Consent -->
+                <div class="modal fade" id="viewParentalConsentModal-{{ $player->id }}" tabindex="-1" aria-labelledby="viewParentalConsentModalLabel-{{ $player->id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="viewParentalConsentModalLabel-{{ $player->id }}">View Parental Consent</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <div class="scrollable-content mx-auto my-3">
+                                    @if($player->has_parental_consent)
+                                        <div class="mb-3">
+                                            <img src="{{ asset('storage/parental_consents/' . $player->parental_consent) }}" alt="Parental Consent">
+                                        </div>
+                                    @else
+                                        <p>No Parental Consent uploaded yet.</p>
+                                    @endif
+                                </div>
+                                <div class="d-flex justify-content-around mt-3">
+                                    <form action="{{ route('delete.player.parental_consent', $player->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-link">Delete</button>
+                                    </form>
+                                    <a href="{{ asset('storage/parental_consents/' . $player->parental_consent) }}" class="btn btn-green" download>Download PDF</a>
+                                    <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#uploadParentalConsentModal-{{ $player->id }}">Change</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+
+
             @endforeach
         </div>
     </section>
