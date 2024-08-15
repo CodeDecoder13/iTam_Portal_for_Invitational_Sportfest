@@ -21,7 +21,10 @@ return new class extends Migration
             $table->string('last_name', 255);
             $table->date('birthday')->nullable();
             $table->enum('gender', ['Male', 'Female'])->nullable();
+            $table->string('birth_certificate')->nullable();
+            $table->string('parental_consent')->nullable();
             $table->enum('status', ['Approved', 'For Review', 'Rejected', 'No File Attached'])->default('No File Attached');
+            $table->timestamp('last_update')->useCurrent();
             $table->timestamps();
         });
     }

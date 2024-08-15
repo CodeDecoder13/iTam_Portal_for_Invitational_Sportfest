@@ -1,4 +1,3 @@
-<script src="https://cdn.tailwindcss.com"></script>
 <style>
     #sidebar {
         background-image: url(''), linear-gradient(),
@@ -123,7 +122,7 @@
                             @foreach ($teams as $team)
                                 <option value="{{ $team->id }}"
                                     {{ isset($newTeam) && $newTeam->id === $team->id ? 'selected' : '' }}>
-                                    {{ $team->acronym }} - {{ $team->sport_category }}</option>
+                                    {{ $team->name }} - {{ $team->sport_category }}</option>
                             @endforeach
                             <option value="add-new-team">Add New Team</option>
                         </select>
@@ -147,7 +146,7 @@
             </li>
             <li>
                 <a href="{{ route('my-calendar') }}" class="nav-link text-white">
-                    <ion-icon name="people"></ion-icon>
+                    <ion-icon name="calendar"></ion-icon>
                     My Calendar
                 </a>
             </li>
@@ -191,4 +190,5 @@
         }
     });
 </script>
+<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>
