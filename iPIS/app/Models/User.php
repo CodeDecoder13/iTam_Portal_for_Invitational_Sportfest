@@ -52,5 +52,9 @@ class User extends Authenticatable
             'is_active' => 'boolean', // Cast is_active as boolean
         ];
     }
+    public function players()
+    {
+        return $this->hasMany(Player::class, 'user_id');
+    }
    
 }

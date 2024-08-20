@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TestingController;
+use App\Http\Controllers\DocumentCheckerController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -64,6 +65,13 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/SummaryOfPlayers', [AdminController::class, 'documentChecker'])->name('admin.SummaryOfPlayers');
 
     
+});
+//added for document checker
+Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
+    Route::post('/document/approve/{player}/{document}', [DocumentCheckerController::class, 'approveDocument'])->name('document.approve');
+    Route::post('/document/reject/{player}/{document}', [DocumentCheckerController::class, 'rejectDocument'])->name('document.reject');
+    Route::get('/document/download/{player}/{document}', [DocumentCheckerController::class, 'downloadDocument'])->name('document.download');
+    Route::delete('/document/delete/{player}/{document}', [DocumentCheckerController::class, 'deleteDocument'])->name('document.delete');
 });
 
 

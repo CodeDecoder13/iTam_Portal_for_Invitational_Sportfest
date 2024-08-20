@@ -25,7 +25,10 @@ class AdminController extends Controller
     }
     public function documentChecker()
     {
-        return view('admin.admin-sidebar.team-documents.SummaryOfPlayers');
+        $players = Player::all();
+        $teams = Team::all();
+        $users = User::all();
+        return view('admin.admin-sidebar.team-documents.SummaryOfPlayers',compact('players','teams','users'));
     }
 
     public function calendar()
