@@ -38,7 +38,6 @@
         
         <div class="grid grid-cols-12 px-4 py-3 bg-green-700 text-white rounded-lg border">
             <div class="col-span-3">Team Name</div>
-            <div class="col-span-2">Team Acronym</div>
             <div class="col-span-3">Sports</div>
             <div class="col-span-3">Document Status</div>
             <div class="col-span-1">Action</div>
@@ -46,7 +45,6 @@
         @foreach ($teams as $team)
             <div class="grid grid-cols-12 px-4 py-3 rounded-lg border mt-2">
                 <div class="col-span-3">{{ $team->name }}</div>
-                <div class="col-span-2">{{ $team->acronym }}</div>
                 <div class="col-span-3">{{ $team->sport_category }}</div>
                 <div class="col-span-3">???</div>
                 <div class="col-span-1">

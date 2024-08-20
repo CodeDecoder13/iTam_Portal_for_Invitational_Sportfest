@@ -44,15 +44,16 @@
                         @endswitch
                     </div>
                     <div class="col-span-1 text-green-700">
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#documentModal" data-doc="{{ $a[0] }}">
+                        <a href="{{ route('admin.SummaryOfPlayers', 'SummaryOfPlayers') }}">
                             <ion-icon name="document"></ion-icon>
-                        </button>
+                        </a>
                     </div>
+                    
                 </div>
             @endforeach
         </div>
     </section>
-
+    
     <!-- Bootstrap Modal -->
     <div class="modal fade" id="documentModal" tabindex="-1" role="dialog" aria-labelledby="documentModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">

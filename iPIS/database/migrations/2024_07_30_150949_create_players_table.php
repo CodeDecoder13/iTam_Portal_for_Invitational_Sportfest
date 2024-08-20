@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('team_id')->constrained()->onDelete('cascade');
             $table->foreignId('coach_id')->constrained('users')->onDelete('cascade'); // Adding the coach_id foreign key
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Foreign key referencing users table
             $table->string('jersey_no', 10);
             $table->string('first_name', 255);
             $table->string('middle_name', 255)->nullable();
