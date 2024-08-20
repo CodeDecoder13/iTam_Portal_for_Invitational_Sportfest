@@ -60,6 +60,10 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/teams/{id}', [AdminController::class, 'showteam'])->name('admin.showteams');
     Route::get('/sidebar', [UserController::class, 'getCurrentTeams'])->name('sidebar');
     Route::get('/players-team-documents', [AdminController::class, 'teamdocuments'])->name('admin.playersTeamDocuments');
+
+    Route::get('/SummaryOfPlayers', [AdminController::class, 'documentChecker'])->name('admin.SummaryOfPlayers');
+
+    
 });
 
 

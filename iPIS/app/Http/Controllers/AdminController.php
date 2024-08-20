@@ -23,6 +23,10 @@ class AdminController extends Controller
     {
         return view('admin.admin-sidebar.documents');
     }
+    public function documentChecker()
+    {
+        return view('admin.admin-sidebar.team-documents.SummaryOfPlayers');
+    }
 
     public function calendar()
     {
@@ -155,6 +159,7 @@ class AdminController extends Controller
     {
         return view('admin.admin-sidebar.players-team-documents');
     }
+    
     
 
 }
