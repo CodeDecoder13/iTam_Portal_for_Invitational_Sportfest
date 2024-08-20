@@ -1,180 +1,347 @@
-{{/*<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="description" content="Your website description here">
-
-    <title>{{ config('app.name', 'Laravel') }}</title>
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-    <!-- Stylesheets -->
-    @vite('resources/css/app.css') <!-- Ensure you are using Vite correctly -->
-
-    <!-- Scripts -->
-    @vite('resources/js/app.js')
-</head>
-
-<body class="font-sans antialiased bg-gray-100 min-h-screen flex">
-    <div class="flex flex-row w-full h-full">
-        <!-- Left Sidebar -->
-        <div class="bg-green-600 text-white text-center flex items-center justify-center p-4 h-full" style="writing-mode: vertical-rl;">
-            <span class="font-bold text-lg">NALS</span>
-        </div>
-
-        <!-- Main Content -->
-        <div class="w-full flex flex-col justify-center items-center p-5">
-            <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-2/4">
-                <!-- Step Tracker -->
-                <div class="flex mb-8 justify-center">
-                    <div class="flex-1 text-center">
-                        <div class="w-10 h-10 bg-green-600 text-white rounded-full inline-flex items-center justify-center step-circle" data-step="1">1</div>
-                        <div class="mt-2 text-sm font-bold text-green-600">Account Details</div>
-                    </div>
-                    <div class="flex-1 text-center">
-                        <div class="w-10 h-10 bg-gray-300 text-gray-700 rounded-full inline-flex items-center justify-center step-circle" data-step="2">2</div>
-                        <div class="mt-2 text-sm text-gray-700">Team Details</div>
-                    </div>
-                    <div class="flex-1 text-center">
-                        <div class="w-10 h-10 bg-gray-300 text-gray-700 rounded-full inline-flex items-center justify-center step-circle" data-step="3">3</div>
-                        <div class="mt-2 text-sm text-gray-700">Data Privacy</div>
+<x-app-layout>
+    <section class="flex flex-col w-full">
+        <div class="m-auto bg-green-700 text-white w-full lg:w-1/2 p-5 rounded-xl">
+            <h1 class="text-center font-bold">Add Team</h1>
+            <form id="team-form" class="p-5" type="POST">
+                <div class="w-full">
+                    <label for="teamname" class="block text-sm font-medium leading-6">Team Name</label>
+                    <div class="mt-2">
+                        <div
+                            class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-slate-600">
+                            <input type="text" name="teamname" id="teamname" autocomplete="teamname"
+                                class="block flex-1 border-1 rounded-md bg-transparent py-1.5 pl-1 text-white w-full placeholder:text-slate-300 focus:ring-0 sm:text-sm sm:leading-6"
+                                placeholder="Enter Team Name">
+                        </div>
                     </div>
                 </div>
-
-                <form id="wizard-form" method="POST" action="">
-                    @csrf
-                    <div class="wizard-step" id="step-1">
-                        <h2 class="text-xl font-bold mb-4">Account Details</h2>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="first_name">First Name</label>
-                            <input type="text" id="first_name" name="first_name"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                required>
+                <div class="w-full">
+                    <label for="teamacro" class="block text-sm font-medium leading-6">Team Name Acronym (Max of 5
+                        letters ex. FITEC)</label>
+                    <div class="mt-2">
+                        <div
+                            class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-slate-600">
+                            <input type="text" name="teamacro" id="teamacro" autocomplete="teamacro"
+                                class="block flex-1 border-1 rounded-md bg-transparent py-1.5 pl-1 text-white w-full placeholder:text-slate-300 focus:ring-0 sm:text-sm sm:leading-6"
+                                placeholder="Enter Team Name">
                         </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="last_name">Last Name</label>
-                            <input type="text" id="last_name" name="last_name"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                required>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="email">Email Address</label>
-                            <input type="email" id="email" name="email"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                required>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="birth_date">Birth Date</label>
-                            <input type="date" id="birth_date" name="birth_date"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                required>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="gender">Gender</label>
-                            <select id="gender" name="gender"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                required>
-                                <option value="">Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
+                    </div>
+                </div>
+                <div class="w-full">
+                    <label for="sportcategory" class="block text-sm font-medium leading-6">Sport Category</label>
+                    <div class="mt-2">
+                        <div
+                            class="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-slate-600">
+                            <select name="sportcategory" id="sportcategory"
+                                class="block flex-1 border-1 rounded-md bg-transparent py-1.5 pl-1 text-white w-full placeholder:text-slate-300 focus:ring-0 sm:text-sm sm:leading-6">
+                                <option class="text-black" value="" disabled selected>Select a Sport Category
+                                </option>
+                                <option class="text-black" value="basketball">Basketball</option>
+                                <option class="text-black" value="soccer">Soccer</option>
+                                <option class="text-black" value="baseball">Baseball</option>
+                                <option class="text-black" value="tennis">Tennis</option>
                             </select>
                         </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
-                            <input type="password" id="password" name="password"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                required>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="confirm_password">Confirm
-                                Password</label>
-                            <input type="password" id="confirm_password" name="confirm_password"
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                required>
-                        </div>
-                        <button type="button"
-                            class="next-step bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Proceed</button>
                     </div>
-<!--
-                    <div class="wizard-step hidden" id="step-2">
-                        <h2 class="text-xl font-bold mb-4">Team Details</h2>
-                        <button type="button"
-                            class="prev-step bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Previous</button>
-                        <button type="button"
-                            class="next-step bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Next</button>
-                    </div> -->
+                </div>
+            </form>
+        </div>
+        <div class="m-auto mt-4 border w-full lg:w-1/2 p-5 rounded-xl">
+            <h1 class="text-2xl font-bold mb-4">Team Members</h1>
+            <div id="team-members-list">
+                <!-- Team members will be added here -->
+                <div id="hidethis">There are no players added yet.</div>
+            </div>
+            <div class="w-full flex justify-center">
+                <button id="add-player-btn-modal"
+                    class="hover:bg-green-700 mt-2 hover:text-white transition duration-200 px-4 py-1 rounded-full border"
+                    type="button" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                    <span class="bg-green-700 text-white rounded-full px-1">+</span> Add Player
+                </button>
+            </div>
+        </div>
+        <div class="w-full flex justify-center mt-4">
+            <button id="submit"
+                class="bg-green-700 font-bold text-white transition duration-200 px-4 py-1 rounded-full border">
+                Proceed
+            </button>
+        </div>
 
-                    <div class="wizard-step hidden" id="step-2">
-                        <h2 class="text-xl font-bold mb-4">Data Privacy</h2>
-                        <div class="mb-4">
-                            <label class="block text-gray-700 text-sm font-bold mb-2" for="data_privacy">Data Privacy
-                                Agreement</label>
-                            <input type="checkbox" id="data_privacy" name="data_privacy"
-                                class="shadow appearance-none border rounded leading-tight focus:outline-none focus:shadow-outline"
-                                required>
-                            <label for="data_privacy" class="ml-2">I agree to the data privacy terms and
-                                conditions.</label>
-                        </div>
-                        <button type="button"
-                            class="prev-step bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Previous</button>
-                        <button type="submit"
-                            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Submit</button>
+        <!-- Add Player Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Add Player</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                </form>
+                    <div class="modal-body">
+                        <form id="player-form">
+                            <div class="mb-3">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstName" name="first_name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="middleName" class="form-label">Middle Name</label>
+                                <input type="text" class="form-control" id="middleName" name="middle_name">
+                            </div>
+                            <div class="mb-3">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lastName" name="last_name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="birthday" class="form-label">Birthday</label>
+                                <input type="date" class="form-control" id="birthday" name="birthday">
+                            </div>
+                            <div class="mb-3">
+                                <label for="gender" class="form-label">Gender</label>
+                                <select class="form-select" id="gender" name="gender">
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" id="save-player-btn" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Right Sidebar -->
-        <div class="bg-yellow-600 text-white text-center flex items-center justify-center p-4" style="writing-mode: vertical-rl;">
-            <span class="font-bold text-lg">INVITATIONALS</span>
+        <!-- Edit Player Modal -->
+        <div class="modal fade" id="editPlayerModal" tabindex="-1" aria-labelledby="editPlayerModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editPlayerModalLabel">Edit Player</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="edit-player-form">
+                            <div class="mb-3">
+                                <label for="editFirstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="editFirstName" name="edit_first_name"
+                                    required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editMiddleName" class="form-label">Middle Name</label>
+                                <input type="text" class="form-control" id="editMiddleName"
+                                    name="edit_middle_name">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editLastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="editLastName" name="edit_last_name"
+                                    required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editBirthday" class="form-label">Birthday</label>
+                                <input type="date" class="form-control" id="editBirthday" name="edit_birthday">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editGender" class="form-label">Gender</label>
+                                <select class="form-select" id="editGender" name="edit_gender">
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" id="save-edit-player-btn" class="btn btn-primary">Save
+                            Changes</button>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const steps = document.querySelectorAll('.wizard-step');
-            const stepCircles = document.querySelectorAll('.step-circle');
-            let currentStep = 0;
+        // Initialize player array
+        var players = [];
+        var counter = 0;
 
-            function showStep(index) {
-                steps.forEach((step, i) => {
-                    step.classList.toggle('hidden', i !== index);
-                });
-                stepCircles.forEach((circle, i) => {
-                    if (i <= index) {
-                        circle.classList.add('bg-green-600', 'text-white');
-                        circle.classList.remove('bg-gray-300', 'text-gray-700');
-                    } else {
-                        circle.classList.remove('bg-green-600', 'text-white');
-                        circle.classList.add('bg-gray-300', 'text-gray-700');
-                    }
-                });
+        document.getElementById('save-player-btn').addEventListener('click', function() {
+            if (counter == 0) {
+                document.getElementById('hidethis').style.display = 'none';
+                counter++;
             }
+            // Get player details from the form
+            var firstName = document.getElementById('firstName').value;
+            var middleName = document.getElementById('middleName').value;
+            var lastName = document.getElementById('lastName').value;
+            var birthday = document.getElementById('birthday').value;
+            var gender = document.getElementById('gender').value;
 
-            document.querySelectorAll('.next-step').forEach(button => {
-                button.addEventListener('click', () => {
-                    currentStep = Math.min(steps.length - 1, currentStep + 1);
-                    showStep(currentStep);
-                });
+            // Create a player object
+            var newPlayer = {
+                firstName,
+                middleName,
+                lastName,
+                birthday,
+                gender
+            };
+
+            // Add the new player to the player array
+            players.push(newPlayer);
+
+            // Add the new player to the team members list
+            var playerList = document.getElementById('team-members-list');
+            var playerItem = document.createElement('div');
+            playerItem.className = 'p-4 mb-4 border rounded flex';
+            playerItem.innerHTML = `
+                <div class="w-7/12">
+                    <p class="text-green-700"><strong>${firstName} ${lastName}</strong></p>
+                    <p>${middleName}</p>
+                    <p>${birthday}</p>
+                    <p>${gender}</p>
+                </div>
+                <div class="w-5/12 flex justify-between">
+                    <button class="bg-green-700 text-white px-4 py-1 rounded-full edit-player-btn" data-index="${players.length - 1}" data-bs-toggle="modal" data-bs-target="#editPlayerModal">Edit</button>
+                    <button class="bg-red-700 text-white px-4 py-1 rounded-full remove-player-btn" data-index="${players.length - 1}">Remove</button>
+                </div>
+            `;
+            playerList.appendChild(playerItem);
+
+            // Close the modal
+            var modal = bootstrap.Modal.getInstance(document.getElementById('exampleModal'));
+            modal.hide();
+
+            // Clear the form
+            document.getElementById('player-form').reset();
+        });
+
+        // Edit player button click event
+        document.getElementById('team-members-list').addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('edit-player-btn')) {
+                var index = e.target.getAttribute('data-index');
+                var player = players[index];
+
+                // Fill the edit form with player data
+                document.getElementById('editFirstName').value = player.firstName;
+                document.getElementById('editMiddleName').value = player.middleName;
+                document.getElementById('editLastName').value = player.lastName;
+                document.getElementById('editBirthday').value = player.birthday;
+                document.getElementById('editGender').value = player.gender;
+
+                // Save the index in the save button
+                document.getElementById('save-edit-player-btn').setAttribute('data-index', index);
+            }
+        });
+
+        // Save changes in the edit modal
+        document.getElementById('save-edit-player-btn').addEventListener('click', function() {
+            var index = this.getAttribute('data-index');
+            var player = players[index];
+
+            // Get edited details from the form
+            player.firstName = document.getElementById('editFirstName').value;
+            player.middleName = document.getElementById('editMiddleName').value;
+            player.lastName = document.getElementById('editLastName').value;
+            player.birthday = document.getElementById('editBirthday').value;
+            player.gender = document.getElementById('editGender').value;
+
+            // Update the player in the array
+            players[index] = player;
+
+            // Update the player in the list
+            var playerList = document.getElementById('team-members-list');
+            var playerItems = playerList.getElementsByClassName('p-4 mb-4 border rounded flex');
+            var playerItem = playerItems[index];
+            playerItem.innerHTML = `
+                <div class="w-7/12">
+                    <p class="text-green-700"><strong>${player.firstName} ${player.lastName}</strong></p>
+                    <p>${player.middleName}</p>
+                    <p>${player.birthday}</p>
+                    <p>${player.gender}</p>
+                </div>
+                <div class="w-5/12 flex justify-between">
+                    <button class="bg-green-700 text-white px-4 py-1 rounded-full edit-player-btn" data-index="${index}" data-bs-toggle="modal" data-bs-target="#editPlayerModal">Edit</button>
+                    <button class="bg-red-700 text-white px-4 py-1 rounded-full remove-player-btn" data-index="${index}">Remove</button>
+                </div>
+            `;
+
+            // Close the modal
+            var modal = bootstrap.Modal.getInstance(document.getElementById('editPlayerModal'));
+            modal.hide();
+        });
+
+        // Remove player button click event
+        document.getElementById('team-members-list').addEventListener('click', function(e) {
+            if (e.target && e.target.classList.contains('remove-player-btn')) {
+                var index = e.target.getAttribute('data-index');
+
+                // Remove the player from the array
+                players.splice(index, 1);
+
+                // Remove the player from the list
+                var playerList = document.getElementById('team-members-list');
+                playerList.removeChild(e.target.parentNode.parentNode);
+
+                // Re-index the remaining players and update the data-index attributes
+                var playerItems = playerList.getElementsByClassName('p-4 mb-4 border rounded flex');
+                for (var i = 0; i < playerItems.length; i++) {
+                    var editButton = playerItems[i].getElementsByClassName('edit-player-btn')[0];
+                    var removeButton = playerItems[i].getElementsByClassName('remove-player-btn')[0];
+                    editButton.setAttribute('data-index', i);
+                    removeButton.setAttribute('data-index', i);
+                }
+            }
+        });
+
+        document.getElementById('submit').addEventListener('click', function() {
+            // Get team form data
+            var teamForm = document.getElementById('team-form');
+            var formData = new FormData(teamForm);
+            var teamData = {
+                teamName: formData.get('teamname'),
+                teamAcronym: formData.get('teamacro'),
+                sportCategory: formData.get('sportcategory'),
+                players: players
+            };
+
+            // Submit teamData (e.g., send it to the server)
+            console.log('Submitting team data:', teamData);
+            $.ajaxSetup({
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
             });
-
-            document.querySelectorAll('.prev-step').forEach(button => {
-                button.addEventListener('click', () => {
-                    currentStep = Math.max(0, currentStep - 1);
-                    showStep(currentStep);
-                });
+            $.ajax({
+                url: '/save-team',
+                type: 'POST',
+                data: JSON.stringify(teamData),
+                success: function(response) {
+                    alert(response.message);
+                    window.location.href = "{{ route('dashboard') }}";
+                },
+                error: function(xhr) {
+                    if (xhr.status === 422) {
+                        // Validation error
+                        var errors = xhr.responseJSON.errors;
+                        var errorMessage = 'Validation Error:\n';
+                        for (var field in errors) {
+                            if (errors.hasOwnProperty(field)) {
+                                errorMessage += errors[field].join('\n') + '\n';
+                            }
+                        }
+                        alert(errorMessage);
+                    } else {
+                        alert('Error saving Team data');
+                    }
+                }
             });
-
-            showStep(currentStep);
         });
     </script>
-</body>
 
-</html>
-}}
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous">
+    </script>
+</x-app-layout>

@@ -76,7 +76,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
 
 
 
-Route::post('/testing-site', [TestingController::class, 'test'])->name('test.');
+Route::get('/testing-site', [TestingController::class, 'test'])->name('test.');
 
 //Route for save team
 Route::post('/save-team', [TestingController::class, 'addteam'])->name('test.addteam');
