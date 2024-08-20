@@ -23,6 +23,13 @@ class AdminController extends Controller
     {
         return view('admin.admin-sidebar.documents');
     }
+    public function documentChecker()
+    {
+        $players = Player::all();
+        $teams = Team::all();
+        $users = User::all();
+        return view('admin.admin-sidebar.team-documents.SummaryOfPlayers',compact('players','teams','users'));
+    }
 
     public function calendar()
     {
@@ -155,6 +162,7 @@ class AdminController extends Controller
     {
         return view('admin.admin-sidebar.players-team-documents');
     }
+    
     
 
 }

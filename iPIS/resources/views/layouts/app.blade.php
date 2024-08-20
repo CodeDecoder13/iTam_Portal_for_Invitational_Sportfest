@@ -9,7 +9,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 
-    <title>{{ config('app.name', 'ITam_Ivitationals_Sportfest') }}</title>
+    <title>{{ config('app.name', 'ITam_Invitationals_Sportfest') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
