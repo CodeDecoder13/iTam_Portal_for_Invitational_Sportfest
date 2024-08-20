@@ -33,11 +33,12 @@
             <!-- Players List -->
             @foreach ($players as $player)
                 <div class="grid grid-cols-12 px-4 py-3 bg-white rounded-lg border mt-3">
-                    <div class="col-span-2">{{ $player->jersey_no }}</div>
+                    <div class="col-span-1">{{ $player->jersey_no }}</div>
                     <div class="col-span-2">{{ $player->first_name }} {{ $player->last_name }}</div>
-                    <div class="col-span-2">{{ $player->sport_category }}</div>
+                    <div class="col-span-2">{{ $player->team->sport_category }}</div>
+                    <div class="col-span-2">{{ $player->team->name }}</div>
                     <div class="col-span-2">{{ $player->gender }}</div>
-                    <div class="col-span-2">
+                    <div class="col-span-1">
                         @switch($player->status)
                             @case('Approved')
                                 <span class="text-green-500">Approved</span>
