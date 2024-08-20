@@ -11,6 +11,27 @@
                 <div class="col-span-3">Status</div>
                 <div class="col-span-1">Action</div>
             </div>
+
+            <!-- Check if a team is selected -->
+            @if (session('selected_team'))
+                @php
+                    // Fetch team-related data based on selected team ID
+                    $team = App\Models\Team::where('id', session('selected_team'))
+                        ->where('coach_id', Auth::user()->id)
+                        ->first();
+                    
+                    // Get the last updated date and status from the related players
+                    $lastUpdated = $team ? $team->players()->latest()->first()->updated_at ?? 'No Data' : 'No Data';
+                    $status = $team ? $team->players()->latest()->first()->status ?? 'No File Attached' : 'No File Attached';
+                @endphp
+            @else
+                @php
+                    // Default or fallback data when no team is selected
+                    $lastUpdated = 'No Data';
+                    $status = 'No Team Selected';
+                @endphp
+            @endif
+
             <div class="grid grid-cols-12 px-4 py-3 rounded-lg border mt-2">
                 <div class="col-span-4">Summary of Players</div>
                 <div class="col-span-4">{{ $lastUpdated }}</div>

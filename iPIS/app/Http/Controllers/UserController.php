@@ -42,8 +42,6 @@ class UserController extends Controller
         $teams = Team::where('coach_id', $coachId)->get();
         return view('layouts.sidebar', compact('teams'));
     }
-
-
     // In your UserController
 
     public function myDocuments_sub($type)

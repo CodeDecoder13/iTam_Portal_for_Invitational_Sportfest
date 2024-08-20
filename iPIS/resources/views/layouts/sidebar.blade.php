@@ -111,6 +111,8 @@
     </a>
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
+            <form action="{{ route('select-team') }}" method="POST">
+                @csrf
             @if (Auth::user()->is_active)
                 <div class="sm:col-span-3" style="margin-bottom: 30px">
                     <label for="team" class="block text-sm font-medium leading-6 text-white">Select team</label>
@@ -124,7 +126,7 @@
                                     {{ isset($newTeam) && $newTeam->id === $team->id ? 'selected' : '' }}>
                                     {{ $team->name }} - {{ $team->sport_category }}</option>
                             @endforeach
-                            <option value="add-new-team"><a href="/add-teams"><sup>+</sup>Add New Team</a></option>
+                            <option value="add-new-team">Add New Team</option>
                         </select>
                     </div>
                 </div>

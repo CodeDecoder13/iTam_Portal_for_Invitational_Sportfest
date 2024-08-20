@@ -1,3 +1,4 @@
+
 <x-app-layout>
     <section class="grid grid-cols-1">
         <div class="grid grid-cols-2">
@@ -15,11 +16,12 @@
         <div class="grid grid-cols-1 mt-5">
             <!-- Header Row -->
             <div class="grid grid-cols-12 px-4 py-3 bg-green-700 text-white rounded-lg border">
-                <div class="font-bold col-span-2">Jersey No.</div>
+                <div class="font-bold col-span-1">Jersey No.</div>
                 <div class="font-bold col-span-2">Given Name</div>
                 <div class="font-bold col-span-2">Sport Category</div>
+                <div class="font-bold col-span-2">Team Name</div>
                 <div class="font-bold col-span-2">Gender</div>
-                <div class="font-bold col-span-2">Status</div>
+                <div class="font-bold col-span-1">Status</div>
                 <div class="font-bold col-span-2">Action</div>
             </div>
             <!-- No Players -->
