@@ -52,4 +52,5 @@ class User extends Authenticatable
             'is_active' => 'boolean', // Cast is_active as boolean
         ];
     }
+   
 }

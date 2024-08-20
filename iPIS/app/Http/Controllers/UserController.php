@@ -42,8 +42,6 @@ class UserController extends Controller
         $teams = Team::where('coach_id', $coachId)->get();
         return view('layouts.sidebar', compact('teams'));
     }
-
-
     // In your UserController
 
 public function myDocuments_sub($type)
@@ -261,7 +259,8 @@ public function myDocuments_sub($type)
     public function myPlayers()
     {
         $players = Player::all();
-        return view('user-sidebar.my-players', compact('players'));
+        $team = Team::all();
+        return view('user-sidebar.my-players', compact('players','team'));
     }
     public function addTeams()
     {
