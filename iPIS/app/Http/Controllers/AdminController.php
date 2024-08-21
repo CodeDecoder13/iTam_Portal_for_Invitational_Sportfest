@@ -23,14 +23,7 @@ class AdminController extends Controller
     {
         return view('admin.admin-sidebar.documents');
     }
-    public function documentChecker()
-    {
-        $players = Player::all();
-        $teams = Team::all();
-        $users = User::all();
-        
-        return view('admin.admin-sidebar.team-documents.SummaryOfPlayers',compact('players','teams','users'));
-    }
+  
     public function documentCheckerFilter(Request $request)
     {
         $players = Player::all();
@@ -46,7 +39,6 @@ class AdminController extends Controller
         });
     }
 
-    // Filtering by sport
     // Filtering by sport
 if ($request->filled('sport_category')) {
     $query->whereHas('team', function($q) use ($request) {
@@ -65,7 +57,7 @@ if ($request->filled('sport_category')) {
     }
 
     $players = $query->get();
-        return view('admin.admin-sidebar.team-documents.SummaryOfPlayers2',compact('players','teams','users'));
+        return view('admin.admin-sidebar.team-documents.SummaryOfPlayers',compact('players','teams','users'));
     }
 
     public function calendar()
