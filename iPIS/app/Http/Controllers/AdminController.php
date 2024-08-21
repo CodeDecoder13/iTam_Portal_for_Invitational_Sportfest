@@ -28,7 +28,44 @@ class AdminController extends Controller
         $players = Player::all();
         $teams = Team::all();
         $users = User::all();
+        
         return view('admin.admin-sidebar.team-documents.SummaryOfPlayers',compact('players','teams','users'));
+    }
+    public function documentCheckerFilter(Request $request)
+    {
+        $players = Player::all();
+        $teams = Team::all();
+        $users = User::all();
+        $query = Player::query();
+
+    // Filtering based on search input
+    if ($request->filled('search')) {
+        $query->where(function($q) use ($request) {
+            $q->where('first_name', 'like', '%' . $request->search . '%')
+              ->orWhere('last_name', 'like', '%' . $request->search . '%');
+        });
+    }
+
+    // Filtering by sport
+    // Filtering by sport
+if ($request->filled('sport_category')) {
+    $query->whereHas('team', function($q) use ($request) {
+        $q->where('sport_category', $request->input('sport_category'));
+    });
+}
+
+    // Filtering by team
+    if ($request->filled('team')) {
+        $query->where('team_id', $request->team);
+    }
+
+    // Filtering by status
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    $players = $query->get();
+        return view('admin.admin-sidebar.team-documents.SummaryOfPlayers2',compact('players','teams','users'));
     }
 
     public function calendar()
