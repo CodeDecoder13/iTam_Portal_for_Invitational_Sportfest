@@ -106,77 +106,78 @@
 
                 <!-- Default to View Birth Certificate Modal if uploaded -->
                 @if ($player->has_birth_certificate)
-                    <div class="modal fade" id="viewBirthCertificateModal-{{ $player->id }}" tabindex="-1" aria-labelledby="viewBirthCertificateModalLabel-{{ $player->id }}" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header border-0">
-                                    <h5 class="modal-title" id="viewBirthCertificateModalLabel-{{ $player->id }}">View PSA Birth Certificate</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body text-center">
-                                    <p class="mb-1">Status: 
-                                        @if ($player->birth_certificate_status == 'submitted')
-                                            <span class="text-primary">Submitted</span>
-                                        @else
-                                            <span class="text-muted">Not Submitted</span>
-                                        @endif
-                                    </p>
-                                    <div class="scrollable-content mx-auto my-3">
-                                        <div class="mb-4">
-                                            <img src="{{ asset('storage/birth_certificates/' . $player->birth_certificate) }}" alt="PSA Birth Certificate" style="width: 100%; height: auto;">
-                                        </div>
+                <div class="modal fade" id="viewBirthCertificateModal-{{ $player->id }}" tabindex="-1" aria-labelledby="viewBirthCertificateModalLabel-{{ $player->id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header border-0">
+                                <h5 class="modal-title" id="viewBirthCertificateModalLabel-{{ $player->id }}">View PSA Birth Certificate</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <p class="mb-1">Status: 
+                                    @if ($player->birth_certificate_status == 'submitted')
+                                        <span class="text-primary">Submitted</span>
+                                    @else
+                                        <span class="text-muted">Not Submitted</span>
+                                    @endif
+                                </p>
+                                <div class="scrollable-content mx-auto my-3">
+                                    <div class="mb-4">
+                                        <img src="{{ route('player.viewBirthCertificate', $player->id) }}" alt="PSA Birth Certificate" style="width: 100%; height: auto;">
                                     </div>
                                 </div>
-                                <div class="modal-footer border-0 justify-content-center">
-                                    <form action="{{ route('delete.player.birth_certificate', $player->id) }}" method="POST" style="display:inline;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-link text-danger">Delete</button>
-                                    </form>
-                                    <a href="{{ asset('storage/birth_certificates/' . $player->birth_certificate) }}" class="btn btn-success" download>Download PDF</a>
-                                    <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#uploadBirthCertificateModal-{{ $player->id }}">Change</button>
-                                </div>
+                            </div>
+                            <div class="modal-footer border-0 justify-content-center">
+                                <form action="{{ route('delete.player.birth_certificate', $player->id) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-link text-danger">Delete</button>
+                                </form>
+                                <a href="{{ route('player.viewBirthCertificate', $player->id) }}" class="btn btn-success" download>Download PDF</a>
+                                <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#uploadBirthCertificateModal-{{ $player->id }}">Change</button>
                             </div>
                         </div>
                     </div>
+                </div>
                 @endif
 
                 <!-- Default to View Parental Consent Modal if uploaded -->
                 @if ($player->has_parental_consent)
-                    <div class="modal fade" id="viewParentalConsentModal-{{ $player->id }}" tabindex="-1" aria-labelledby="viewParentalConsentModalLabel-{{ $player->id }}" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header border-0">
-                                    <h5 class="modal-title" id="viewParentalConsentModalLabel-{{ $player->id }}">Parental Consent</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body text-center">
-                                    <p class="mb-1">Status: 
-                                        @if ($player->parental_consent_status == 'submitted')
-                                            <span class="text-primary">Submitted</span>
-                                        @else
-                                            <span class="text-muted">Not Submitted</span>
-                                        @endif
-                                    </p>
-                                    <div class="scrollable-content mx-auto my-3">
-                                        <div class="mb-4">
-                                            <img src="{{ asset('storage/parental_consents/' . $player->parental_consent) }}" alt="Parental Consent" style="width: 100%; height: auto;">
-                                        </div>
+                <div class="modal fade" id="viewParentalConsentModal-{{ $player->id }}" tabindex="-1" aria-labelledby="viewParentalConsentModalLabel-{{ $player->id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header border-0">
+                                <h5 class="modal-title" id="viewParentalConsentModalLabel-{{ $player->id }}">Parental Consent</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <p class="mb-1">Status: 
+                                    @if ($player->parental_consent_status == 'submitted')
+                                        <span class="text-primary">Submitted</span>
+                                    @else
+                                        <span class="text-muted">Not Submitted</span>
+                                    @endif
+                                </p>
+                                <div class="scrollable-content mx-auto my-3">
+                                    <div class="mb-4">
+                                        <img src="{{ route('player.viewParentalConsent', $player->id) }}" alt="Parental Consent" style="width: 100%; height: auto;">
                                     </div>
                                 </div>
-                                <div class="modal-footer border-0 justify-content-center">
-                                    <form action="{{ route('delete.player.parental_consent', $player->id) }}" method="POST" style="display:inline;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-link text-danger">Delete</button>
-                                    </form>
-                                    <a href="{{ asset('storage/parental_consents/' . $player->parental_consent) }}" class="btn btn-success" download>Download PDF</a>
-                                    <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#uploadParentalConsentModal-{{ $player->id }}">Change</button>
-                                </div>
+                            </div>
+                            <div class="modal-footer border-0 justify-content-center">
+                                <form action="{{ route('delete.player.parental_consent', $player->id) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-link text-danger">Delete</button>
+                                </form>
+                                <a href="{{ route('player.viewParentalConsent', $player->id) }}" class="btn btn-success" download>Download PDF</a>
+                                <button type="button" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#uploadParentalConsentModal-{{ $player->id }}">Change</button>
                             </div>
                         </div>
                     </div>
+                </div>
                 @endif
+
 
             @endforeach
         </div>
