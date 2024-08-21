@@ -65,7 +65,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/sidebar', [UserController::class, 'getCurrentTeams'])->name('sidebar');
     Route::get('/players-team-documents', [AdminController::class, 'teamdocuments'])->name('admin.playersTeamDocuments');
 
-    Route::get('/SummaryOfPlayers', [AdminController::class, 'documentChecker'])->name('admin.SummaryOfPlayers');
+   
 
     
 });
@@ -75,6 +75,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::post('/document/reject/{player}/{document}', [DocumentCheckerController::class, 'rejectDocument'])->name('document.reject');
     Route::get('/document/download/{player}/{document}', [DocumentCheckerController::class, 'downloadDocument'])->name('document.download');
     Route::delete('/document/delete/{player}/{document}', [DocumentCheckerController::class, 'deleteDocument'])->name('document.delete');
+    Route::get('/summary-of-players', [AdminController::class, 'documentCheckerFilter'])->name('admin.SummaryOfPlayers');
 });
 
 
