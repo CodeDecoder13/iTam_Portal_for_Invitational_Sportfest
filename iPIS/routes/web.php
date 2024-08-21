@@ -34,6 +34,7 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::post('/store/team', [UserController::class, 'storeTeam'])->name('store.team');
     Route::get('/add-players', [UserController::class, 'addPlayers'])->name('add-players');
     Route::post('/store-players', [UserController::class, 'storePlayers'])->name('store.players');
+    Route::post('/update-players', [UserController::class, 'updatePlayers'])->name('update.players');
     Route::get('/select-team', [UserController::class, 'selectTeam'])->name('select-team');
     Route::post('/upload/player/{id}/birth_certificate', [UserController::class, 'uploadPlayerDocuments'])->name('upload.player.birth_certificate');
     Route::post('/upload/player/{id}/parental_consent', [UserController::class, 'uploadPlayerDocuments'])->name('upload.player.parental_consent');

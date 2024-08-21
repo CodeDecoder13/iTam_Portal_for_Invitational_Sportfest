@@ -42,7 +42,7 @@ class UserController extends Controller
         $teams = Team::where('coach_id', $coachId)->get();
         return view('layouts.sidebar', compact('teams'));
     }
-    
+
 
     public function myDocuments_sub($type)
     {
@@ -141,52 +141,52 @@ class UserController extends Controller
 
         return redirect()->back()->with('success', 'Documents uploaded successfully and status updated to "For Review".');
     }
-    
-        // Method to view and download PSA Birth Certificate
-        public function viewBirthCertificate($id)
-        {
-            $player = Player::findOrFail($id);
-    
-            if ($player->birth_certificate) {
-                $filePath = 'public/birth_certificates/' . $player->birth_certificate;
-    
-                // Check if the file exists in the storage
-                if (Storage::exists($filePath)) {
-                    $mimeType = Storage::mimeType($filePath);
-                    return Storage::download($filePath, $player->birth_certificate, [
-                        'Content-Type' => $mimeType,
-                    ]);
-                } else {
-                    return redirect()->back()->with('error', 'Birth Certificate file not found.');
-                }
+
+    // Method to view and download PSA Birth Certificate
+    public function viewBirthCertificate($id)
+    {
+        $player = Player::findOrFail($id);
+
+        if ($player->birth_certificate) {
+            $filePath = 'public/birth_certificates/' . $player->birth_certificate;
+
+            // Check if the file exists in the storage
+            if (Storage::exists($filePath)) {
+                $mimeType = Storage::mimeType($filePath);
+                return Storage::download($filePath, $player->birth_certificate, [
+                    'Content-Type' => $mimeType,
+                ]);
             } else {
-                return redirect()->back()->with('error', 'No Birth Certificate uploaded for this player.');
+                return redirect()->back()->with('error', 'Birth Certificate file not found.');
             }
+        } else {
+            return redirect()->back()->with('error', 'No Birth Certificate uploaded for this player.');
         }
-    
-        // Method to view and download Parental Consent
-        public function viewParentalConsent($id)
-        {
-            $player = Player::findOrFail($id);
-    
-            if ($player->parental_consent) {
-                $filePath = 'public/parental_consents/' . $player->parental_consent;
-    
-                // Check if the file exists in the storage
-                if (Storage::exists($filePath)) {
-                    $mimeType = Storage::mimeType($filePath);
-                    return Storage::download($filePath, $player->parental_consent, [
-                        'Content-Type' => $mimeType,
-                    ]);
-                } else {
-                    return redirect()->back()->with('error', 'Parental Consent file not found.');
-                }
+    }
+
+    // Method to view and download Parental Consent
+    public function viewParentalConsent($id)
+    {
+        $player = Player::findOrFail($id);
+
+        if ($player->parental_consent) {
+            $filePath = 'public/parental_consents/' . $player->parental_consent;
+
+            // Check if the file exists in the storage
+            if (Storage::exists($filePath)) {
+                $mimeType = Storage::mimeType($filePath);
+                return Storage::download($filePath, $player->parental_consent, [
+                    'Content-Type' => $mimeType,
+                ]);
             } else {
-                return redirect()->back()->with('error', 'No Parental Consent uploaded for this player.');
+                return redirect()->back()->with('error', 'Parental Consent file not found.');
             }
+        } else {
+            return redirect()->back()->with('error', 'No Parental Consent uploaded for this player.');
         }
-    
-    
+    }
+
+
 
     // Method to delete PSA Birth Certificate
     public function deleteBirthCertificate($id)
@@ -279,7 +279,53 @@ class UserController extends Controller
             return response()->json([
                 'message' => 'An error occurred while saving players.',
                 'error' => $e->getMessage()
-            ], 500);    
+            ], 500);
+        }
+    }
+
+
+
+
+    public function updatePlayers(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'playerid' => 'required|integer|exists:players,id',
+                'teamNumber' => 'required|integer|exists:teams,id',
+                'firstName' => 'required|string|max:255',
+                'middleName' => 'nullable|string|max:255',
+                'lastName' => 'required|string|max:255',
+                'birthday' => 'required|date',
+                'gender' => 'required|string|in:Male,Female',
+                'jersey_no' => 'required|integer|min:1|max:99',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            Player::updateOrCreate(
+                [
+                    'id' => $request->input('playerid'),
+                ],
+                [
+                    'team_id' => $request->input('teamNumber'),
+                    'first_name' => $request->input('firstName'),
+                    'last_name' => $request->input('lastName'),
+                    'coach_id' => Auth::user()->id,
+                    'middle_name' => $request->input('middleName'),
+                    'birthday' => $request->input('birthday'),
+                    'gender' => $request->input('gender'),
+                    'jersey_no' => $request->input('jersey_no')
+                ]
+            );
+
+            return response()->json(['message' => 'Players saved successfully!']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred while saving players.',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
