@@ -88,7 +88,6 @@ class UserController extends Controller
 
     public function uploadPlayerDocuments(Request $request, $playerId)
     {
-
         $player = Player::findOrFail($playerId);
 
         // Fetch the school name, sport category, and player's name
@@ -107,12 +106,16 @@ class UserController extends Controller
             Storage::makeDirectory($playerFolderPath);
         }
 
+        $documentUploaded = false;
+
         // Handle the upload of the birth certificate
         if ($request->hasFile('birth_certificate')) {
             $birthCertificate = $request->file('birth_certificate');
             $birthCertificateName = 'birth_certificate.' . $birthCertificate->getClientOriginalExtension();
             $birthCertificate->storeAs($playerFolderPath, $birthCertificateName);
             $player->birth_certificate = $birthCertificateName;
+            $player->has_birth_certificate = true; // Mark that the player has a birth certificate
+            $documentUploaded = true; // Flag that a document has been uploaded
         }
 
         // Handle the upload of the parental consent
@@ -121,44 +124,70 @@ class UserController extends Controller
             $parentalConsentName = 'parental_consent.' . $parentalConsent->getClientOriginalExtension();
             $parentalConsent->storeAs($playerFolderPath, $parentalConsentName);
             $player->parental_consent = $parentalConsentName;
+            $player->has_parental_consent = true; // Mark that the player has parental consent
+            $documentUploaded = true; // Flag that a document has been uploaded
+        }
+
+        // If any document has been uploaded, update the status to "For Review"
+        if ($documentUploaded) {
+            $player->status = 'For Review';
+        } else {
+            // If no document is uploaded, set a message or handle accordingly
+            $player->status = 'No File Attached';
         }
 
         // Save the player's updated information
         $player->save();
 
-        return redirect()->back()->with('success', 'Documents uploaded successfully.');
+        return redirect()->back()->with('success', 'Documents uploaded successfully and status updated to "For Review".');
     }
-    public function deleteDocument(Request $request, $playerId)
-    {
-        $player = Player::findOrFail($playerId);
-        $type = $request->input('type');
-
-        if ($type === 'birth_certificate') {
-            Storage::delete("public/birth_certificates/{$player->birth_certificate}");
-            $player->birth_certificate = null;
+    
+        // Method to view and download PSA Birth Certificate
+        public function viewBirthCertificate($id)
+        {
+            $player = Player::findOrFail($id);
+    
+            if ($player->birth_certificate) {
+                $filePath = 'public/birth_certificates/' . $player->birth_certificate;
+    
+                // Check if the file exists in the storage
+                if (Storage::exists($filePath)) {
+                    $mimeType = Storage::mimeType($filePath);
+                    return Storage::download($filePath, $player->birth_certificate, [
+                        'Content-Type' => $mimeType,
+                    ]);
+                } else {
+                    return redirect()->back()->with('error', 'Birth Certificate file not found.');
+                }
+            } else {
+                return redirect()->back()->with('error', 'No Birth Certificate uploaded for this player.');
+            }
         }
-
-        if ($type === 'parental_consent') {
-            Storage::delete("public/parental_consents/{$player->parental_consent}");
-            $player->parental_consent = null;
+    
+        // Method to view and download Parental Consent
+        public function viewParentalConsent($id)
+        {
+            $player = Player::findOrFail($id);
+    
+            if ($player->parental_consent) {
+                $filePath = 'public/parental_consents/' . $player->parental_consent;
+    
+                // Check if the file exists in the storage
+                if (Storage::exists($filePath)) {
+                    $mimeType = Storage::mimeType($filePath);
+                    return Storage::download($filePath, $player->parental_consent, [
+                        'Content-Type' => $mimeType,
+                    ]);
+                } else {
+                    return redirect()->back()->with('error', 'Parental Consent file not found.');
+                }
+            } else {
+                return redirect()->back()->with('error', 'No Parental Consent uploaded for this player.');
+            }
         }
+    
+    
 
-        $player->save();
-
-        return back()->with('success', ucfirst($type) . ' deleted successfully.');
-    }
-    public function viewBirthCertificate($playerId)
-    {
-        $player = Player::findOrFail($playerId);
-
-        return view('modals.view-birth-certificate', compact('player'));
-    }
-    public function viewParentalConsent($playerId)
-    {
-        $player = Player::findOrFail($playerId);
-
-        return view('modals.view-parental-consent', compact('player'));
-    }
     // Method to delete PSA Birth Certificate
     public function deleteBirthCertificate($id)
     {
