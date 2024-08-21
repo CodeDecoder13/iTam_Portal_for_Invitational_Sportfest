@@ -137,12 +137,12 @@
                 var content = '';
 
                 if (docType === 'Parental Consent') {
-                    fileName = 'parental_consent.png';
+                    fileName = 'parental_consent';
                 } else if (docType === 'Birth Certificate') {
-                    fileName = 'birth_certificate.png';
+                    fileName = 'birth_certificate';
                 }
 
-                iframeSrc = location + fileName;
+                iframeSrc = location + fileName+'.png';
 
                 checkUrl(iframeSrc, function(exists) {
                     if (exists) {
