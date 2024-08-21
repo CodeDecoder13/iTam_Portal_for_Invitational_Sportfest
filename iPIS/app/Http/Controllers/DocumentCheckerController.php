@@ -19,7 +19,7 @@ class DocumentCheckerController extends Controller
             'last_update' => now(),
         ]);
 
-        return back()->with('status', ucfirst($document).' approved successfully!');
+        return back()->with('status', ucfirst($document) . ' approved successfully!');
     }
 
     public function rejectDocument($playerId, $document)
@@ -33,7 +33,7 @@ class DocumentCheckerController extends Controller
             'last_update' => now(),
         ]);
 
-        return back()->with('status', ucfirst($document).' rejected.');
+        return back()->with('status', ucfirst($document) . ' rejected.');
     }
 
     public function downloadDocument($playerId, $document)
@@ -60,9 +60,50 @@ class DocumentCheckerController extends Controller
                 'status' => 'No File Attached',
                 'last_update' => now(),
             ]);
-            return back()->with('status', ucfirst($document).' deleted successfully!');
+            return back()->with('status', ucfirst($document) . ' deleted successfully!');
         }
 
         return back()->with('error', 'File not found.');
     }
+
+    //suggestion ko Dwei:
+    /*
+    public function updateDocument($playerId, $document, $update)
+    {
+        $player = Player::findOrFail($playerId);
+        $filePath = $player->$document;
+        $action = "";
+        switch ($update) {
+            case 0:
+                $action = "deleted";
+                break;
+            case 2:
+                $action = "approved";
+                break;
+            case 3:
+                $action = "rejected";
+                break;
+        }
+        // Updating the document
+        if ($update == 0) {
+
+            if (Storage::exists($filePath)) {
+                Storage::delete($filePath);
+            }
+        }
+        if ($update == 4) {
+
+            if (Storage::exists($filePath)) {
+                return Storage::download($filePath);
+            }
+
+            return back()->with('error', 'File not found.');
+        }
+        $player->update([
+            $document => $update,
+            'last_update' => now(),
+        ]);
+
+        return back()->with('status', ucfirst($document) . ' ' . $action . ' successfully!');
+    }*/
 }
