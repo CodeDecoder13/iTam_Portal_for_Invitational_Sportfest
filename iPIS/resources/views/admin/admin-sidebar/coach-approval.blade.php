@@ -33,7 +33,7 @@
                 <div class="grid grid-cols-12 px-4 py-3 bg-white rounded-lg border mt-3">
                     <div class="col-span-1">{{ $user->created_at->format('Y-m-d H:i:s') }}</div>
                     <div class="col-span-2">{{ $user->first_name }} {{ $user->last_name }}</div>
-                    <div class="col-span-2">{{ $user->school_name ?? 'N/A' }}</div>
+                     
                     <div class="col-span-1">{{ $user->role ?? 'N/A' }}</div>
                     <div class="col-span-2">{{ $sports->isNotEmpty() ? $sports->implode(', ') : 'N/A' }}</div>
                     <div class="col-span-1">{{ $teams->isNotEmpty() ? $teams->implode(', ') : 'N/A' }}</div>

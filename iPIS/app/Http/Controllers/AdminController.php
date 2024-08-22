@@ -14,10 +14,25 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
+    //public function dashboard()
+    //{
+      //  return view('admin.dashboard');
+    //}
     public function dashboard()
     {
-        return view('admin.dashboard');
+        // Calculate the total registrations based on unique team IDs across all categories
+        $totalRegistrations = Team::distinct('team_id')->count('team_id');
+
+        // Pass the analytics data and total registrations to the view
+        return view('admin.dashboard', compact('totalRegistrations'));
     }
+
+
+
+
+
+
+
 
     public function documents()
     {
