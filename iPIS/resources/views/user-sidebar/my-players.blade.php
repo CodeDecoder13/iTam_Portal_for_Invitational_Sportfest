@@ -39,7 +39,19 @@
                     <div class="col-span-2">{{ $player->team->name }}</div>
                     <div class="col-span-2">{{ $player->gender }}</div>
                     <div class="col-span-1">
-                        @switch($player->status)
+                        @php
+                            $status = 'No File Attached'; // Default status
+
+                            if ($player->birth_certificate_status == 3 || $player->parental_consent_status == 3) {
+                                $status = 'Rejected';
+                            } elseif ($player->birth_certificate_status == 2 && $player->parental_consent_status == 2) {
+                                $status = 'Approved';
+                            } elseif ($player->birth_certificate_status == 1 || $player->parental_consent_status == 1) {
+                                $status = 'For Review';
+                            }
+                        @endphp
+
+                        @switch($status)
                             @case('Approved')
                                 <span class="text-green-500">Approved</span>
                             @break
@@ -57,6 +69,7 @@
                             @break
                         @endswitch
                     </div>
+                    
                     <div class="col-span-2">
                         <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editPlayerModal" 
                                 data-player="{{ json_encode($player) }}">

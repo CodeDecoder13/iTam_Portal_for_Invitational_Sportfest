@@ -166,12 +166,13 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer border-0 justify-content-center">
-                                    <form action="{{ route('delete.player.birth_certificate', $player->id) }}"
+                                   <!--  <form action="{{ route('delete.player.birth_certificate', $player->id) }}"
                                         method="POST" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-link text-danger">Delete</button>
                                     </form>
+                                    -->
 
                                     <button type="button" class="btn btn-link" data-bs-toggle="modal"
                                         data-bs-target="#uploadBirthCertificateModal-{{ $player->id }}">Change</button>
@@ -210,12 +211,12 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer border-0 justify-content-center">
-                                    <form action="{{ route('delete.player.parental_consent', $player->id) }}"
+                                   <!--  <form action="{{ route('delete.player.parental_consent', $player->id) }}"
                                         method="POST" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-link text-danger">Delete</button>
-                                    </form>
+                                    </form> -->
                                     <button type="button" class="btn btn-link" data-bs-toggle="modal"
                                         data-bs-target="#uploadParentalConsentModal-{{ $player->id }}">Change</button>
                                 </div>
