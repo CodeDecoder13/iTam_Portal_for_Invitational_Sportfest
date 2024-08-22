@@ -24,11 +24,14 @@ class AdminController extends Controller
         return view('admin.admin-sidebar.documents');
     }
 
+
     public function documentCheckerFilter(Request $request)
+
     {
         $players = Player::all();
         $teams = Team::all();
         $users = User::all();
+
         $query = Player::query();
 
         // Filtering based on search input
@@ -60,6 +63,7 @@ class AdminController extends Controller
         //return view('admin.admin-sidebar.team-documents.SummaryOfPlayers', compact('players', 'teams', 'users'));
         return view('admin.admin-sidebar.team-documents.SummaryOfPlayers_suggested', compact('players', 'teams', 'users'));
     }
+
 
     public function calendar()
     {
