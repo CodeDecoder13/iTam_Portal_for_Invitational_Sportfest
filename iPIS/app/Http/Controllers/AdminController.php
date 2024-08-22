@@ -57,9 +57,10 @@ class AdminController extends Controller
         }
 
         $players = $query->get();
-        //return view('admin.admin-sidebar.team-documents.SummaryOfPlayers', compact('players', 'teams', 'users'));
+       
         return view('admin.admin-sidebar.team-documents.SummaryOfPlayers_suggested', compact('players', 'teams', 'users'));
     }
+     //return view('admin.admin-sidebar.team-documents.SummaryOfPlayers', compact('players', 'teams', 'users'));
 
     public function calendar()
     {
