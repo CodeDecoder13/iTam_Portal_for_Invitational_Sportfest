@@ -3,6 +3,13 @@
         <h1 class="text-2xl font-bold">Coaches Approval</h1>
         <p>Manage and organize coaches</p>
     </div>
+
+    <div class="w-full flex justify-end items-end">
+        <!-- Button to trigger the Bootstrap modal -->
+        <button class="btn btn-success h-2/3" data-bs-toggle="modal" data-bs-target="#addPlayerModal">
+            <sup>+</sup>Add New Coach
+        </button>
+    </div>
     
     <div class="grid grid-cols-1 mt-5">
         <div class="grid grid-cols-12 px-4 py-3 bg-green-700 text-white rounded-lg border">
