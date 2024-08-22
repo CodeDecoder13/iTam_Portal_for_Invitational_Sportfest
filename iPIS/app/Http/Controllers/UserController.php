@@ -354,7 +354,7 @@ class UserController extends Controller
 
     public function addTeams()
     {
-        return view('user-sidebar.add-Teams');
+        return view('user-sidebar.add-teams');
     }
     public function storeTeam(Request $request)
     {
