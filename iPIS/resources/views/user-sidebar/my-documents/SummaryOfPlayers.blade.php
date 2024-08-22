@@ -19,7 +19,7 @@
                     <div class="col-span-2">{{ $player->team->sport_category }}</div>
                     <div class="col-span-1">{{ $player->team->name }}</div>
                     <div class="col-span-2 text-green-700">
-                        @if($player->has_birth_certificate)
+                        @if($player->birth_certificate_status != 0)
                             <a href="#" data-bs-toggle="modal" data-bs-target="#viewBirthCertificateModal-{{ $player->id }}"> 
                                 <ion-icon name="eye"></ion-icon> View Birth Certificate
                             </a>
@@ -30,7 +30,7 @@
                         @endif
                     </div>
                     <div class="col-span-2 text-green-700">
-                        @if($player->has_parental_consent)
+                        @if($player->parental_consent_status != 0)
                             <a href="#" data-bs-toggle="modal" data-bs-target="#viewParentalConsentModal-{{ $player->id }}"> 
                                 <ion-icon name="eye"></ion-icon> View Parental Consent
                             </a>
@@ -105,7 +105,7 @@
                 </div>
 
                 <!-- Default to View Birth Certificate Modal if uploaded -->
-                @if ($player->has_birth_certificate)
+                @if ($player->birth_certificate_status != 0)
                 <div class="modal fade" id="viewBirthCertificateModal-{{ $player->id }}" tabindex="-1" aria-labelledby="viewBirthCertificateModalLabel-{{ $player->id }}" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
@@ -115,7 +115,7 @@
                             </div>
                             <div class="modal-body text-center">
                                 <p class="mb-1">Status: 
-                                    @if ($player->birth_certificate_status == 'submitted')
+                                    @if ($player->birth_certificate_status == '1')
                                         <span class="text-primary">Submitted</span>
                                     @else
                                         <span class="text-muted">Not Submitted</span>
@@ -123,7 +123,8 @@
                                 </p>
                                 <div class="scrollable-content mx-auto my-3">
                                     <div class="mb-4">
-                                        <img src="{{ route('player.viewBirthCertificate', $player->id) }}" alt="PSA Birth Certificate" style="width: 100%; height: auto;">
+                                        <img src="{{ asset('storage/'.$player->user->school_name . '/' . $player->team->sport_category . '/' . $player->team_id . '/' . $player->id . '/' . $player->birth_certificate) }}" alt="PSA Birth Certificate" style="width: 100%; height: auto;">
+
                                     </div>
                                 </div>
                             </div>
@@ -142,7 +143,7 @@
                 @endif
 
                 <!-- Default to View Parental Consent Modal if uploaded -->
-                @if ($player->has_parental_consent)
+                @if ($player->parental_consent_status != 0)
                 <div class="modal fade" id="viewParentalConsentModal-{{ $player->id }}" tabindex="-1" aria-labelledby="viewParentalConsentModalLabel-{{ $player->id }}" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
@@ -152,7 +153,7 @@
                             </div>
                             <div class="modal-body text-center">
                                 <p class="mb-1">Status: 
-                                    @if ($player->parental_consent_status == 'submitted')
+                                    @if ($player->parental_consent_status == '1')
                                         <span class="text-primary">Submitted</span>
                                     @else
                                         <span class="text-muted">Not Submitted</span>

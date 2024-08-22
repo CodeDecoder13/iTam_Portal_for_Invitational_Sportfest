@@ -21,6 +21,7 @@ class UserSeed extends Seeder
             'email_verified_at' => Carbon::now(),
             'birth_date' => '1990-01-01',
             'gender' => 'male',
+            'school_name'=>'FEU Tech',
             'password' => 'password',
             'is_active' => true,
             'remember_token' => Str::random(10),

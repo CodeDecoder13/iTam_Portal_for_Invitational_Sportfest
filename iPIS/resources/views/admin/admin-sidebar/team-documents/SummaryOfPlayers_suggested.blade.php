@@ -60,12 +60,20 @@
                             <button
                                 class="bg-green-500 hover:bg-green-400 mb-2 w-full text-white font-bold py-2 px-4 rounded"
                                 data-toggle="modal" data-target="#documentModal" data-doc="Parental Consent"
-                                data-team_id="{{ $player->team_id }}" data-player_id="{{ $player->id }}">
+                                data-team_id="{{ $player->team_id }}" data-player_id="{{ $player->id }}"
+                                data-school_name="{{ $player->user->school_name }}"
+                                data-sport_category="{{ $player->team->sport_category }}"
+                                data-status="{{ $player->parental_consent_status }}"
+                                data-file_name="{{ $player->parental_consent }}">
                                 View Parental Consent
                             </button>
                             <button class="bg-blue-500 hover:bg-blue-400 w-full text-white font-bold py-2 px-4 rounded"
                                 data-toggle="modal" data-target="#documentModal" data-doc="Birth Certificate"
-                                data-team_id="{{ $player->team_id }}" data-player_id="{{ $player->id }}">
+                                data-team_id="{{ $player->team_id }}" data-player_id="{{ $player->id }}"
+                                data-school_name="{{ $player->user->school_name }}"
+                                data-sport_category="{{ $player->team->sport_category }}"
+                                data-status="{{ $player->birth_certificate_status }}"
+                                data-file_name="{{ $player->birth_certificate }}">
                                 View Birth Certificate
                             </button>
                         </div>
@@ -121,7 +129,7 @@
                 };
                 xhr.send();
             }
-        
+
             $('#documentModal').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget);
                 var docType = button.data('doc');
@@ -129,48 +137,88 @@
                 var teamId = button.data('team_id');
                 var schoolName = button.data('school_name');
                 var sportCategory = button.data('sport_category');
+                var status = button.data('status');
                 var modal = $(this);
-                
+                var fileName = button.data('file_name');
+
                 // Update the location based on the new file structure
                 var location = `/storage/${schoolName}/${sportCategory}/${teamId}/${playerId}/`;
-                var fileName;
                 var iframeSrc;
-        
+
                 modal.find('.modal-title').text(docType);
                 var content = '';
-        
-                if (docType === 'Parental Consent') {
-                    fileName = 'parental_consent';
-                } else if (docType === 'Birth Certificate') {
-                    fileName = 'birth_certificate';
-                }
-        
+
                 // Adjust the file extension based on your needs
-                iframeSrc = location + fileName + '.png';
-        
-                checkUrl(iframeSrc, function(exists) {
-                    if (exists) {
-                        content = `
-                    <div class="row mb-4">
-                        <div class="col-md-8">
-                            <h5>Document: ${docType}</h5>
-                            <iframe id="iframecontent" class="w-full min-h-96" src="${iframeSrc}"></iframe>
-                        </div>
+                iframeSrc = location + fileName;
+
+                var contentApproved = `
                         <div class="col-md-4 d-flex flex-column justify-content-center">
-                            <form method="POST" action="/document/update/${playerId}/${fileName}/2">
+                            <h1 class="text-center mb-2 text-success">File Approved</h1>
+                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/4">
+                                @csrf
+                                @method('POST')
+                                <button class="btn btn-primary mb-2 w-full">Download</button>
+                            </form>
+                        </div>
+                    </div>`;
+                var contentReject = `<div class="col-md-4 d-flex flex-column justify-content-center">
+                    <h1 class="text-center mb-2 text-danger">File Rejected</h1>
+                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/2">
                                 @csrf
                                 <button class="btn btn-success mb-2 w-full">Approve</button>
                             </form>
-                            <form method="POST" action="/document/update/${playerId}/${fileName}/3">
+                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/4">
+                                @csrf
+                                @method('POST')
+                                <button class="btn btn-primary mb-2 w-full">Download</button>
+                            </form>
+                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/0">
+                                @csrf
+                                @method('POST')
+                                <button class="btn btn-warning w-full">Delete</button>
+                            </form>
+                        </div>
+                    </div>`;
+                var contentDefault = `<div class="col-md-4 d-flex flex-column justify-content-center">
+                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/2">
+                                @csrf
+                                <button class="btn btn-success mb-2 w-full">Approve</button>
+                            </form>
+                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/3">
                                 @csrf
                                 <button class="btn btn-danger mb-2 w-full">Reject</button>
                             </form>
-                            <a href="/document/update/${playerId}/${fileName}/4" class="btn btn-secondary mb-2">Download PDF</a>
-                            <form method="POST" action="/document/update/${playerId}/${fileName}/0">
+                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/4">
                                 @csrf
-                                @method('DELETE')
+                                @method('POST')
+                                <button class="btn btn-primary mb-2 w-full">Download</button>
+                            </form>
+                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/0">
+                                @csrf
+                                @method('POST')
                                 <button class="btn btn-warning w-full">Delete</button>
                             </form>
+                        </div>
+                    </div>`;
+                var contentStart = `<div class="row mb-4">
+                        <div class="col-md-8">
+                            <h5>Document: ${docType}</h5>
+                            <iframe id="iframecontent" class="w-full min-h-96" src="${iframeSrc}"></iframe>
+                        </div>`;
+
+
+                checkUrl(iframeSrc, function(exists) {
+                    if (exists && status == 2) {
+                        content = contentStart + contentApproved;
+                    } else if (exists && status == 3) {
+                        content = contentStart + contentReject;
+                    } else if (exists) {
+                        content = contentStart + contentDefault;
+                    } else if (status == 0) {
+                        content = `
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <p>The coach has yet to submit the document.</p>
                         </div>
                     </div>`;
                     } else {
@@ -185,7 +233,7 @@
                 });
             });
         </script>
-        
+
 
 
     </x-app-layout>

@@ -22,10 +22,9 @@ return new class extends Migration
             $table->date('birthday')->nullable();
             $table->enum('gender', ['Male', 'Female'])->nullable();
             $table->string('birth_certificate')->nullable();
-            $table->boolean('has_birth_certificate')->default(false);
+            $table->integer('birth_certificate_status')->default(0);
             $table->string('parental_consent')->nullable();
-            $table->boolean('has_parental_consent')->default(false);
-            $table->enum('status', ['Approved', 'For Review', 'Rejected', 'No File Attached'])->default('No File Attached');
+            $table->integer('parental_consent_status')->default(0);
             $table->timestamp('last_update')->useCurrent();
             $table->timestamps();
         });

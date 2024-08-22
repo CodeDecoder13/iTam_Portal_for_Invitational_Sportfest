@@ -42,6 +42,16 @@
     @endif
     <!-- Main Content -->
     <main class="flex flex-col flex-grow px-10 py-5">
+        @if (session()->has('success'))
+            <div class="alert alert-success">
+                {{ session()->get('success') }}
+            </div>
+        @endif
+        @if (session()->has('fail'))
+            <div class="alert alert-danger">
+                {{ session()->get('fail') }}
+            </div>
+        @endif
         <div class="flex flex-col min-h-screen">
             <!-- Page Heading -->
             <header class="bg-white shadow">
