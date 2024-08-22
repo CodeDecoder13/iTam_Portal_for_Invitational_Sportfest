@@ -121,66 +121,71 @@
                 };
                 xhr.send();
             }
-
-
+        
             $('#documentModal').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget);
                 var docType = button.data('doc');
                 var playerId = button.data('player_id');
                 var teamId = button.data('team_id');
+                var schoolName = button.data('school_name');
+                var sportCategory = button.data('sport_category');
                 var modal = $(this);
-                var location = `/storage/${teamId}/${playerId}/`;
+        
+                // Update the location based on the new file structure
+                var location = `/storage/${schoolName}/${sportCategory}/${teamId}/${playerId}/`;
                 var fileName;
                 var iframeSrc;
-
+        
                 modal.find('.modal-title').text(docType);
                 var content = '';
-
+        
                 if (docType === 'Parental Consent') {
                     fileName = 'parental_consent';
                 } else if (docType === 'Birth Certificate') {
                     fileName = 'birth_certificate';
                 }
-
-                iframeSrc = location + fileName+'.png';
-
+        
+                // Adjust the file extension based on your needs
+                iframeSrc = location + fileName + '.png';
+        
                 checkUrl(iframeSrc, function(exists) {
                     if (exists) {
                         content = `
-                <div class="row mb-4">
-                    <div class="col-md-8">
-                        <h5>Document: ${docType}</h5>
-                        <iframe id="iframecontent" class="w-full min-h-96" src="${iframeSrc}"></iframe>
-                    </div>
-                    <div class="col-md-4 d-flex flex-column justify-content-center">
-                        <form method="POST" action="/document/update/${playerId}/${fileName}/2">
-                            @csrf
-                            <button class="btn btn-success mb-2 w-full">Approve</button>
-                        </form>
-                        <form method="POST" action="/document/update/${playerId}/${fileName}/3">
-                            @csrf
-                            <button class="btn btn-danger mb-2 w-full">Reject</button>
-                        </form>
-                        <a href="/document/update/${playerId}/${fileName}/4" class="btn btn-secondary mb-2">Download PDF</a>
-                        <form method="POST" action="/document/update/${playerId}/${fileName}/0">
-                            @csrf
-                            @method('DELETE')
-                            <button class="btn btn-warning w-full">Delete</button>
-                        </form>
-                    </div>
-                </div>`;
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <h5>Document: ${docType}</h5>
+                            <iframe id="iframecontent" class="w-full min-h-96" src="${iframeSrc}"></iframe>
+                        </div>
+                        <div class="col-md-4 d-flex flex-column justify-content-center">
+                            <form method="POST" action="/document/update/${playerId}/${fileName}/2">
+                                @csrf
+                                <button class="btn btn-success mb-2 w-full">Approve</button>
+                            </form>
+                            <form method="POST" action="/document/update/${playerId}/${fileName}/3">
+                                @csrf
+                                <button class="btn btn-danger mb-2 w-full">Reject</button>
+                            </form>
+                            <a href="/document/update/${playerId}/${fileName}/4" class="btn btn-secondary mb-2">Download PDF</a>
+                            <form method="POST" action="/document/update/${playerId}/${fileName}/0">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-warning w-full">Delete</button>
+                            </form>
+                        </div>
+                    </div>`;
                     } else {
                         content = `
-                <div class="row mb-4">
-                    <div class="col-md-12">
-                        <p>There is a problem with the file or the file does not exist.</p>
-                    </div>
-                </div>`;
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <p>There is a problem with the file or the file does not exist.</p>
+                        </div>
+                    </div>`;
                     }
                     modal.find('#documentContent').html(content);
                 });
             });
         </script>
+        
 
 
     </x-app-layout>
