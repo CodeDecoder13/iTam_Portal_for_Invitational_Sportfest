@@ -133,12 +133,13 @@
                 Calendar
             </a>-->
         </li>
-        <li>
+        <!--<li>
             <a href="{{ route('admin.players-teams') }}" class="nav-link text-white">
                 <ion-icon name="people"></ion-icon>
                 Players & Teams
-            </a>
+            </a> 
         </li>
+        -->
         <li>
             <a href="{{ route('admin.user-management') }}" class="nav-link text-white">
                 <ion-icon name="people"></ion-icon>

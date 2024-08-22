@@ -67,7 +67,7 @@
             </div>
             <div class="rounded-b-lg p-4 py-2">
                 <ul>
-                    <li class="border text-xs p-2 flex">
+               <!--      <li class="border text-xs p-2 flex">
                         <div class="text-green-700 text-xl">
                             <ion-icon name="document"></ion-icon>
                         </div>
@@ -75,7 +75,7 @@
                             <span class="font-bold">Document Comment:</span> "Full name and address doesn’t match ID
                             details” - RAC Representative"
                         </div>
-                    </li>
+                    </li> -->
                 </ul>
             </div>
         </div>
@@ -85,7 +85,7 @@
             </div>
             <div class="rounded-b-lg p-4 py-2">
                 <ul>
-                    <li class="border text-xs p-2 flex">
+                 <!--   <li class="border text-xs p-2 flex">
                         <div class="w-8/12 border-e-2 flex-grow flex">
                             <div><img width="15" class="img-fluid" src="/images/userlogo.png" /></div>
                             <div class="text-center">
@@ -96,8 +96,8 @@
                         </div>
                         <div class="w-4/12 text-end">
                             <p class="font-bold">Sept. 11, 2024</p>
-                        </div>
-                    </li>
+                        </div>  
+                    </li> -->
                 </ul>
             </div>
         </div>
@@ -107,7 +107,7 @@
             </div>
             <div class="rounded-b-lg p-4 py-2">
                 <ol type="1">
-                    <li type="1" class="border text-xs flex w-full">
+                 <!--    <li type="1" class="border text-xs flex w-full">
                         <div class="bg-yellow-100 p-2 w-1/12">1</div>
                         <div class="my-2 ps-2 w-6/12 border-e-2">FTICGC</div>
                         <div class="p-2 w-3/12">Wins</div>
@@ -124,7 +124,7 @@
                         <div class="my-2 ps-2 w-6/12 border-e-2">FTICGC</div>
                         <div class="p-2 w-3/12">Wins</div>
                         <div class="p-2 w-2/12 font-bold">06</div>
-                    </li>
+                    </li> -->
                 </ol>
             </div>
         </div>
