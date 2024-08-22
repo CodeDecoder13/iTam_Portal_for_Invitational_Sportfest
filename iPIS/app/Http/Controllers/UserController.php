@@ -47,9 +47,14 @@ class UserController extends Controller
     public function myDocuments_sub($type)
     {
         $coachId = Auth::user()->id;
-        $players = Player::all();
+
+        // Fetch only the players associated with the current coach
+        $players = Player::where('coach_id', $coachId)->get();
+
+        // Fetch the teams associated with the current coach
         $teams = Team::where('coach_id', $coachId)->get();
 
+        // Check if each player has a birth certificate and parental consent
         foreach ($players as $player) {
             $player->has_birth_certificate = !is_null($player->birth_certificate);
             $player->has_parental_consent = !is_null($player->parental_consent);
@@ -57,11 +62,12 @@ class UserController extends Controller
 
         switch ($type) {
             case 'SummaryOfPlayers':
-                return view('user-sidebar.my-documents.SummaryOfPlayers', compact('players'));
+                return view('user-sidebar.my-documents.SummaryOfPlayers', compact('players', 'teams'));
             default:
                 return redirect()->route('my-documents');
         }
     }
+
 
     //added for base line
 
@@ -69,15 +75,16 @@ class UserController extends Controller
     // Method to create a folder for a newly created player
     public function createPlayerFolder(Player $player)
     {
-        // Fetch the school name, sport category, and player's name
+        // Fetch the school name, team ID, and player ID
         $team = $player->team;
         $coach = $team->coach;
         $schoolName = $coach->school_name;
         $sportCategory = $team->sport_category;
-        $playerName = $player->first_name . ' ' . $player->last_name;
+        $teamId = $team->id;
+        $playerId = $player->id;
 
-        // Define the path for the player's folder
-        $playerFolderPath = "public/{$schoolName}/{$sportCategory}/{$playerName}";
+        // Define the path for the player's folder using school_name, team_id, and player_id
+        $playerFolderPath = "public/{$schoolName}/{$sportCategory}/{$teamId}/{$playerId}";
 
         // Check if the folder already exists
         if (!Storage::exists($playerFolderPath)) {
@@ -85,6 +92,7 @@ class UserController extends Controller
             Storage::makeDirectory($playerFolderPath);
         }
     }
+
 
     public function uploadPlayerDocuments(Request $request, $playerId)
     {
@@ -95,10 +103,12 @@ class UserController extends Controller
         $coach = $team->coach;
         $schoolName = $coach->school_name;
         $sportCategory = $team->sport_category;
-        $playerName = $player->first_name . ' ' . $player->last_name;
+        $teamId = $team->id;
+        $$playerId = $player->id;
 
         // Define the path for the player's folder
-        $playerFolderPath = "public/{$schoolName}/{$sportCategory}/{$playerName}";
+        $playerFolderPath = "public/{$schoolName}/{$sportCategory}/{$teamId}/{$playerId}";
+
 
         // Check if the folder already exists
         if (!Storage::exists($playerFolderPath)) {
@@ -259,7 +269,7 @@ class UserController extends Controller
                 return response()->json(['errors' => $validator->errors()], 422);
             }
 
-            Player::updateOrCreate(
+            $player = Player::updateOrCreate(
                 [
                     'team_id' => $request->input('teamNumber'),
                     'first_name' => $request->input('firstName'),
@@ -273,6 +283,8 @@ class UserController extends Controller
                     'jersey_no' => $request->input('jersey_no')
                 ]
             );
+            // Call the createPlayerFolder method to create the player's folder
+            $this->createPlayerFolder($player);
 
             return response()->json(['message' => 'Players saved successfully!']);
         } catch (\Exception $e) {
@@ -337,12 +349,17 @@ class UserController extends Controller
 
     public function myPlayers()
     {
-        $players = Player::all();
         $coachId = Auth::user()->id;
 
+        // Fetch only the players associated with the current coach
+        $players = Player::where('coach_id', $coachId)->get();
+
+        // Fetch the teams associated with the current coach
         $teams = Team::where('coach_id', $coachId)->get();
+
         return view('user-sidebar.my-players', compact('players', 'teams'));
     }
+
     public function addTeams()
     {
         return view('user-sidebar.add-Teams');
