@@ -127,10 +127,11 @@
             </a>
         </li>
         <li>
+            <!--
             <a href="{{ route('admin.calendar') }}" class="nav-link text-white">
                 <ion-icon name="people"></ion-icon>
                 Calendar
-            </a>
+            </a>-->
         </li>
         <li>
             <a href="{{ route('admin.players-teams') }}" class="nav-link text-white">

@@ -55,7 +55,43 @@
                         </div>
                         <div class="col-span-2">{{ $player->team->sport_category }}</div>
                         <div class="col-span-2">{{ $player->team->name }}</div>
-                        <div class="col-span-2">{{ $player->status }}</div>
+                        <div class="col-span-2">
+                            @php
+                                $status = 'No File Attached'; // Default status
+
+                                if ($player->birth_certificate_status == 3 || $player->parental_consent_status == 3) {
+                                    $status = 'Rejected';
+                                } elseif (
+                                    $player->birth_certificate_status == 2 &&
+                                    $player->parental_consent_status == 2
+                                ) {
+                                    $status = 'Approved';
+                                } elseif (
+                                    $player->birth_certificate_status == 1 ||
+                                    $player->parental_consent_status == 1
+                                ) {
+                                    $status = 'For Review';
+                                }
+                            @endphp
+
+                            @switch($status)
+                                @case('Approved')
+                                    <span class="text-green-500">Approved</span>
+                                @break
+
+                                @case('For Review')
+                                    <span class="text-yellow-500">For Review</span>
+                                @break
+
+                                @case('Rejected')
+                                    <span class="text-red-500">Rejected</span>
+                                @break
+
+                                @case('No File Attached')
+                                    <span class="text-gray-500">No File Attached</span>
+                                @break
+                            @endswitch
+                        </div>
                         <div class="col-span-2 text-white-700">
                             <button
                                 class="bg-green-500 hover:bg-green-400 mb-2 w-full text-white font-bold py-2 px-4 rounded"

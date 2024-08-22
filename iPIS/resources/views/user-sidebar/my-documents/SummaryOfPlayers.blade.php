@@ -45,7 +45,19 @@
                         @endif
                     </div>
                     <div class="col-span-2">
-                        @switch($player->status)
+                        @php
+                            $status = 'No File Attached'; // Default status
+
+                            if ($player->birth_certificate_status == 3 || $player->parental_consent_status == 3) {
+                                $status = 'Rejected';
+                            } elseif ($player->birth_certificate_status == 2 && $player->parental_consent_status == 2) {
+                                $status = 'Approved';
+                            } elseif ($player->birth_certificate_status == 1 || $player->parental_consent_status == 1) {
+                                $status = 'For Review';
+                            }
+                        @endphp
+
+                        @switch($status)
                             @case('Approved')
                                 <span class="text-green-500">Approved</span>
                             @break
@@ -160,7 +172,7 @@
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-link text-danger">Delete</button>
                                     </form>
-                                    
+
                                     <button type="button" class="btn btn-link" data-bs-toggle="modal"
                                         data-bs-target="#uploadBirthCertificateModal-{{ $player->id }}">Change</button>
                                 </div>
