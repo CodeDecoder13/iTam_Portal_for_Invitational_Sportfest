@@ -130,7 +130,7 @@
                 var schoolName = button.data('school_name');
                 var sportCategory = button.data('sport_category');
                 var modal = $(this);
-        
+                
                 // Update the location based on the new file structure
                 var location = `/storage/${schoolName}/${sportCategory}/${teamId}/${playerId}/`;
                 var fileName;
