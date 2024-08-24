@@ -144,11 +144,11 @@
                     My Documents
                 </a>
             </li>
-            <li>
+            <li><!--
                 <a href="{{ route('my-calendar') }}" class="nav-link text-white">
                     <ion-icon name="calendar"></ion-icon>
                     My Calendar
-                </a>
+                </a>-->
             </li>
             <li>
                 <a href="{{ route('my-players') }}" class="nav-link text-white">

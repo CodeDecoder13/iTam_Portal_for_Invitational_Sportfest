@@ -98,17 +98,14 @@ class UserController extends Controller
     {
         $player = Player::findOrFail($playerId);
 
-        // Fetch the school name, sport category, and player's name
         $team = $player->team;
         $coach = $team->coach;
         $schoolName = $coach->school_name;
         $sportCategory = $team->sport_category;
         $teamId = $team->id;
-        $$playerId = $player->id;
 
         // Define the path for the player's folder
-        $playerFolderPath = "public/{$schoolName}/{$sportCategory}/{$teamId}/{$playerId}";
-
+        $playerFolderPath = "public/$schoolName/$sportCategory/$teamId/$playerId";
 
         // Check if the folder already exists
         if (!Storage::exists($playerFolderPath)) {
@@ -124,8 +121,8 @@ class UserController extends Controller
             $birthCertificateName = 'birth_certificate.' . $birthCertificate->getClientOriginalExtension();
             $birthCertificate->storeAs($playerFolderPath, $birthCertificateName);
             $player->birth_certificate = $birthCertificateName;
-            $player->has_birth_certificate = true; // Mark that the player has a birth certificate
-            $documentUploaded = true; // Flag that a document has been uploaded
+            $player->birth_certificate_status = 1; // Set status to "For Review"
+            $documentUploaded = true;
         }
 
         // Handle the upload of the parental consent
@@ -134,23 +131,18 @@ class UserController extends Controller
             $parentalConsentName = 'parental_consent.' . $parentalConsent->getClientOriginalExtension();
             $parentalConsent->storeAs($playerFolderPath, $parentalConsentName);
             $player->parental_consent = $parentalConsentName;
-            $player->has_parental_consent = true; // Mark that the player has parental consent
-            $documentUploaded = true; // Flag that a document has been uploaded
+            $player->parental_consent_status = 1; // Set status to "For Review"
+            $documentUploaded = true;
         }
 
         // If any document has been uploaded, update the status to "For Review"
-        if ($documentUploaded) {
-            $player->status = 'For Review';
-        } else {
-            // If no document is uploaded, set a message or handle accordingly
-            $player->status = 'No File Attached';
-        }
 
         // Save the player's updated information
         $player->save();
 
         return redirect()->back()->with('success', 'Documents uploaded successfully and status updated to "For Review".');
     }
+
 
     // Method to view and download PSA Birth Certificate
     public function viewBirthCertificate($id)
@@ -362,7 +354,7 @@ class UserController extends Controller
 
     public function addTeams()
     {
-        return view('user-sidebar.add-Teams');
+        return view('user-sidebar.add-teams');
     }
     public function storeTeam(Request $request)
     {

@@ -78,7 +78,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::delete('/document/delete/{player}/{document}', [DocumentCheckerController::class, 'deleteDocument'])->name('document.delete');
 
     //suggest Dwei: para di crowded route and functions
-    Route::post('/document/update/{player}/{document}/{update}', [DocumentCheckerController::class, 'updateDocument'])->name('document.update');
+    Route::post('/document/update/{player}/{document}/{type}/{update}', [DocumentCheckerController::class, 'updateDocument'])->name('document.update');
     Route::get('/summary-of-players', [AdminController::class, 'documentCheckerFilter'])->name('admin.SummaryOfPlayers');
 
 });

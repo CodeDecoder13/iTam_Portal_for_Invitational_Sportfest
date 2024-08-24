@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 class DocumentCheckerController extends Controller
 {
-    public function approveDocument($playerId, $document)
+    /*public function approveDocument($playerId, $document)
     {
         $player = Player::findOrFail($playerId);
 
@@ -34,7 +34,7 @@ class DocumentCheckerController extends Controller
         ]);
 
         return back()->with('status', ucfirst($document) . ' rejected.');
-    }
+    }*/
 
     public function downloadDocument($playerId, $document)
     {
@@ -66,16 +66,29 @@ class DocumentCheckerController extends Controller
         return back()->with('error', 'File not found.');
     }
 
-    //suggestion ko Dwei:
-    /*
-    public function updateDocument($playerId, $document, $update)
+    //Dwei:
+
+    public function updateDocument($playerId, $document, $type, $update)
     {
         $player = Player::findOrFail($playerId);
-        $filePath = $player->$document;
+        $filePath = 'public/' . $player->user->school_name . "/" . $player->team->sport_category . "/" . $player->team_id . "/" . $player->id . "/" . $document;
         $action = "";
+        //will be used for the update of status
+        $typeStatus = "";
+        switch ($type) {
+            case "Birth Certificate":
+                $typeStatus = "birth_certificate_status";
+                break;
+            case "Parental Consent":
+                $typeStatus = "parental_consent_status";
+                break;
+        }
         switch ($update) {
             case 0:
                 $action = "deleted";
+                if (Storage::exists($filePath)) {
+                    Storage::delete($filePath);
+                }
                 break;
             case 2:
                 $action = "approved";
@@ -83,27 +96,19 @@ class DocumentCheckerController extends Controller
             case 3:
                 $action = "rejected";
                 break;
+            case 4:
+                if (Storage::exists($filePath)) {
+                    return Storage::download($filePath);
+                }
+                return back()->with('error', 'File not found.');
+                break;
         }
-        // Updating the document
-        if ($update == 0) {
 
-            if (Storage::exists($filePath)) {
-                Storage::delete($filePath);
-            }
-        }
-        if ($update == 4) {
-
-            if (Storage::exists($filePath)) {
-                return Storage::download($filePath);
-            }
-
-            return back()->with('error', 'File not found.');
-        }
         $player->update([
-            $document => $update,
+            $typeStatus => $update,
             'last_update' => now(),
         ]);
 
-        return back()->with('status', ucfirst($document) . ' ' . $action . ' successfully!');
-    }*/
+        return back()->with('success', ucfirst($document) . ' ' . $action . ' successfully!');
+    }
 }
