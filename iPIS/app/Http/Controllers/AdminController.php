@@ -11,6 +11,8 @@ use App\Models\Player;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
 {
@@ -120,7 +122,116 @@ class AdminController extends Controller
             return response()->json(['message' => $e->getMessage(), 'code' => $e->getCode()], 500);
         }
     }
+    // added for storing user
+    public function storeUser(Request $request)
+    {
+        // Validate the incoming request data
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'birth_date' => 'required|date',
+            'gender' => 'required|string|max:10',
+            'school_name' => 'required', 'string',
+            'role' => 'required|string|max:50',
+            
+        ]);
 
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Create a new user
+        $user = User::create([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'birth_date' => $request->birth_date,
+            'gender' => $request->gender,
+            'school_name' => $request->school_name,
+            'role' => $request->role,
+            
+        ]);
+        Log::info($request->all()); 
+        // Fetch the school name from the user model
+        $schoolName = $user->school_name;
+
+        // Define the path for the school folder
+        $schoolFolderPath = "public/{$schoolName}";
+
+        // Check if the folder already exists
+        if (!Storage::exists($schoolFolderPath)) {
+            // Create the folder
+            Storage::makeDirectory($schoolFolderPath);
+        }
+
+        return response()->json(['message' => 'User added successfully', 'user' => $user], 200);
+    }
+    // added for storing admin accounts
+    public function storeAdmin(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:admins',
+            'role' => 'required|string|max:50',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+    
+        // Create a new admin
+        $admin = Admin::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'role' => $request->role,
+            'password' => Hash::make($request->password),
+
+        ]);
+    
+        return response()->json(['message' => 'Admin added successfully', 'user' => $admin], 200);
+    }
+    //update admins
+    public function updateAdmin(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'adminid' => 'required|integer|exists:admin,id',
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:admins',
+                'role' => 'required|string|max:50',
+                'password' => 'required|string|min:8|confirmed',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            Admin::updateOrCreate(
+                [
+                    'id' => $request->input('adminid'),
+                ],
+                [
+            
+                    'name' => $request->input('name'),
+                    'email' => $request->input('email'),
+                    'role' => $request->input('role'),
+                    'password' => $request->input('password'),
+                    
+                ]
+            );
+
+            return response()->json(['message' => 'Admin saved successfully!']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred while saving Admin.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 
 
 
