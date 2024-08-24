@@ -1,15 +1,15 @@
 <x-app-layout>
     <div class="container mx-auto">
-        <h1 class="text-2xl font-bold">Coaches Approval</h1>
+        <h1 class="font-bold mb-2 text-3xl">Coaches Approval</h1>
         <p>Manage and organize coaches</p>
     </div>
-    
     <li class="w-full flex justify-end items-end">
        
         <button class="btn btn-success h-2/3" data-bs-toggle="modal" data-bs-target="#addUserModal">
             <sup>+</sup>Add New User
         </button>
     </li>
+    
     
     <div class="grid grid-cols-1 mt-5">
         <div class="grid grid-cols-12 px-4 py-3 bg-green-700 text-white rounded-lg border">

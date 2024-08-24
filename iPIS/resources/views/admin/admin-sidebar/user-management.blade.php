@@ -1,19 +1,18 @@
 <x-app-layout>
-    <section class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <!-- Your content here -->
-    </section>
 
-    <div class="w-full flex justify-end items-end">
-        
-        <button class="btn btn-success h-2/3" data-bs-toggle="modal" data-bs-target="#addAdminModal">
-            <sup>+</sup>Add New Admin
-        </button>
-    </div>
-    
     <!-- User and Admin Management Section -->
-    <section class="grid grid-cols-1">
+    <div class="grid grid-cols-1">
         <h1 class="font-bold mb-2 text-3xl">User Management</h1>
         <h3>Manage and Organize Users/Admins</h3>
+    </div>
+
+
+        <li class="w-full flex justify-end items-end">
+        
+            <button class="btn btn-success h-2/3" data-bs-toggle="modal" data-bs-target="#addAdminModal">
+                <sup>+</sup>Add New Admin
+            </button>
+        </li>
 
 
         <div class="grid grid-cols-1 mt-5">
@@ -47,7 +46,7 @@
                 </div>
             @endforeach
         </div>
-    </section>
+    
             <!-- Add Admin Modal -->
             <div class="modal fade" id="addAdminModal" tabindex="-1" aria-labelledby="addAdminModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
@@ -118,7 +117,8 @@
                 </div>
             </div>
             
-            <!-- Edit a Admin Modal -->
+            
+            <!-- Edit an Admin Modal -->
             <div class="modal fade" id="editAdminModal" tabindex="-1" aria-labelledby="editAdminModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
@@ -129,30 +129,30 @@
                         <div class="modal-body">
                             <form id="editAdminForm">
                                 <input type="hidden" id="editAdminId" name="admin_id">
-                                 <!-- Name -->
+                                <!-- Name -->
                                 <div class="mb-4">
                                     <div class="mt-1">
                                         <label for="editName" class="form-label">Name</label>
-                                        <input type="text" id="editName" name="Name" class="form-control">
+                                        <input type="text" id="editName" name="name" class="form-control">
                                     </div>
                                 </div>
                                 <!-- Email -->
                                 <div class="mb-4">
                                     <div class="mt-1">
                                         <label for="editEmail" class="form-label">Email</label>
-                                        <input type="text" id="editEmail" name="Email" class="form-control">
+                                        <input type="text" id="editEmail" name="email" class="form-control">
                                     </div>
                                 </div>
                                 <!-- Role -->
                                 <div class="mb-4">
                                     <div class="mt-1">
                                         <label for="editRole" class="form-label">Role</label>
-                                        <select id="role" name="role" required class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                        <select id="editRole" name="role" required class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                             <option value="" disabled selected>Select Role</option>
-                                            <option value="SysAdmin" {{ old('role') == 'SysAdmin' ? 'selected' : '' }}>SysAdmin</option>
-                                            <option value="SADO" {{ old('role') == 'SADO' ? 'selected' : '' }}>SADO</option>
-                                            <option value="RAC OFFICER" {{ old('role') == 'RAC OFFICER' ? 'selected' : '' }}>RAC OFFICER</option>
-                                            <option value="Guest Admin" {{ old('role') == 'Guest Admin' ? 'selected' : '' }}>Guest Admin</option>
+                                            <option value="SysAdmin">SysAdmin</option>
+                                            <option value="SADO">SADO</option>
+                                            <option value="RAC OFFICER">RAC OFFICER</option>
+                                            <option value="Guest Admin">Guest Admin</option>
                                         </select>
                                     </div>
                                 </div>
@@ -160,14 +160,14 @@
                                 <div class="mb-4">
                                     <div class="mt-1">
                                         <label for="editPassword" class="form-label">Password</label>
-                                        <input type="text" id="editpassword" name="Password" class="form-control">
+                                        <input type="password" id="editPassword" name="password" class="form-control">
                                     </div>
                                 </div>
                                 <!-- Confirm Password -->
                                 <div class="mb-4">
                                     <div class="mt-1">
                                         <label for="editConfirmPassword" class="form-label">Confirm Password</label>
-                                        <input type="text" id="editConfirmpassword" name="Confirm_Password" class="form-control">
+                                        <input type="password" id="editConfirmPassword" name="password_confirmation" class="form-control">
                                     </div>
                                 </div>
                                 <!-- Submit Button -->
@@ -175,11 +175,12 @@
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                     <button type="submit" id="saveAdmin" class="btn btn-primary">Save Admin</button>
                                 </div>
-
-
-
                             </form>
                         </div>
+                    </div>
+                </div>
+            </div>
+
   
   
   
@@ -240,61 +241,52 @@
         });
         //added for Edit Admin
 
-        document.querySelectorAll('[data-bs-target="#editAdminModal"]').forEach(button => {
-            button.addEventListener('click', function() {
-                const admin = JSON.parse(this.getAttribute('data-admin'));
-                document.getElementById('editAdminId').value = admin.id;
-                document.getElementById('editName').value = admin.name;
-                document.getElementById('editEmail').value = admin.email;
-                document.getElementById('editRole').value = admin.role;
-                document.getElementById('editPassword').value = admin.password;
-                document.getElementById('editConfirmPassword').value = admin.confirmpassword;
-            });
-        });
+            document.getElementById('editAdminForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                var adminForm = document.getElementById('editAdminForm');
+                var formData = new FormData(adminForm);
+                var adminData = {
+                    adminid: formData.get('admin_id'),
+                    name: formData.get('name'),
+                    email: formData.get('email'),
+                    role: formData.get('role'),
+                    password: formData.get('Password'), // Adjusted to match input name
+                    confirmPassword: formData.get('Confirm_Password') // Adjusted to match input name
+                };
 
-        document.getElementById('editAdmin').addEventListener('click', function() {
-            var adminForm = document.getElementById('editAdminForm');
-            var formData = new FormData(adminForm);
-            var adminData = {
-                adminid: formData.get('admin_id'),
-                name: formData.get('name'),
-                email: formData.get('email'),
-                role: formData.get('role'),
-                password: formData.get('password'),
-                confirmPassword: formData.get('confirmPassword')
-            };
+                $.ajaxSetup({
+                    headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                }
+                            });
 
-            $.ajaxSetup({
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-
-            $.ajax({
-                url: '/update-admin',
-                type: 'POST',
-                data: JSON.stringify(adminData),
-                success: function(response) {
-                    alert(response.message);
-                    window.location.href = "{{ route('admin.user-management') }}";
-                },
-                error: function(xhr) {
-                    if (xhr.status === 422) {
-                        // Validation error
-                        var errors = xhr.responseJSON.errors;
-                        var errorMessage = 'Validation Error:\n';
-                        for (var field in errors) {
-                            if (errors.hasOwnProperty(field)) {
-                                errorMessage += errors[field].join('\n') + '\n';
-                            }
-                        }
-                        alert(errorMessage);
-                    } else {
-                        alert('Error saving Admin data');
-                    }
-                }
-            });
+                            $.ajax({
+                                url: '/update-admin',
+                                type: 'POST',
+                                data: JSON.stringify(adminData),
+                                success: function(response) {
+                                    alert(response.message);
+                                    window.location.href = "{{ route('admin.user-management') }}";
+                                },
+                                error: function(xhr) {
+                                    if (xhr.status === 422) {
+                                        // Validation error
+                                        var errors = xhr.responseJSON.errors;
+                                        var errorMessage = 'Validation Error:\n';
+                                        for (var field in errors) {
+                                            if (errors.hasOwnProperty(field)) {
+                                                errorMessage += errors[field].join('\n') + '\n';
+                                            }
+                                        }
+                                        alert(errorMessage);
+                                    } else {
+                                        alert('Error saving Admin data');
+                                    }
+                                }
+                            });
+                        });
 
     });
 
