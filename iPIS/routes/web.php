@@ -66,6 +66,11 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/players-team-documents', [AdminController::class, 'teamdocuments'])->name('admin.playersTeamDocuments');
     
     Route::get('/summary-of-players', [AdminController::class, 'documentChecker'])->name('admin.SummaryOfPlayers');
+    Route::post('/store-user-accounts', [AdminController::class, 'storeUser'])->name('admin.store-user');
+    Route::post('/store-admin-accounts', [AdminController::class, 'storeAdmin'])->name('admin.store-admin');
+    Route::post('/update-Admin', [AdminController::class, 'updateAdmin'])->name('admin.Update-Admin');
+
+    
    
 
     
