@@ -26,23 +26,22 @@
         /* Allow scrolling if content overflows */
     }
 
+    .nav-link.active {
+    background-color: #007bff; /* This is the blue background color */
+    color: white; /* This ensures the text color is readable */
+    }
+
     .nav-link {
-        width: auto;
-        /* Auto width for better responsiveness */
-        font-family: 'Inter', sans-serif;
-        font-weight: 500;
-        font-size: 13px;
-        line-height: 24px;
-        color: #FFFFFF;
+        color: #ffffff;
         text-decoration: none;
-        /* Remove underline */
         display: flex;
-        /* Flex display for better alignment */
         align-items: center;
-        gap: 8px;
-        /* Gap between icon and text */
-        padding: 8px 16px;
-        /* Padding for better touch target */
+        padding: 10px;
+        transition: background-color 0.3s ease;
+    }
+
+    .nav-link:hover {
+        background-color: rgba(0, 0, 0, 0.1); /* This is for the hover effect */
     }
 
     .side-head {
@@ -115,41 +114,42 @@
     <ul class="nav nav-pills flex-column mb-auto">
         
         <li class="nav-item">
-            <a href="{{ route('admin.dashboard') }}" class="nav-link active" aria-current="page">
+            <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                 <ion-icon name="home"></ion-icon>
                 Home
             </a>
-        </li>
-        <li>
-            <a href="{{ route('admin.documents') }}" class="nav-link text-white">
-                <ion-icon name="document"></ion-icon>
+        <li class="nav-item">
+            <a href="{{ route('admin.documents') }}" class="nav-link {{ request()->routeIs('admin.documents') ? 'active' : '' }}">
+                <ion-icon name="folder"></ion-icon>
                 Documents
             </a>
         </li>
-        <li>
-            <!--
-            <a href="{{ route('admin.calendar') }}" class="nav-link text-white">
-                <ion-icon name="people"></ion-icon>
+        <!--
+        <li class="nav-item">
+            <a href="{{ route('admin.calendar') }}" class="nav-link {{ request()->routeIs('admin.calendar') ? 'active' : '' }}">
+                <ion-icon name="calendar"></ion-icon>
                 Calendar
-            </a>-->
-        </li>
-        <!--<li>
-            <a href="{{ route('admin.players-teams') }}" class="nav-link text-white">
-                <ion-icon name="people"></ion-icon>
-                Players & Teams
-            </a> 
-        </li>
-        -->
-        <li>
-            <a href="{{ route('admin.user-management') }}" class="nav-link text-white">
-                <ion-icon name="people"></ion-icon>
-                Users
             </a>
         </li>
-        <li>
-            <a href="{{ route('admin.coach-approval') }}" class="nav-link text-white">
+        -->
+         <!--
+        <li class="nav-item">
+            <a href="{{ route('admin.players-teams') }}" class="nav-link {{ request()->routeIs('admin.players-teams') ? 'active' : '' }}">
+                <ion-icon name="person"></ion-icon>
+                Players & Teams
+            </a>
+        </li>
+        -->
+        <li class="nav-item">
+            <a href="{{ route('admin.user-management') }}" class="nav-link {{ request()->routeIs('admin.user-management') ? 'active' : '' }}">
                 <ion-icon name="people"></ion-icon>
-                Coaches
+                User Management
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ route('admin.coach-approval') }}" class="nav-link {{ request()->routeIs('admin.coach-approval') ? 'active' : '' }}">
+                <ion-icon name="walk"></ion-icon>
+                Coach Approval
             </a>
         </li>
     </ul>
