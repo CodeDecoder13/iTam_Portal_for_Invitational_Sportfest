@@ -305,6 +305,18 @@ class AdminController extends Controller
             ], 500);
         }
     }
+    //
+    // Method to fetch user details by ID
+    public function getUserDetails($id)
+    {
+        // Fetch the user by ID
+        $user = User::findOrFail($id);
+
+        // Return the user data as JSON response
+        return response()->json($user);
+    }
+    
+    
     public function teamdocuments()
     {
         return view('admin.admin-sidebar.players-team-documents');

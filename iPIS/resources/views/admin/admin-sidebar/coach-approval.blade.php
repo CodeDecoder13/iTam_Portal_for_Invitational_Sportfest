@@ -43,7 +43,8 @@
                     <div class="col-span-1 flex justify-end space-x-2">
                         <button class="bg-green-700 text-white px-2 py-1 rounded-lg" onclick="updateStatus({{ $user->id }}, 'activate')">Activate</button>
                         <button class="bg-red-700 text-white px-2 py-1 rounded-lg" onclick="updateStatus({{ $user->id }}, 'deactivate')">Deactivate</button>
-                        <button class="bg-yellow-700 text-white px-2 py-1 rounded-lg" data-bs-toggle="modal" data-bs-target="#editUserModal" onclick="editUser({{ $user }})">Edit</button>
+                        <button class="bg-yellow-700 text-white px-2 py-1 rounded-lg" data-bs-toggle="modal" data-bs-target="#viewUserModal" onclick="viewUser({{ $user->id }})">View</button>
+
                     </div>
                 </div>
             @endforeach
@@ -236,86 +237,63 @@
                 </div>
             </div>  
             
-            <!-- Bootstrap Modal for Editing Users -->
-            <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+            <!-- Bootstrap Modal for View Users -->
+            <div class="modal fade" id="viewUserModal" tabindex="-1" aria-labelledby="viewUserModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header bg-green-700">
-                            <h5 class="modal-title text-white" id="editUserModalLabel">Edit User</h5>
+                            <h5 class="modal-title text-white" id="viewUserModalLabel">User Details</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form id="editUserForm" method="POST" action="">
-                                @csrf
-                                @method('PUT')
-                                <input type="hidden" id="editUserId" name="user_id">
-                                
-                                <!-- First Name -->
-                                <div class="mb-4">
-                                    <label for="editFirstName" class="form-label">First Name</label>
-                                    <input type="text" id="editFirstName" name="first_name" class="form-control" required>
+                            <h5 id="modalUserName" class="text-xl font-bold"></h5>
+                            <h6 class="text-sm text-gray-500" id="modalUserRole"></h6>
+                            <div class="mb-4">
+                                <p class="font-semibold text-gray-700">Team</p>
+                                <p class="text-gray-900" id="modalUserTeam"></p>
+                            </div>
+                            <div class="flex mb-4">
+                                <div class="w-1/2">
+                                    <p class="font-semibold text-gray-700">First Name</p>
+                                    <p class="text-gray-900" id="modalFirstName"></p>
                                 </div>
-
-                                <!-- Last Name -->
-                                <div class="mb-4">
-                                    <label for="editLastName" class="form-label">Last Name</label>
-                                    <input type="text" id="editLastName" name="last_name" class="form-control" required>
+                                <div class="w-1/2 pl-4">
+                                    <p class="font-semibold text-gray-700">Last Name</p>
+                                    <p class="text-gray-900" id="modalLastName"></p>
                                 </div>
-
-                                <!-- Email Address -->
-                                <div class="mb-4">
-                                    <label for="editEmail" class="form-label">Email Address</label>
-                                    <input type="email" id="editEmail" name="email" class="form-control" required>
+                            </div>
+                            <div class="flex mb-4">
+                                <div class="w-1/2">
+                                    <p class="font-semibold text-gray-700">Middle Name</p>
+                                    <p class="text-gray-900" id="modalMiddleName"></p>
                                 </div>
-
-                                <!-- Birth Date -->
-                                <div class="mb-4">
-                                    <label for="editBirthDate" class="form-label">Birth Date</label>
-                                    <input type="date" id="editBirthDate" name="birth_date" class="form-control" required>
+                                <div class="w-1/2 pl-4">
+                                    <p class="font-semibold text-gray-700">Birth Date</p>
+                                    <p class="text-gray-900" id="modalBirthDate"></p>
                                 </div>
-
-                                <!-- Gender -->
-                                <div class="mb-4">
-                                    <label for="editGender" class="form-label">Gender</label>
-                                    <select id="editGender" name="gender" class="form-select" required>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
-
-                                <!-- School Name -->
-                                <div class="mb-4">
-                                    <label for="editSchoolName" class="form-label">School Name</label>
-                                    <select id="editSchoolName" name="school_name" class="form-select" required>
-                                        <option value="" disabled selected>Select School</option>
-                                        <!-- Add your school options here -->
-                                        <option value="Ilaya Barangka Elementary School">Ilaya Barangka Elementary School</option>
-                                        <option value="Aquinas School">Aquinas School</option>
-                                        <!-- Add more options as necessary -->
-                                    </select>
-                                </div>
-
-                                <!-- Role -->
-                                <div class="mb-4">
-                                    <label for="editRole" class="form-label">Role</label>
-                                    <select id="editRole" name="role" class="form-select" required>
-                                        <option value="" disabled selected>Select Role</option>
-                                        <option value="Captain">Captain</option>
-                                        <option value="Coach">Coach</option>
-                                        <option value="School Representative">School Representative</option>
-                                    </select>
-                                </div>
-
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                                </div>
-                            </form>
+                            </div>
+                            <div class="mb-4">
+                                <p class="font-semibold text-gray-700">Gender</p>
+                                <p class="text-gray-900" id="modalGender"></p>
+                            </div>
+                            <div class="mb-4">
+                                <label for="status" class="font-semibold text-gray-700">Updated Status</label>
+                                <select id="modalStatus" class="w-full mt-2 p-2 bg-gray-100 border border-gray-300 rounded-lg">
+                                    <option value="Unverified">Deactivated</option>
+                                    <option value="Verified">Activated</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>
             </div>
+            
+            
+              
+              
 
 
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
