@@ -101,27 +101,18 @@ class AdminController extends Controller
 
     public function usersManagement()
     {
-        try {
-            $users = User::select('first_name', 'last_name', 'email', 'is_active', 'created_at', 'role')
-                ->get();
-
             $admins = Admin::select('name', 'email', 'is_active', 'created_at', 'role')
                 ->get();
 
-            Log::info('Fetched users: ', $users->toArray());
             Log::info('Fetched admins: ', $admins->toArray());
 
             $data = [
-                'users' => $users,
                 'admins' => $admins,
             ];
 
             return view('admin.admin-sidebar.user-management', compact('data'));
-        } catch (\Exception $e) {
-            Log::error('Error fetching user management data: ' . $e->getMessage());
-            return response()->json(['message' => $e->getMessage(), 'code' => $e->getCode()], 500);
-        }
-    }
+    
+}
     // added for storing user
     public function storeUser(Request $request)
     {
@@ -194,44 +185,33 @@ class AdminController extends Controller
     
         return response()->json(['message' => 'Admin added successfully', 'user' => $admin], 200);
     }
-    //update admins
+    
+    //update admins 'email' => 'required|string|email|max:255|unique:admins,email,' . $request->input('adminid'),
     public function updateAdmin(Request $request)
     {
-        try {
-            $validator = Validator::make($request->all(), [
-                'adminid' => 'required|integer|exists:admin,id',
-                'name' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:admins,email,' . $request->input('adminid'),
-                'role' => 'required|string|max:50',
-                'password' => 'nullable|string|min:8|confirmed',
-            ]);
+        
+        $request->validate([
+            'adminid' => 'required|exists:admins,id',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:admins,email',
+            'role' => 'required|string',
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
 
-            if ($validator->fails()) {
-                return response()->json(['errors' => $validator->errors()], 422);
-            }
+        $admin = Admin::findOrFail($request->adminid);
+        $admin->name = $request->input('name');
+        $admin->email = $request->input('email');
+        $admin->role = $request->input('role');
 
-            Admin::updateOrCreate(
-                [
-                    'id' => $request->input('adminid'),
-                ],
-                [
-            
-                    'name' => $request->input('name'),
-                    'email' => $request->input('email'),
-                    'role' => $request->input('role'),
-                    'password' => Hash::make($request->input('password')),
-                    
-                ]
-            );
-
-            return response()->json(['message' => 'Admin saved successfully!']);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'An error occurred while saving Admin.',
-                'error' => $e->getMessage()
-            ], 500);
+        if ($request->filled('password')) {
+            $admin->password = Hash::make($request->input('password'));
         }
+
+        $admin->save();
+
+        return response()->json(['message' => 'Admin updated successfully.']);
     }
+
     
 
 
