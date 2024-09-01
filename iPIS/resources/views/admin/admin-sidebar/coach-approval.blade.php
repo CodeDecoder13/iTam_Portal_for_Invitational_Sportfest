@@ -316,7 +316,9 @@
                     </div>
                 </div>
             </div>
-
+            <!-- new layout -->
+            
+              
 
             <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.x.x/dist/js/bootstrap.bundle.min.js"></script>
@@ -395,6 +397,19 @@
                     alert('Error saving user data');
                 }
             }
+        });
+
+        document.querySelectorAll('[data-bs-target="#editUserModal"]').forEach(button => {
+        button.addEventListener('click', function() {
+        const user = this.getAttribute('data-user');
+                document.getElementById('editUserId').value = user.id;
+                document.getElementById('editName').value = user.name;
+                document.getElementById('editEmail').value = user.email;
+                document.getElementById('editRole').value = user.role;
+                // Clear the password fields, assuming the user needs to re-enter if changing
+                document.getElementById('editPassword').value = '';
+                document.getElementById('editConfirmPassword').value = '';
+            });
         });
     });
     </script>

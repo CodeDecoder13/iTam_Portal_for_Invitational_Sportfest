@@ -35,11 +35,10 @@
                     <div class="col-span-1">{{ $admin->is_active ? 'Active' : 'Inactive' }}</div>
                     <div class="col-span-1">
                         <button class="bg-green-700 text-white px-2 py-1 rounded-lg" data-bs-toggle="modal" data-bs-target="#editAdminModal"
-                        data-admin="{{ json_encode($admin) }}">
+                            data-admin="{{ json_encode($admin) }}">
                             Edit
                         </button>
-                        <button class="bg-red-700 text-white px-2 py-1 rounded-lg" data-bs-toggle="modal" data-bs-target="#deleteAdminModal"
-                        data-admin="{{ json_encode($admin) }}">
+                        <button class="bg-red-700 text-white px-2 py-1 rounded-lg" data-bs-toggle="modal" data-bs-target="#deleteAdminModal">
                             Delete
                         </button>
                     </div>
@@ -109,7 +108,7 @@
                                 <!-- Submit Button -->
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" id="saveAdmin" class="btn btn-primary">Register Admin</button>
+                                    <button type="submit" id="registerAdmin" class="btn btn-primary">Register Admin</button>
                                 </div>
                             </form>
                         </div>
@@ -127,7 +126,8 @@
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form id="editAdminForm">
+                            <form id="editAdminForm" method="POST">
+                                @csrf
                                 <input type="hidden" id="editAdminId" name="admin_id">
                                 <!-- Name -->
                                 <div class="mb-4">
@@ -149,10 +149,10 @@
                                         <label for="editRole" class="form-label">Role</label>
                                         <select id="editRole" name="role" required class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                             <option value="" disabled selected>Select Role</option>
-                                            <option value="SysAdmin">SysAdmin</option>
-                                            <option value="SADO">SADO</option>
-                                            <option value="RAC OFFICER">RAC OFFICER</option>
-                                            <option value="Guest Admin">Guest Admin</option>
+                                            <option value="SysAdmin" {{ old('role') == 'SysAdmin' ? 'selected' : '' }}>SysAdmin</option>
+                                            <option value="SADO" {{ old('role') == 'SADO' ? 'selected' : '' }}>SADO</option>
+                                            <option value="RAC OFFICER" {{ old('role') == 'RAC OFFICER' ? 'selected' : '' }}>RAC OFFICER</option>
+                                            <option value="Guest Admin" {{ old('role') == 'Guest Admin' ? 'selected' : '' }}>Guest Admin</option>
                                         </select>
                                     </div>
                                 </div>
@@ -173,7 +173,7 @@
                                 <!-- Submit Button -->
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" id="saveAdmin" class="btn btn-primary">Save Admin</button>
+                                    <button type="submit" id="EditAdmin" class="btn btn-primary">Save Admin</button>
                                 </div>
                             </form>
                         </div>
@@ -186,7 +186,7 @@
   
   
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.x.x/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons/ionicons.esm.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -194,7 +194,7 @@
 
  
     // added for admin add
-    document.getElementById('saveAdmin').addEventListener('click', function() {
+    document.getElementById('registerAdmin').addEventListener('click', function() {
         var adminForm = document.getElementById('addAdminForm');
         var formData = new FormData(adminForm);
 
@@ -241,52 +241,71 @@
         });
         //added for Edit Admin
 
-            document.getElementById('editAdminForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-                
-                var adminForm = document.getElementById('editAdminForm');
-                var formData = new FormData(adminForm);
-                var adminData = {
-                    adminid: formData.get('admin_id'),
-                    name: formData.get('name'),
-                    email: formData.get('email'),
-                    role: formData.get('role'),
-                    password: formData.get('Password'), // Adjusted to match input name
-                    confirmPassword: formData.get('Confirm_Password') // Adjusted to match input name
-                };
+        document.querySelectorAll('[data-bs-target="#editAdminModal"]').forEach(button => {
+        button.addEventListener('click', function() {
+        const admin = this.getAttribute('data-admin');
+                document.getElementById('editAdminId').value = admin.id;
+                document.getElementById('editName').value = admin.name;
+                document.getElementById('editEmail').value = admin.email;
+                document.getElementById('editRole').value = admin.role;
+                // Clear the password fields, assuming the user needs to re-enter if changing
+                document.getElementById('editPassword').value = '';
+                document.getElementById('editConfirmPassword').value = '';
 
-                $.ajaxSetup({
-                    headers: {
-                                    'Content-Type': 'application/json',
-                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                }
-                            });
+    
+        
+            });
+        });
 
-                            $.ajax({
-                                url: '/update-admin',
-                                type: 'POST',
-                                data: JSON.stringify(adminData),
-                                success: function(response) {
-                                    alert(response.message);
-                                    window.location.href = "{{ route('admin.user-management') }}";
-                                },
-                                error: function(xhr) {
-                                    if (xhr.status === 422) {
-                                        // Validation error
-                                        var errors = xhr.responseJSON.errors;
-                                        var errorMessage = 'Validation Error:\n';
-                                        for (var field in errors) {
-                                            if (errors.hasOwnProperty(field)) {
-                                                errorMessage += errors[field].join('\n') + '\n';
-                                            }
-                                        }
-                                        alert(errorMessage);
-                                    } else {
-                                        alert('Error saving Admin data');
-                                    }
-                                }
-                            });
-                        });
+        document.getElementById('editAdmin').addEventListener('click', function() {
+            var adminForm = document.getElementById('editAdminForm');
+            var formData = new FormData(adminForm);
+            var adminData = {
+                adminid: formData.get('admin_id'),
+                name: formData.get('name'),
+                email: formData.get('email'),
+                role: formData.get('role'),
+                password: formData.get('password'),
+                password_confirmation: formData.get('password_confirmation')
+            };
+
+            console.log('Submitting admin data:', adminData);
+
+            $.ajaxSetup({
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
+            $.ajax({
+                url: '/update-admin',
+                type: 'POST',
+                data: JSON.stringify(adminData),
+                success: function(response) {
+                    alert(response.message);
+                    window.location.href = "{{ route('admin.user-management') }}";
+                },
+                error: function(xhr) {
+                    if (xhr.status === 422) {
+                        // Validation error
+                        var errors = xhr.responseJSON.errors;
+                        var errorMessage = 'Validation Error:\n';
+                        for (var field in errors) {
+                            if (errors.hasOwnProperty(field)) {
+                                errorMessage += errors[field].join('\n') + '\n';
+                            }
+                        }
+                        alert(errorMessage);
+                    } else {
+                        alert('Error saving Admin data');
+                    }
+                }
+            });
+        });
+
+
+
 
     });
 
