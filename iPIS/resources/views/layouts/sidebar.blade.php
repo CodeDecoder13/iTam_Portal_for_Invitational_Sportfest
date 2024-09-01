@@ -24,24 +24,24 @@
         /* Allow scrolling if content overflows */
     }
 
-    .nav-link {
-        width: auto;
-        /* Auto width for better responsiveness */
-        font-family: 'Inter', sans-serif;
-        font-weight: 500;
-        font-size: 13px;
-        line-height: 24px;
-        color: #FFFFFF;
-        text-decoration: none;
-        /* Remove underline */
-        display: flex;
-        /* Flex display for better alignment */
-        align-items: center;
-        gap: 8px;
-        /* Gap between icon and text */
-        padding: 8px 16px;
-        /* Padding for better touch target */
+    .nav-link.active {
+    background-color: #007bff; /* This is the blue background color */
+    color: white; /* This ensures the text color is readable */
     }
+
+    .nav-link {
+        color: #ffffff;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        transition: background-color 0.3s ease;
+    }
+
+    .nav-link:hover {
+        background-color: rgba(0, 0, 0, 0.1); /* This is for the hover effect */
+    }
+
 
     .side-head {
         display: flex;
@@ -132,28 +132,30 @@
         </li>
 
         <li class="nav-item">
-            <a href="/dashboard" class="nav-link active" aria-current="page">
+            <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <ion-icon name="home"></ion-icon>
                 Home
             </a>
-        </li>
+            
         @if (Auth::user()->is_active)
-            <li>
-                <a href="{{ route('my-documents') }}" class="nav-link text-white">
-                    <ion-icon name="document"></ion-icon>
-                    My Documents
-                </a>
-            </li>
-            <li><!--
-                <a href="{{ route('my-calendar') }}" class="nav-link text-white">
-                    <ion-icon name="calendar"></ion-icon>
-                    My Calendar
-                </a>-->
-            </li>
-            <li>
-                <a href="{{ route('my-players') }}" class="nav-link text-white">
-                    <ion-icon name="people"></ion-icon>
-                    My Players
+        <li class="nav-item">
+            <a href="{{ route('my-documents') }}" class="nav-link {{ request()->routeIs('my-documents') ? 'active' : '' }}">
+                <ion-icon name="folder"></ion-icon>
+                Documents
+            </a>
+        </li>
+        <!--
+        <li class="nav-item">
+            <a href="{{ route('my-calendar') }}" class="nav-link {{ request()->routeIs('my-calendar') ? 'active' : '' }}">
+                <ion-icon name="calendar"></ion-icon>
+                My Calendar
+            </a>
+        </li>
+        -->
+        <li class="nav-item">
+            <a href="{{ route('my-players') }}" class="nav-link {{ request()->routeIs('my-players') ? 'active' : '' }}">
+                <ion-icon name="people"></ion-icon>                    
+                My Player's
                 </a>
             </li>
         @endif
