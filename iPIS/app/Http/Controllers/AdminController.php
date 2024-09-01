@@ -13,13 +13,25 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
     public function dashboard()
     {
-        return view('admin.dashboard');
+         // Fetch all teams
+         $teams = Team::all();
+
+         // Count the total number of teams
+         $totalTeams = $teams->count();
+
+         dd(compact('totalTeams'));
+ 
+         return view('admin.dashboard', compact('totalTeams'));
     }
+    //
+   
+                                                                                                        
 
     public function documents()
     {

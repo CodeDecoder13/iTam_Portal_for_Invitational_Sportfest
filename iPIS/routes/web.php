@@ -69,12 +69,12 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::post('/store-user-accounts', [AdminController::class, 'storeUser'])->name('admin.store-user');
     Route::post('/store-admin-accounts', [AdminController::class, 'storeAdmin'])->name('admin.store-admin');
     Route::post('/update-admin', [AdminController::class, 'updateAdmin'])->name('update.admin');
-
-    
    
+    
 
     
 });
+
 //added for document checker
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::post('/document/approve/{player}/{document}', [DocumentCheckerController::class, 'approveDocument'])->name('document.approve');

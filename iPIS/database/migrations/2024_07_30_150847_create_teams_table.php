@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('teams', function (Blueprint $table) {
             $table->id();
             $table->string('name', 255);
-            $table->string('sport_category');
+            $table->string('sport_category')->index();
             $table->foreignId('coach_id')->constrained('users')->onDelete('cascade'); // Adding the coach_id foreign key
             $table->string('team_logo')->nullable();
             $table->timestamps();
