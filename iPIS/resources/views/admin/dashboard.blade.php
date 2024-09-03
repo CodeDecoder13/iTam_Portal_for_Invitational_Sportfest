@@ -9,8 +9,7 @@
 <div class="container mx-auto p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
     <div class="bg-white hover:bg-green-700 hover:text-white p-4 rounded-lg transition duration-300">
         <h2 class="text-lg">Total Registrations</h2>
-    
-        <p class="text-4xl">{{ $totalTeams }}</p>
+        <p class="text-4xl" >0</p>
     </div>
    
 

@@ -105,7 +105,7 @@
     }
 </style>
 <div id="sidebar" class="flex flex-col flex-grow min-h-screen p-3 text-white sticky">
-    <a href="/" class="d-flex side-head align-items-center mb-3 mb-md-3 me-md-auto text-white text-decoration-none">
+    <a href="/dashboard" class="d-flex side-head align-items-center mb-3 mb-md-3 me-md-auto text-white text-decoration-none">
         <img width="50" height="32" class="img-fluid" src="/images/userlogo.png" />
         <span class="fs-4">ITAM INVITATIONAL SPORTFEST COMPILER</span>
     </a>
