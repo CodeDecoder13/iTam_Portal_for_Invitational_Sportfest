@@ -13,7 +13,6 @@
         background-repeat: no-repeat;
         /* Prevent repeating */
         height: 100vh;
-        width: 350px; 
         /* Full width for smaller screens */
         /* Maximum width for larger screens */
         position: ;
