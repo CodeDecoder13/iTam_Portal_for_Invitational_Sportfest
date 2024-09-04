@@ -4,47 +4,61 @@
         <h3>Fill in player's summary to complete your requirements.</h3>
         <div class="grid grid-cols-1 mt-5">
             <div class="grid grid-cols-12 px-4 py-3 bg-green-700 text-white rounded-lg border">
-                <div class="font-bold col-span-1">Jersey No.</div>
+                <div class="font-bold col-span-2">Jersey No.</div>
                 <div class="font-bold col-span-2">Given Name</div>
-                <div class="font-bold col-span-2">Sport Category</div>
-                <div class="font-bold col-span-1">Team Name</div>
                 <div class="font-bold col-span-2">PSA Birth Certificate</div>
-                <div class="font-bold col-span-2">Parental Consent</div>
-                <div class="font-bold col-span-2">Status</div>
+                <div class="font-bold col-span-3">Parental Consent</div>
+                <div class="font-bold col-span-3">Status</div>
             </div>
-            @foreach ($players as $player)
+            
+            @php
+                // Sort the players based on status priority
+                $sortedPlayers = $players->sortByDesc(function($player) {
+                    $statusPriority = 0; // Default priority
+
+                    if ($player->birth_certificate_status == 3 || $player->parental_consent_status == 3) {
+                        $statusPriority = 3; // Rejected
+                    } elseif ($player->birth_certificate_status == 2 && $player->parental_consent_status == 2) {
+                        $statusPriority = 2; // Approved
+                    } elseif ($player->birth_certificate_status == 1 || $player->parental_consent_status == 1) {
+                        $statusPriority = 1; // For Review
+                    }
+
+                    return $statusPriority;
+                });
+            @endphp
+
+            @foreach ($sortedPlayers as $player)
                 <div class="grid grid-cols-12 px-4 py-3 bg-white rounded-lg border mt-3">
-                    <div class="col-span-1">{{ $player->jersey_no }}</div>
+                    <div class="col-span-2">{{ $player->jersey_no }}</div>
                     <div class="col-span-2">{{ $player->first_name }} {{ $player->last_name }}</div>
-                    <div class="col-span-2">{{ $player->team->sport_category }}</div>
-                    <div class="col-span-1">{{ $player->team->name }}</div>
                     <div class="col-span-2 text-green-700">
                         @if ($player->birth_certificate_status != 0)
                             <a href="#" data-bs-toggle="modal"
-                                data-bs-target="#viewBirthCertificateModal-{{ $player->id }}">
+                               data-bs-target="#viewBirthCertificateModal-{{ $player->id }}">
                                 <ion-icon name="eye"></ion-icon> View Birth Certificate
                             </a>
                         @else
                             <a href="#" data-bs-toggle="modal"
-                                data-bs-target="#uploadBirthCertificateModal-{{ $player->id }}">
+                               data-bs-target="#uploadBirthCertificateModal-{{ $player->id }}">
                                 <ion-icon name="cloud-upload"></ion-icon> Upload Birth Certificate
                             </a>
                         @endif
                     </div>
-                    <div class="col-span-2 text-green-700">
+                    <div class="col-span-3 text-green-700">
                         @if ($player->parental_consent_status != 0)
                             <a href="#" data-bs-toggle="modal"
-                                data-bs-target="#viewParentalConsentModal-{{ $player->id }}">
+                               data-bs-target="#viewParentalConsentModal-{{ $player->id }}">
                                 <ion-icon name="eye"></ion-icon> View Parental Consent
                             </a>
                         @else
                             <a href="#" data-bs-toggle="modal"
-                                data-bs-target="#uploadParentalConsentModal-{{ $player->id }}">
+                               data-bs-target="#uploadParentalConsentModal-{{ $player->id }}">
                                 <ion-icon name="cloud-upload"></ion-icon> Upload Parental Consent
                             </a>
                         @endif
                     </div>
-                    <div class="col-span-2">
+                    <div class="col-span-3">
                         @php
                             $status = 'No File Attached'; // Default status
 

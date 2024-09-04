@@ -20,8 +20,8 @@
                 <div class="font-bold col-span-2">Given Name</div>
                 <div class="font-bold col-span-2">Sport Category</div>
                 <div class="font-bold col-span-2">Team Name</div>
-                <div class="font-bold col-span-2">Gender</div>
-                <div class="font-bold col-span-1">Status</div>
+                <div class="font-bold col-span-1">Gender</div>
+                <div class="font-bold col-span-2">Status</div>
                 <div class="font-bold col-span-2">Action</div>
             </div>
             <!-- No Players -->
@@ -37,8 +37,8 @@
                     <div class="col-span-2">{{ $player->first_name }} {{ $player->last_name }}</div>
                     <div class="col-span-2">{{ $player->team->sport_category }}</div>
                     <div class="col-span-2">{{ $player->team->name }}</div>
-                    <div class="col-span-2">{{ $player->gender }}</div>
-                    <div class="col-span-1">
+                    <div class="col-span-1">{{ $player->gender }}</div>
+                    <div class="col-span-2">
                         @php
                             $status = 'No File Attached'; // Default status
 
