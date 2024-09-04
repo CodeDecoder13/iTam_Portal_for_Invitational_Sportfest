@@ -11,12 +11,13 @@
                         <label for="sport" class="form-label">Sports</label>
                         <select class="form-select" id="sport" name="sport" required>
                             <option selected disabled>Select Sport</option>
-                            <option value="Men's Basketball Developmental (D)">Men's Basketball Developmental (D)</option>
-                            <option value="Men's Basketball Competitive (C)">Men's Basketball Competitive (C)</option>
-                            <option value="Men's Volleyball Developmental (D)">Men's Volleyball Developmental (D)</option>
-                            <option value="Men's Volleyball Competitive (C)">Men's Volleyball Competitive (C)</option>
-                            <option value="Women’s Volleyball Developmental (D)">Women’s Volleyball Developmental (D)</option>
-                            <option value="Women’s Volleyball Competitive (C)">Women’s Volleyball Competitive (C)</option>
+                            <option value="Boys Basketball Developmental">Boys Basketball Developmental</option>
+                            <option value="Boys Basketball Competitive">Boys Basketball Competitive</option>
+                            <option value="Girls Basketball Developmental">Girls Basketball Developmental</option>
+                            <option value="Boys Volleyball Developmental">Boys Volleyball Developmental</option>
+                            <option value="Boys Volleyball Competitive">Boys Volleyball Competitive</option>
+                            <option value="Girls Volleyball Developmental">Girls Volleyball Developmental</option>
+                            <option value="Girls Volleyball Competitive">Girls Volleyball Competitive</option>
                         </select>
                     </div>
 
@@ -32,7 +33,7 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="team-logo" class="form-label">Team Logo (Must be square ratio, max of 25mb)</label>
+                        <label for="team-logo" class="form-label">Please Provide School Logo (max of 25mb)</label>
                         <input type="file" class="form-control" id="team-logo" name="team_logo" required>
                     </div>
                     <div class="text-center">

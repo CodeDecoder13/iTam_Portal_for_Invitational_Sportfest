@@ -10,6 +10,7 @@ use App\Models\Admin;
 use App\Models\Player;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -22,9 +23,17 @@ class AdminController extends Controller
     }
 
     public function documents()
-    {
-        return view('admin.admin-sidebar.documents');
-    }
+{
+    // Fetch all players (adjust this query according to your needs)
+    $players = Player::with('team')->get();
+
+    // Group players by sport_category and team name to avoid repetition
+    $groupedPlayers = $players->groupBy(function ($player) {
+        return $player->team->sport_category . '|' . $player->team->name;
+    });
+
+    return view('admin.admin-sidebar.documents', compact('groupedPlayers'));
+}
 
 
     public function documentCheckerFilter(Request $request)

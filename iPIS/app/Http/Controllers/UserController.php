@@ -21,20 +21,22 @@ class UserController extends Controller
     }
 
     public function myDocuments()
-    {
-        $coachId = Auth::user()->id;
+{
+    $coachId = Auth::user()->id;
 
-        // Fetch players associated with the logged-in coach
-        $players = Player::where('coach_id', $coachId)->get();
+    // Fetch players associated with the logged-in coach and eager load the 'team' relationship
+    $players = Player::where('coach_id', $coachId)
+        ->with('team')
+        ->get();
 
-        // Get the most recent updated_at value
-        $lastUpdated = $players->max('last_update');
+    // Group players by sport_category and team name to avoid repetition
+    $groupedPlayers = $players->groupBy(function ($player) {
+        return $player->team->sport_category . '|' . $player->team->name;
+    });
 
-        // Determine the overall status
-        $status = $players->isNotEmpty() ? 'Approved' : 'No File Attached'; // Default status
+    return view('user-sidebar.my-documents', compact('groupedPlayers'));
+}
 
-        return view('user-sidebar.my-documents', compact('lastUpdated', 'status'));
-    }
 
     public function selectTeam()
     {
@@ -44,29 +46,35 @@ class UserController extends Controller
     }
 
 
-    public function myDocuments_sub($type)
+    public function myDocuments_sub($type, $sport_category, $name)
     {
         $coachId = Auth::user()->id;
 
-        // Fetch only the players associated with the current coach
-        $players = Player::where('coach_id', $coachId)->get();
+        // Fetch the team based on sport_category and team name
+        $team = Team::where('sport_category', $sport_category)
+                    ->where('name', $name)
+                    ->first();
 
-        // Fetch the teams associated with the current coach
-        $teams = Team::where('coach_id', $coachId)->get();
-
-        // Check if each player has a birth certificate and parental consent
-        foreach ($players as $player) {
-            $player->has_birth_certificate = !is_null($player->birth_certificate);
-            $player->has_parental_consent = !is_null($player->parental_consent);
+        // If the team doesn't exist, redirect back with an error message
+        if (!$team) {
+            return redirect()->route('my-documents')->with('error', 'Team not found.');
         }
 
+        // Fetch only the players associated with the current coach and the specific team
+        $players = Player::where('coach_id', $coachId)
+                        ->where('team_id', $team->id)
+                        ->with('team')
+                        ->get();
+
+        // Handle different document types
         switch ($type) {
             case 'SummaryOfPlayers':
-                return view('user-sidebar.my-documents.SummaryOfPlayers', compact('players', 'teams'));
+                return view('user-sidebar.my-documents.SummaryOfPlayers', compact('players'));
             default:
-                return redirect()->route('my-documents');
+                return redirect()->route('my-documents')->with('error', 'Invalid document type.');
         }
     }
+
 
 
     //added for base line
