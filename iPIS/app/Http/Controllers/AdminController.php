@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Admin;
 use App\Models\Player;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -202,7 +203,7 @@ class AdminController extends Controller
         $request->validate([
             'adminid' => 'required|exists:admins,id',
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:admins,email',
+            'email' => ['required', 'email', 'max:255', Rule::unique('admins')->ignore($request->adminid)],
             'role' => 'required|string',
             'password' => 'nullable|string|min:8|confirmed',
         ]);

@@ -142,7 +142,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editAdminForm" method="POST">
+                    <form id="editAdminForm">
                         @csrf
                         <input type="hidden" id="editAdminId" name="admin_id">
                         <!-- Name -->
@@ -276,7 +276,7 @@
             });
         });
 
-        document.getElementById('editAdmin').addEventListener('click', function() {
+        document.getElementById('EditAdmin').addEventListener('click', function() {
             var adminForm = document.getElementById('editAdminForm');
             var formData = new FormData(adminForm);
             var adminData = {
