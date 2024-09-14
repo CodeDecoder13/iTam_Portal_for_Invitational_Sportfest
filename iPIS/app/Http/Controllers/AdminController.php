@@ -199,7 +199,7 @@ class AdminController extends Controller
     //update admins 'email' => 'required|string|email|max:255|unique:admins,email,' . $request->input('adminid'),
     public function updateAdmin(Request $request)
     {
-        
+        // Validate the request
         $request->validate([
             'adminid' => 'required|exists:admins,id',
             'name' => 'required|string|max:255',
@@ -208,15 +208,18 @@ class AdminController extends Controller
             'password' => 'nullable|string|min:8|confirmed',
         ]);
 
+        // Find the admin by ID and update fields
         $admin = Admin::findOrFail($request->adminid);
         $admin->name = $request->input('name');
         $admin->email = $request->input('email');
         $admin->role = $request->input('role');
 
+        // Update password only if it's provided
         if ($request->filled('password')) {
             $admin->password = Hash::make($request->input('password'));
         }
 
+        // Save the updated admin
         $admin->save();
 
         return response()->json(['message' => 'Admin updated successfully.']);

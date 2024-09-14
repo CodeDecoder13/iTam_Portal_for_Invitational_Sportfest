@@ -415,4 +415,6 @@ class UserController extends Controller
         // Return a response
         return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
     }
+   
+
 }

@@ -44,10 +44,6 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::delete('/delete/player/birth_certificate/{id}', [UserController::class, 'deleteBirthCertificate'])->name('delete.player.birth_certificate');
     Route::delete('/delete/player/parental_consent/{id}', [UserController::class, 'deleteParentalConsent'])->name('delete.player.parental_consent');
     Route::get('/player/{playerId}/download-document', [UserController::class, 'downloadDocument'])->name('download.player.document');
-
-
-    
-
    
 });
 
@@ -68,7 +64,9 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/summary-of-players', [AdminController::class, 'documentChecker'])->name('admin.SummaryOfPlayers');
     Route::post('/store-user-accounts', [AdminController::class, 'storeUser'])->name('admin.store-user');
     Route::post('/store-admin-accounts', [AdminController::class, 'storeAdmin'])->name('admin.store-admin');
-    Route::post('/update-admin', [AdminController::class, 'updateAdmin'])->name('admin.update-admin');
+    Route::post('/admin/update-admin', [AdminController::class, 'updateAdmin'])->name('update.admin');
+
+    
 
     
    

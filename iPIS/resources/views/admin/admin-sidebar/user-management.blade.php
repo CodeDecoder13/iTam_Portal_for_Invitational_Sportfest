@@ -35,7 +35,7 @@
                 <div class="col-span-1">{{ $admin->is_active ? 'Active' : 'Inactive' }}</div>
                 <div class="col-span-1">
                     <button class="bg-green-700 text-white px-2 py-1 rounded-lg" data-bs-toggle="modal"
-                        data-bs-target="#editAdminModal" data-admin="{{ json_encode($admin) }}">
+                        data-bs-target="#editAdminModal" data-admin="{{ json_encode($admin) }}" data-admin_id="{{ $admin->id }}">
                         Edit
                     </button>
                     <button class="bg-red-700 text-white px-2 py-1 rounded-lg" data-bs-toggle="modal"
@@ -144,7 +144,7 @@
                 <div class="modal-body">
                     <form id="editAdminForm">
                         @csrf
-                        <input type="hidden" id="editAdminId" name="admin_id">
+                        <input type="hidden" id="adminid" name="adminid" value="{{ $admin->id }}">
                         <!-- Name -->
                         <div class="mb-4">
                             <div class="mt-1">
@@ -218,15 +218,13 @@
             var formData = new FormData(adminForm);
 
             var adminData = {
-                name: formData.get('name'),
-                email: formData.get('email'),
-                role: formData.get('role'),
-                password: formData.get('password'),
-                password_confirmation: formData.get('password_confirmation'),
-                is_active: formData.get('is_active')
-
+                name: $('#name').val(),
+                email: $('#email').val(),
+                role: $('#role').val(),
+                password: $('#password').val(),
+                password_confirmation: $('#password_confirmation').val()
             };
-
+            console.log(adminData);
             $.ajaxSetup({
                 headers: {
                     'Content-Type': 'application/json',
@@ -257,30 +255,30 @@
                     }
                 }
             });
-
-
         });
 
+        //edit modal
         document.querySelectorAll('[data-bs-target="#editAdminModal"]').forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 const admin = JSON.parse(this.getAttribute('data-admin'));
-                console.log(admin);
-                document.getElementById('editAdminId').value = admin.id;
+
+                // Populate the modal form with existing admin data
+                document.getElementById('adminid').value = admin.id;
                 document.getElementById('editName').value = admin.name;
                 document.getElementById('editEmail').value = admin.email;
                 document.getElementById('editRole').value = admin.role;
-                // Clear the password fields, assuming the user needs to re-enter if changing
+
+                // Clear password fields
                 document.getElementById('editPassword').value = '';
                 document.getElementById('editConfirmPassword').value = '';
-
             });
         });
 
-        document.getElementById('EditAdmin').addEventListener('click', function() {
+        document.getElementById('EditAdmin').addEventListener('click', function () {
             var adminForm = document.getElementById('editAdminForm');
             var formData = new FormData(adminForm);
             var adminData = {
-                adminid: formData.get('admin_id'),
+                adminid: document.getElementById('adminid').value,
                 name: formData.get('name'),
                 email: formData.get('email'),
                 role: formData.get('role'),
@@ -290,24 +288,20 @@
 
             console.log('Submitting admin data:', adminData);
 
-            $.ajaxSetup({
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-
             $.ajax({
-                url: '/update-admin',
+                url: '/admin/update-admin',
                 type: 'POST',
                 data: JSON.stringify(adminData),
-                success: function(response) {
-                    alert(response.message);
-                    window.location.href = "{{ route('admin.user-management') }}";
+                contentType: 'application/json',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
-                error: function(xhr) {
+                success: function (response) {
+                    alert(response.message);
+                    window.location.reload();
+                },
+                error: function (xhr) {
                     if (xhr.status === 422) {
-                        // Validation error
                         var errors = xhr.responseJSON.errors;
                         var errorMessage = 'Validation Error:\n';
                         for (var field in errors) {
@@ -317,11 +311,14 @@
                         }
                         alert(errorMessage);
                     } else {
-                        alert('Error saving Admin data');
+                        console.error('Error updating admin data:', error);
+                        alert('Error updating admin data');
                     }
                 }
             });
         });
+
+
     </script>
 
 
