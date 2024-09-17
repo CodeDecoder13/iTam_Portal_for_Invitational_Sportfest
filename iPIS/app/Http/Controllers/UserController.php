@@ -416,5 +416,21 @@ class UserController extends Controller
         return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
     }
    
+    public function deletePlayer(Request $request)
+    {
+        try {
+            // Find the player by ID
+            $player = Player::findOrFail($request->id);
+
+            // Delete the player
+            if ($player->delete()) {
+                return response()->json(['status' => 200, 'message' => 'Player deleted successfully.']);
+            } else {
+                return response()->json(['status' => 400, 'message' => 'Failed to delete player.']);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 400, 'message' => 'Error: ' . $e->getMessage()]);
+        }
+    }
 
 }
