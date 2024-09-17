@@ -111,7 +111,7 @@ class AdminController extends Controller
 
     public function usersManagement()
     {
-            $admins = Admin::select('name', 'email', 'is_active', 'created_at', 'role')
+            $admins = Admin::select('id','name', 'email', 'is_active', 'created_at', 'role')
                 ->get();
 
             Log::info('Fetched admins: ', $admins->toArray());
@@ -199,6 +199,11 @@ class AdminController extends Controller
     //update admins 'email' => 'required|string|email|max:255|unique:admins,email,' . $request->input('adminid'),
     public function updateAdmin(Request $request)
     {
+        // Check if the adminid is being received
+        if (!$request->has('adminid')) {
+            return response()->json(['error' => 'Admin ID is missing'], 400);
+        }
+
         // Validate the request
         $request->validate([
             'adminid' => 'required|exists:admins,id',
@@ -225,6 +230,71 @@ class AdminController extends Controller
         return response()->json(['message' => 'Admin updated successfully.']);
     }
 
+    public function deleteAdmin(Request $request)
+{
+    try {
+        $admin = Admin::find($request->adminid); // Use the 'adminid' from the request
+        
+        if ($admin && $admin->delete()) {
+            return response()->json(['status' => 200, 'message' => 'Admin deleted successfully.']);
+        } else {
+            return response()->json(['status' => 400, 'message' => 'Failed to delete admin.']);
+        }
+    } catch (\Exception $e) {
+        return response()->json(['status' => 500, 'message' => 'Error: ' . $e->getMessage()]);
+    }
+}
+
+
+    // Update user details
+    public function updateUser(Request $request)
+{
+    try {
+        // Validate incoming data
+        $request->validate([
+            'id' => 'required|integer', // The ID of the user to update
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'role' => 'required|string',
+            'school_name' => 'required|string|max:255',
+            'password' => 'nullable|string|min:8|confirmed', // Password confirmation required only when changing
+        ]);
+
+        // Find the user by ID
+        $user = User::findOrFail($request->id);
+
+        // Update user details
+        $user->first_name = $request->first_name;
+        $user->last_name = $request->last_name;
+        $user->email = $request->email;
+        $user->role = $request->role;
+        $user->school_name = $request->school_name;
+
+        // Update password only if provided
+        if ($request->password) {
+            $user->password = Hash::make($request->password);
+        }
+
+        // Save updated data
+        $user->save();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'User updated successfully',
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 500,
+            'message' => 'Error updating user: ' . $e->getMessage(),
+        ]);
+    }
+}
+
+
+    
+
+
     
 
 
@@ -233,32 +303,34 @@ class AdminController extends Controller
     //   return view('admin.admin-sidebar.coach-approval');
     // }
     public function coachApproval(Request $request)
-    {
-        try {
-            // Select all users with their corresponding team info (if available)
-            $users = User::select('users.id', 'users.first_name', 'users.last_name', 'users.school_name', 'users.role', 'users.is_active', 'users.created_at')
-                ->leftJoin('teams', 'users.id', '=', 'teams.coach_id')
-                ->groupBy('users.id', 'users.first_name', 'users.last_name', 'users.school_name', 'users.role', 'users.is_active', 'users.created_at')
-                ->get();
+{
+    try {
+        // Select all users with their corresponding team info
+        $users = User::select('users.id', 'users.first_name', 'users.last_name', 'users.email', 'users.school_name', 'users.role', 'users.is_active', 'users.created_at')
+            ->leftJoin('teams', 'teams.coach_id', '=', 'users.id') // Joining teams table on coach_id
+            ->groupBy('users.id', 'users.first_name', 'users.last_name', 'users.school_name', 'users.role', 'users.is_active', 'users.created_at')
+            ->get();
 
-            // Fetch teams
-            $teams = Team::select('teams.id', 'teams.name', 'teams.sport_category', 'teams.created_at', 'teams.coach_id')
-                ->get();
+        // Fetch all teams
+        $teams = Team::select('teams.id', 'teams.name', 'teams.sport_category', 'teams.created_at', 'teams.coach_id')
+            ->get();
 
-            Log::info('Fetched users: ', $users->toArray());
-            Log::info('Fetched teams: ', $teams->toArray());
+        // Logging data to ensure it's being fetched correctly
+        Log::info('Fetched users: ', $users->toArray());
+        Log::info('Fetched teams: ', $teams->toArray());
 
-            $data = [
-                'users' => $users,
-                'teams' => $teams
-            ];
+        $data = [
+            'users' => $users,
+            'teams' => $teams
+        ];
 
-            return view('admin.admin-sidebar.coach-approval', compact('data'));
-        } catch (\Exception $e) {
-            Log::error('Error fetching coach approval data: ' . $e->getMessage());
-            return response()->json(['message' => $e->getMessage(), 'code' => $e->getCode()], 500);
-        }
+        return view('admin.admin-sidebar.coach-approval', compact('data'));
+    } catch (\Exception $e) {
+        Log::error('Error fetching coach approval data: ' . $e->getMessage());
+        return response()->json(['message' => $e->getMessage(), 'code' => $e->getCode()], 500);
     }
+}
+
 
 
     public function showteam($id)
@@ -302,4 +374,36 @@ class AdminController extends Controller
     {
         return view('admin.admin-sidebar.players-team-documents');
     }
+    
+
+    // AdminController.php
+public function deleteCoach(Request $request)
+    {
+        try {
+            // Find the user by the ID from the request
+            $user = User::find($request->id);
+
+            if ($user && $user->delete()) {
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'User deleted successfully.'
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Failed to delete user.'
+                ]);
+            }
+        } catch (\Exception $e) {
+            // Return an error response in case of exception
+            return response()->json([
+                'status' => 500,
+                'message' => 'Error: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    
+
+
 }

@@ -10,7 +10,7 @@
     <li class="w-full flex justify-end items-end">
 
         <button class="btn btn-success h-2/3" data-bs-toggle="modal" data-bs-target="#addAdminModal">
-            <sup>+</sup>Add New Admin
+            <sup>+</sup>Add New Account
         </button>
     </li>
 
@@ -35,12 +35,11 @@
                 <div class="col-span-1">{{ $admin->is_active ? 'Active' : 'Inactive' }}</div>
                 <div class="col-span-1">
                     <button class="bg-green-700 text-white px-2 py-1 rounded-lg" data-bs-toggle="modal"
-                        data-bs-target="#editAdminModal" data-admin="{{ json_encode($admin) }}" data-admin_id="{{ $admin->id }}">
+                        data-bs-target="#editAdminModal" data-admin-id="{{ $admin->id }}"
+                        data-admin-name="{{ $admin->name }}"
+                        data-admin-email="{{ $admin->email }}"
+                        data-admin-role="{{ $admin->role }}">
                         Edit
-                    </button>
-                    <button class="bg-red-700 text-white px-2 py-1 rounded-lg" data-bs-toggle="modal"
-                        data-bs-target="#deleteAdminModal">
-                        Delete
                     </button>
                 </div>
             </div>
@@ -133,8 +132,7 @@
 
 
     <!-- Edit an Admin Modal -->
-    <div class="modal fade" id="editAdminModal" tabindex="-1" aria-labelledby="editAdminModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="editAdminModal" tabindex="-1" aria-labelledby="editAdminModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-green-700">
@@ -144,7 +142,7 @@
                 <div class="modal-body">
                     <form id="editAdminForm">
                         @csrf
-                        <input type="hidden" id="adminid" name="adminid" value="{{ $admin->id }}">
+                        <input type="hidden" id="adminid" name="adminid" value="">
                         <!-- Name -->
                         <div class="mb-4">
                             <div class="mt-1">
@@ -195,6 +193,7 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" id="EditAdmin" class="btn btn-primary">Save Admin</button>
+                            <button type="button" class="btn btn-danger delete-admin-btn" data-id="{{ $admin->id }}">Delete Admin</button>
                         </div>
                     </form>
                 </div>
@@ -260,13 +259,23 @@
         //edit modal
         document.querySelectorAll('[data-bs-target="#editAdminModal"]').forEach(button => {
             button.addEventListener('click', function () {
-                const admin = JSON.parse(this.getAttribute('data-admin'));
+                // Get admin details directly from the button's data attributes
+                const adminId = this.getAttribute('data-admin-id');
+                const adminName = this.getAttribute('data-admin-name');
+                const adminEmail = this.getAttribute('data-admin-email');
+                const adminRole = this.getAttribute('data-admin-role');
+                
+                // Check if this is correctly fetched
+                console.log('Admin ID:', adminId); 
+                console.log('Admin Name:', adminName);
+                console.log('Admin Email:', adminEmail);
+                console.log('Admin Role:', adminRole);
 
-                // Populate the modal form with existing admin data
-                document.getElementById('adminid').value = admin.id;
-                document.getElementById('editName').value = admin.name;
-                document.getElementById('editEmail').value = admin.email;
-                document.getElementById('editRole').value = admin.role;
+                // Populate the hidden input and other form fields
+                document.getElementById('adminid').value = adminId;
+                document.getElementById('editName').value = adminName;
+                document.getElementById('editEmail').value = adminEmail;
+                document.getElementById('editRole').value = adminRole;
 
                 // Clear password fields
                 document.getElementById('editPassword').value = '';
@@ -274,11 +283,15 @@
             });
         });
 
+
         document.getElementById('EditAdmin').addEventListener('click', function () {
+            var adminid = document.getElementById('adminid').value;
+            console.log(adminid); // Debug: Check if adminid is populated
             var adminForm = document.getElementById('editAdminForm');
             var formData = new FormData(adminForm);
+
             var adminData = {
-                adminid: document.getElementById('adminid').value,
+                adminid: adminid,
                 name: formData.get('name'),
                 email: formData.get('email'),
                 role: formData.get('role'),
@@ -286,10 +299,10 @@
                 password_confirmation: formData.get('password_confirmation')
             };
 
-            console.log('Submitting admin data:', adminData);
+            console.log('Submitting admin data:', adminData); // Debug: Check if adminData includes adminid
 
             $.ajax({
-                url: '/admin/update-admin',
+                url: '{{ route('admin.update.admin') }}',
                 type: 'POST',
                 data: JSON.stringify(adminData),
                 contentType: 'application/json',
@@ -311,14 +324,47 @@
                         }
                         alert(errorMessage);
                     } else {
-                        console.error('Error updating admin data:', error);
+                        console.error('Error updating admin data:', xhr);
                         alert('Error updating admin data');
                     }
                 }
             });
         });
 
+            //delete function
+            $(document).on('click', '.delete-admin-btn', function() {
+                var adminid = $(this).data('id'); // Get the admin ID from the button
 
+                // Confirmation dialog before deletion
+                if (confirm('Are you sure you want to delete this admin?')) {
+                    $.ajax({
+                        url: '{{ route('delete.admin') }}', // Admin deletion route
+                        type: 'DELETE', // HTTP method for deletion
+                        data: { adminid: adminid }, // Send the admin ID in the request
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // CSRF token for security
+                        },
+                        success: function(response) {
+                            console.log(response); // Debugging: log the response
+                            if (response.status === 200) {
+                                alert(response.message); // Show success message
+                                window.location.reload();
+                                $('button[data-id="' + adminid + '"]').closest('tr').remove();
+                            } else {
+                                alert(response.message); // Show error message
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error(xhr); // Debugging: log the error
+                            alert('Error: ' + error); // Show a generic error message
+                        }
+                    });
+                }
+            });
+
+            
+
+                
     </script>
 
 
