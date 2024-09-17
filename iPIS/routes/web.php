@@ -44,10 +44,6 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::delete('/delete/player/birth_certificate/{id}', [UserController::class, 'deleteBirthCertificate'])->name('delete.player.birth_certificate');
     Route::delete('/delete/player/parental_consent/{id}', [UserController::class, 'deleteParentalConsent'])->name('delete.player.parental_consent');
     Route::get('/player/{playerId}/download-document', [UserController::class, 'downloadDocument'])->name('download.player.document');
-
-
-    
-
    
 });
 
@@ -58,22 +54,25 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/calendar', [AdminController::class, 'calendar'])->name('admin.calendar');
     Route::get('/players-teams', [AdminController::class, 'playersTeams'])->name('admin.players-teams');
     Route::get('/user-management', [AdminController::class, 'usersManagement'])->name('admin.user-management');
-    Route::post('/admin/update-user', [AdminController::class, 'updateUser'])->name('admin.update-user');
     Route::get('/coach-approval', [AdminController::class, 'coachApproval'])->name('admin.coach-approval');
     Route::post('/update-status/{id}', [AdminController::class, 'updateStatus'])->name('admin.update-status');
     Route::get('/teams/{id}', [AdminController::class, 'showteam'])->name('admin.showteams');
-    Route::get('/sidebar', [UserController::class, 'getCurrentTeams'])->name('sidebar');
     Route::get('/players-team-documents', [AdminController::class, 'teamdocuments'])->name('admin.playersTeamDocuments');
-    
     Route::get('/summary-of-players', [AdminController::class, 'documentChecker'])->name('admin.SummaryOfPlayers');
-    Route::post('/store-user-accounts', [AdminController::class, 'storeUser'])->name('admin.store-user');
+ 
+});
+// usermanagement routes
+Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::post('/store-admin-accounts', [AdminController::class, 'storeAdmin'])->name('admin.store-admin');
-    Route::post('/update-admin', [AdminController::class, 'updateAdmin'])->name('update.admin');
-
-    
-   
-
-    
+    Route::post('/admin/update-admin', [AdminController::class, 'updateAdmin'])->name('admin.update.admin');
+    Route::delete('/admin/delete', [AdminController::class, 'deleteAdmin'])->name('delete.admin');
+});
+// coach approval routes
+Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
+    Route::get('/admin/users/{id}/edit', [AdminController::class, 'edit'])->name('admin.users.edit');
+    Route::post('/admin/coach/update', [AdminController::class, 'updateUser'])->name('admin.users.update');
+    Route::delete('/admin/delete-coach', [AdminController::class, 'deleteCoach'])->name('delete.coach');
+    Route::post('/store-user-accounts', [AdminController::class, 'storeUser'])->name('admin.store-user');
 });
 //added for document checker
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
@@ -85,6 +84,11 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     //suggest Dwei: para di crowded route and functions
     Route::post('/document/update/{player}/{document}/{type}/{update}', [DocumentCheckerController::class, 'updateDocument'])->name('document.update');
     Route::get('/summary-of-players', [AdminController::class, 'documentCheckerFilter'])->name('admin.SummaryOfPlayers');
+
+});
+// route for myplayer page
+Route::middleware(['auth','verified'])->group(function () {
+Route::delete('/player/delete', [UserController::class, 'deletePlayer'])->name('player.delete');
 
 });
 
