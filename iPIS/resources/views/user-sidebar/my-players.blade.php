@@ -75,7 +75,10 @@
                                 data-player="{{ json_encode($player) }}">
                             Edit
                         </button>
-                    </div>
+                        <button type="button" id="deletePlayer" class="btn btn-danger btn-sm" data-id="{{ $player->id }}">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </button>
+                         </div>
                 </div>
             @endforeach
 
@@ -182,6 +185,7 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                             <button type="button" id="editPlayer" class="btn btn-primary">Save Changes</button>
+                            
                         </div>
                     </form>
                 </div>
@@ -328,5 +332,8 @@
                 }
             });
         });
+
+         
+
     </script>
 </x-app-layout>

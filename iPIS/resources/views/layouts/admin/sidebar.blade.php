@@ -13,7 +13,6 @@
         background-repeat: no-repeat;
         /* Prevent repeating */
         height: 100vh;
-        width: 350px; 
         /* Full width for smaller screens */
         /* Maximum width for larger screens */
         position: ;
@@ -140,12 +139,15 @@
             </a>
         </li>
         -->
+        @if (Auth::guard('admin')->check() && (Auth::guard('admin')->user()->role === 'SysAdmin' || Auth::guard('admin')->user()->role === 'SADO'))
         <li class="nav-item">
             <a href="{{ route('admin.user-management') }}" class="nav-link {{ request()->routeIs('admin.user-management') ? 'active' : '' }}">
                 <ion-icon name="people"></ion-icon>
                 User Management
             </a>
         </li>
+        @endif
+        
         <li class="nav-item">
             <a href="{{ route('admin.coach-approval') }}" class="nav-link {{ request()->routeIs('admin.coach-approval') ? 'active' : '' }}">
                 <ion-icon name="walk"></ion-icon>

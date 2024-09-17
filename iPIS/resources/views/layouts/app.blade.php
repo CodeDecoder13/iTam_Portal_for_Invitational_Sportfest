@@ -32,11 +32,11 @@
 
 
     @if (Auth::guard('admin')->check())
-        <div class="w-full lg:w-4/12 xl:w-3/12 min-h-screen">
+        <div class="w-full lg:w-4/12 xl:w-2/12 min-h-screen">
             @include('layouts.admin.sidebar')
         </div>
     @elseif (Auth::guard('web')->check())
-        <div class="w-full lg:w-4/12 xl:w-3/12 min-h-screen">
+        <div class="w-full lg:w-4/12 xl:w-2/12 min-h-screen">
             @include('layouts.sidebar')
         </div>
     @endif
