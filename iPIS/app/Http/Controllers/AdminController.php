@@ -45,8 +45,8 @@ class AdminController extends Controller
         }
 
         $incompleteDocuments = Player::where('birth_certificate_status', '!=', 2)
-        ->orWhere('parental_consent_status', '!=', 2)
-        ->count();
+            ->orWhere('parental_consent_status', '!=', 2)
+            ->count();
 
         // Pass this data to the view
         return view('admin.dashboard', compact('totalRegistrations', 'categories', 'incompleteDocuments'));
@@ -337,8 +337,9 @@ class AdminController extends Controller
             // Select all users with their corresponding team info
             $users = User::select('users.id', 'users.first_name', 'users.last_name', 'users.email', 'users.school_name', 'users.role', 'users.is_active', 'users.created_at')
                 ->leftJoin('teams', 'teams.coach_id', '=', 'users.id') // Joining teams table on coach_id
-                ->groupBy('users.id', 'users.first_name', 'users.last_name', 'users.school_name', 'users.role', 'users.is_active', 'users.created_at')
+                ->groupBy('users.id', 'users.first_name', 'users.last_name', 'users.email', 'users.school_name', 'users.role', 'users.is_active', 'users.created_at')
                 ->get();
+
 
             // Fetch all teams
             $teams = Team::select('teams.id', 'teams.name', 'teams.sport_category', 'teams.created_at', 'teams.coach_id')
