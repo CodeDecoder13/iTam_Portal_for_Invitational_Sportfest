@@ -18,23 +18,52 @@ use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
 {
+
     public function dashboard()
     {
-        return view('admin.dashboard');
+        // Fetch the total number of teams and players grouped by sport category
+        $registrations = Team::withCount('players')->get();
+
+        $totalRegistrations = $registrations->sum('players_count');
+
+        // Count for each specific category (change according to your needs)
+        $categories = [
+            'Boys Basketball Developmental' => 0,
+            'Boys Basketball Competitive' => 0,
+            'Girls Basketball Developmental' => 0,
+            'Girls Basketball Competitive' => 0,
+            'Boys Volleyball Developmental' => 0,
+            'Boys Volleyball Competitive' => 0,
+            'Girls Volleyball Developmental' => 0,
+            'Girls Volleyball Competitive' => 0,
+        ];
+
+        foreach ($registrations as $team) {
+            if (isset($categories[$team->sport_category])) {
+                $categories[$team->sport_category] += $team->players_count;
+            }
+        }
+
+        $incompleteDocuments = Player::where('birth_certificate_status', '!=', 2)
+        ->orWhere('parental_consent_status', '!=', 2)
+        ->count();
+
+        // Pass this data to the view
+        return view('admin.dashboard', compact('totalRegistrations', 'categories', 'incompleteDocuments'));
     }
 
     public function documents()
-{
-    // Fetch all players (adjust this query according to your needs)
-    $players = Player::with('team')->get();
+    {
+        // Fetch all players (adjust this query according to your needs)
+        $players = Player::with('team')->get();
 
-    // Group players by sport_category and team name to avoid repetition
-    $groupedPlayers = $players->groupBy(function ($player) {
-        return $player->team->sport_category . '|' . $player->team->name;
-    });
+        // Group players by sport_category and team name to avoid repetition
+        $groupedPlayers = $players->groupBy(function ($player) {
+            return $player->team->sport_category . '|' . $player->team->name;
+        });
 
-    return view('admin.admin-sidebar.documents', compact('groupedPlayers'));
-}
+        return view('admin.admin-sidebar.documents', compact('groupedPlayers'));
+    }
 
 
     public function documentCheckerFilter(Request $request)
@@ -72,10 +101,10 @@ class AdminController extends Controller
         }
 
         $players = $query->get();
-       
+
         return view('admin.admin-sidebar.team-documents.SummaryOfPlayers_suggested', compact('players', 'teams', 'users'));
     }
-     //return view('admin.admin-sidebar.team-documents.SummaryOfPlayers', compact('players', 'teams', 'users'));
+    //return view('admin.admin-sidebar.team-documents.SummaryOfPlayers', compact('players', 'teams', 'users'));
 
 
     public function calendar()
@@ -111,18 +140,17 @@ class AdminController extends Controller
 
     public function usersManagement()
     {
-            $admins = Admin::select('id','name', 'email', 'is_active', 'created_at', 'role')
-                ->get();
+        $admins = Admin::select('id', 'name', 'email', 'is_active', 'created_at', 'role')
+            ->get();
 
-            Log::info('Fetched admins: ', $admins->toArray());
+        Log::info('Fetched admins: ', $admins->toArray());
 
-            $data = [
-                'admins' => $admins,
-            ];
+        $data = [
+            'admins' => $admins,
+        ];
 
-            return view('admin.admin-sidebar.user-management', compact('data'));
-    
-}
+        return view('admin.admin-sidebar.user-management', compact('data'));
+    }
     // added for storing user
     public function storeUser(Request $request)
     {
@@ -134,9 +162,10 @@ class AdminController extends Controller
             'password' => 'required|string|min:8|confirmed',
             'birth_date' => 'required|date',
             'gender' => 'required|string|max:10',
-            'school_name' => 'required', 'string',
+            'school_name' => 'required',
+            'string',
             'role' => 'required|string|max:50',
-            
+
         ]);
 
         if ($validator->fails()) {
@@ -153,9 +182,9 @@ class AdminController extends Controller
             'gender' => $request->gender,
             'school_name' => $request->school_name,
             'role' => $request->role,
-            
+
         ]);
-        Log::info($request->all()); 
+        Log::info($request->all());
         // Fetch the school name from the user model
         $schoolName = $user->school_name;
 
@@ -179,11 +208,11 @@ class AdminController extends Controller
             'role' => 'required|string|max:50',
             'password' => 'required|string|min:8|confirmed',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-    
+
         // Create a new admin
         $admin = Admin::create([
             'name' => $request->name,
@@ -192,10 +221,10 @@ class AdminController extends Controller
             'password' => Hash::make($request->password),
 
         ]);
-    
+
         return response()->json(['message' => 'Admin added successfully', 'user' => $admin], 200);
     }
-    
+
     //update admins 'email' => 'required|string|email|max:255|unique:admins,email,' . $request->input('adminid'),
     public function updateAdmin(Request $request)
     {
@@ -231,71 +260,71 @@ class AdminController extends Controller
     }
 
     public function deleteAdmin(Request $request)
-{
-    try {
-        $admin = Admin::find($request->adminid); // Use the 'adminid' from the request
-        
-        if ($admin && $admin->delete()) {
-            return response()->json(['status' => 200, 'message' => 'Admin deleted successfully.']);
-        } else {
-            return response()->json(['status' => 400, 'message' => 'Failed to delete admin.']);
+    {
+        try {
+            $admin = Admin::find($request->adminid); // Use the 'adminid' from the request
+
+            if ($admin && $admin->delete()) {
+                return response()->json(['status' => 200, 'message' => 'Admin deleted successfully.']);
+            } else {
+                return response()->json(['status' => 400, 'message' => 'Failed to delete admin.']);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 500, 'message' => 'Error: ' . $e->getMessage()]);
         }
-    } catch (\Exception $e) {
-        return response()->json(['status' => 500, 'message' => 'Error: ' . $e->getMessage()]);
     }
-}
 
 
     // Update user details
     public function updateUser(Request $request)
-{
-    try {
-        // Validate incoming data
-        $request->validate([
-            'id' => 'required|integer', // The ID of the user to update
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'role' => 'required|string',
-            'school_name' => 'required|string|max:255',
-            'password' => 'nullable|string|min:8|confirmed', // Password confirmation required only when changing
-        ]);
+    {
+        try {
+            // Validate incoming data
+            $request->validate([
+                'id' => 'required|integer', // The ID of the user to update
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                'role' => 'required|string',
+                'school_name' => 'required|string|max:255',
+                'password' => 'nullable|string|min:8|confirmed', // Password confirmation required only when changing
+            ]);
 
-        // Find the user by ID
-        $user = User::findOrFail($request->id);
+            // Find the user by ID
+            $user = User::findOrFail($request->id);
 
-        // Update user details
-        $user->first_name = $request->first_name;
-        $user->last_name = $request->last_name;
-        $user->email = $request->email;
-        $user->role = $request->role;
-        $user->school_name = $request->school_name;
+            // Update user details
+            $user->first_name = $request->first_name;
+            $user->last_name = $request->last_name;
+            $user->email = $request->email;
+            $user->role = $request->role;
+            $user->school_name = $request->school_name;
 
-        // Update password only if provided
-        if ($request->password) {
-            $user->password = Hash::make($request->password);
+            // Update password only if provided
+            if ($request->password) {
+                $user->password = Hash::make($request->password);
+            }
+
+            // Save updated data
+            $user->save();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'User updated successfully',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Error updating user: ' . $e->getMessage(),
+            ]);
         }
-
-        // Save updated data
-        $user->save();
-
-        return response()->json([
-            'status' => 200,
-            'message' => 'User updated successfully',
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => 500,
-            'message' => 'Error updating user: ' . $e->getMessage(),
-        ]);
     }
-}
 
 
-    
 
 
-    
+
+
 
 
 
@@ -303,33 +332,33 @@ class AdminController extends Controller
     //   return view('admin.admin-sidebar.coach-approval');
     // }
     public function coachApproval(Request $request)
-{
-    try {
-        // Select all users with their corresponding team info
-        $users = User::select('users.id', 'users.first_name', 'users.last_name', 'users.email', 'users.school_name', 'users.role', 'users.is_active', 'users.created_at')
-            ->leftJoin('teams', 'teams.coach_id', '=', 'users.id') // Joining teams table on coach_id
-            ->groupBy('users.id', 'users.first_name', 'users.last_name', 'users.school_name', 'users.role', 'users.is_active', 'users.created_at')
-            ->get();
+    {
+        try {
+            // Select all users with their corresponding team info
+            $users = User::select('users.id', 'users.first_name', 'users.last_name', 'users.email', 'users.school_name', 'users.role', 'users.is_active', 'users.created_at')
+                ->leftJoin('teams', 'teams.coach_id', '=', 'users.id') // Joining teams table on coach_id
+                ->groupBy('users.id', 'users.first_name', 'users.last_name', 'users.school_name', 'users.role', 'users.is_active', 'users.created_at')
+                ->get();
 
-        // Fetch all teams
-        $teams = Team::select('teams.id', 'teams.name', 'teams.sport_category', 'teams.created_at', 'teams.coach_id')
-            ->get();
+            // Fetch all teams
+            $teams = Team::select('teams.id', 'teams.name', 'teams.sport_category', 'teams.created_at', 'teams.coach_id')
+                ->get();
 
-        // Logging data to ensure it's being fetched correctly
-        Log::info('Fetched users: ', $users->toArray());
-        Log::info('Fetched teams: ', $teams->toArray());
+            // Logging data to ensure it's being fetched correctly
+            Log::info('Fetched users: ', $users->toArray());
+            Log::info('Fetched teams: ', $teams->toArray());
 
-        $data = [
-            'users' => $users,
-            'teams' => $teams
-        ];
+            $data = [
+                'users' => $users,
+                'teams' => $teams
+            ];
 
-        return view('admin.admin-sidebar.coach-approval', compact('data'));
-    } catch (\Exception $e) {
-        Log::error('Error fetching coach approval data: ' . $e->getMessage());
-        return response()->json(['message' => $e->getMessage(), 'code' => $e->getCode()], 500);
+            return view('admin.admin-sidebar.coach-approval', compact('data'));
+        } catch (\Exception $e) {
+            Log::error('Error fetching coach approval data: ' . $e->getMessage());
+            return response()->json(['message' => $e->getMessage(), 'code' => $e->getCode()], 500);
+        }
     }
-}
 
 
 
@@ -374,10 +403,10 @@ class AdminController extends Controller
     {
         return view('admin.admin-sidebar.players-team-documents');
     }
-    
+
 
     // AdminController.php
-public function deleteCoach(Request $request)
+    public function deleteCoach(Request $request)
     {
         try {
             // Find the user by the ID from the request
@@ -402,8 +431,4 @@ public function deleteCoach(Request $request)
             ]);
         }
     }
-
-    
-
-
 }
