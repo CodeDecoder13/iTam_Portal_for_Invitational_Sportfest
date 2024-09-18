@@ -41,8 +41,8 @@
                         <span  class="status">{{ $user->is_active ? 'Activate' : 'Deactivate' }}</span>
                     </div>
                     <div class="col-span-1 flex justify-end space-x-2">
-                         <button class="bg-green-700 text-white px-2 py-1 rounded-lg" onclick="updateStatus({{ $user->id }}, 'activate')">Activate</button>
-                        <button class="bg-red-700 text-white px-2 py-1 rounded-lg" onclick="updateStatus({{ $user->id }}, 'deactivate')">Deactivate</button>   
+                        <button class="bg-green-700 text-white px-2 py-1 rounded-lg" onclick="updateStatus({{ $user->id }}, 'activate')">Activate</button>
+                        <button class="bg-red-700 text-white px-2 py-1 rounded-lg" onclick="updateStatus({{ $user->id }}, 'deactivate')">Deactivate</button>    
                         <!-- Edit Button -->
                         <button class="bg-yellow-700 text-white px-2 py-1 rounded-lg" 
                                 data-bs-toggle="modal" 
@@ -55,7 +55,6 @@
                                 data-user-schoolname="{{ $user->school_name }}">
                             Edit
                         </button>
-                       
 
                     </div>
                 </div>   
