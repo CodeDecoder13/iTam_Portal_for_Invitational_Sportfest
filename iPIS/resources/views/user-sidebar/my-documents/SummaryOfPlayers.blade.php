@@ -183,7 +183,7 @@
                                    <!--  <form action="{{ route('delete.player.birth_certificate', $player->id) }}"
                                         method="POST" style="display:inline;">
                                         @csrf
-                                        @method('DELETE')
+                                        
                                         <button type="submit" class="btn btn-link text-danger">Delete</button>
                                     </form>
                                     -->
@@ -228,7 +228,7 @@
                                    <!--  <form action="{{ route('delete.player.parental_consent', $player->id) }}"
                                         method="POST" style="display:inline;">
                                         @csrf
-                                        @method('DELETE')
+                                        
                                         <button type="submit" class="btn btn-link text-danger">Delete</button>
                                     </form> -->
                                     <button type="button" class="btn btn-link" data-bs-toggle="modal"
