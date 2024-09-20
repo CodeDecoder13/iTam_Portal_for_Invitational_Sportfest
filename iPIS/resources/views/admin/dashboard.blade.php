@@ -16,7 +16,7 @@
             <p class="text-4xl">{{ $totalRegistrations }}</p>
         </div>
 
-        <!-- Display dynamic data for each category -->
+        <!-- Deisplay dynamic data for each category -->
         <div class="bg-gray-50 hover:bg-green-700 hover:text-white p-4 rounded-lg transition duration-300">
             <h2 class="text-lg">Boys Basketball Developmental</h2>
             <p class="text-4xl">{{ $categories['Boys Basketball Developmental'] }}</p>

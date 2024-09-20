@@ -154,8 +154,8 @@
                 Coach Approval
             </a>
         </li>
+        
     </ul>
-    <hr />
     <div class="m">
         <ul class="nav nav-pills flex-column">
             <li>
