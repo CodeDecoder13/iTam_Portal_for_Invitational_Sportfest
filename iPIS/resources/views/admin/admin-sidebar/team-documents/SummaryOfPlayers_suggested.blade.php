@@ -188,59 +188,66 @@
                 iframeSrc = location + fileName;
 
                 var contentApproved = `
-                        <div class="col-md-4 d-flex flex-column justify-content-center">
-                            <h1 class="text-center mb-2 text-success">File Approved</h1>
-                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/4">
-                                @csrf
-                                @method('POST')
-                                <button class="btn btn-primary mb-2 w-full">Download</button>
-                            </form>
-                        </div>
+                    <div class="text-center">
+                        <h5 class="text-success mb-3">File Approved</h5>
+                        <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/4">
+                            @csrf
+                            @method('POST')
+                            <button class="btn btn-primary">Download</button>
+                        </form>
                     </div>`;
-                var contentReject = `<div class="col-md-4 d-flex flex-column justify-content-center">
-                    <h1 class="text-center mb-2 text-danger">File Rejected</h1>
-                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/2">
-                                @csrf
-                                <button class="btn btn-success mb-2 w-full">Approve</button>
-                            </form>
-                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/4">
-                                @csrf
-                                @method('POST')
-                                <button class="btn btn-primary mb-2 w-full">Download</button>
-                            </form>
-                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/0">
-                                @csrf
-                                @method('POST')
-                                <button class="btn btn-warning w-full">Delete</button>
-                            </form>
-                        </div>
-                    </div>`;
-                var contentDefault = `<div class="col-md-4 d-flex flex-column justify-content-center">
-                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/2">
-                                @csrf
-                                <button class="btn btn-success mb-2 w-full">Approve</button>
-                            </form>
-                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/3">
-                                @csrf
-                                <button class="btn btn-danger mb-2 w-full">Reject</button>
-                            </form>
-                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/4">
-                                @csrf
-                                @method('POST')
-                                <button class="btn btn-primary mb-2 w-full">Download</button>
-                            </form>
-                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/0">
-                                @csrf
-                                @method('POST')
-                                <button class="btn btn-warning w-full">Delete</button>
-                            </form>
-                        </div>
-                    </div>`;
-                var contentStart = `<div class="row mb-4">
-                        <div class="col-md-8">
-                            <h5>Document: ${docType}</h5>
-                            <iframe id="iframecontent" class="w-full min-h-96" src="${iframeSrc}"></iframe>
-                        </div>`;
+                    var contentReject = `
+    <div class="text-center">
+        <h5 class="text-danger mb-3">File Rejected</h5>
+        <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/2" class="d-inline-block me-2">
+            @csrf
+            <button class="btn btn-success">Approve</button>
+        </form>
+        <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/4" class="d-inline-block me-2">
+            @csrf
+            @method('POST')
+            <button class="btn btn-primary">Download</button>
+        </form>
+        <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/0" class="d-inline-block">
+            @csrf
+            @method('POST')
+            <button class="btn btn-warning">Delete</button>
+        </form>
+    </div>`;
+
+var contentDefault = `
+    <div class="text-center">
+        <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/2" class="d-inline-block me-2">
+            @csrf
+            <button class="btn btn-success">Approve</button>
+        </form>
+        <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/3" class="d-inline-block me-2">
+            @csrf
+            <button class="btn btn-danger">Reject</button>
+        </form>
+        <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/4" class="d-inline-block me-2">
+            @csrf
+            @method('POST')
+            <button class="btn btn-primary">Download</button>
+        </form>
+        <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/0" class="d-inline-block">
+            @csrf
+            @method('POST')
+            <button class="btn btn-warning">Delete</button>
+        </form>
+    </div>`;
+               
+                    var contentStart = `
+    <div class="d-flex flex-column h-100">
+        <div class="flex-grow-1 mb-3">
+            <iframe id="iframecontent" class="w-100 h-100" src="${iframeSrc}" style="min-height: 70vh;"></iframe>
+        </div>
+        <div class="d-flex justify-content-center">
+            <div class="text-center">
+                <!-- Buttons will go here -->
+            </div>
+        </div>
+    </div>`;
 
 
                 checkUrl(iframeSrc, function(exists) {

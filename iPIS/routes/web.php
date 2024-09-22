@@ -60,6 +60,8 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/players-team-documents', [AdminController::class, 'teamdocuments'])->name('admin.playersTeamDocuments');
     Route::get('/summary-of-players', [AdminController::class, 'documentChecker'])->name('admin.SummaryOfPlayers');
  
+    
+    
 });
 // usermanagement routes
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {

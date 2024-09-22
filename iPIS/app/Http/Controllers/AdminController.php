@@ -51,7 +51,7 @@ class AdminController extends Controller
         // Pass this data to the view
         return view('admin.dashboard', compact('totalRegistrations', 'categories', 'incompleteDocuments'));
     }
-
+    // added for documents
     public function documents()
     {
         // Fetch all players (adjust this query according to your needs)
@@ -64,8 +64,7 @@ class AdminController extends Controller
 
         return view('admin.admin-sidebar.documents', compact('groupedPlayers'));
     }
-
-
+    // added for documents summary of players
     public function documentCheckerFilter(Request $request)
 
     {
@@ -105,7 +104,6 @@ class AdminController extends Controller
         return view('admin.admin-sidebar.team-documents.SummaryOfPlayers_suggested', compact('players', 'teams', 'users'));
     }
     //return view('admin.admin-sidebar.team-documents.SummaryOfPlayers', compact('players', 'teams', 'users'));
-
 
     public function calendar()
     {
