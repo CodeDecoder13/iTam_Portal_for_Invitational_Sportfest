@@ -105,83 +105,76 @@
     }
 </style>
 <div id="sidebar" class="flex flex-col flex-grow min-h-screen p-3 text-white sticky">
-    <a href="/" class="d-flex side-head align-items-center mb-3 mb-md-3 me-md-auto text-white text-decoration-none">
-        <img width="50" height="32" class="img-fluid" src="/images/userlogo.png" />
-        <span class="fs-4">ITAM INVITATIONAL SPORTFEST COMPILER</span>
-    </a>
-    <ul class="nav nav-pills flex-column mb-auto">
-        <li class="nav-item">
-            @if (Auth::user()->is_active)
-                <div class="sm:col-span-3" style="margin-bottom: 30px">
-                    <label for="team" class="block text-sm font-medium leading-6 text-white">Select team</label>
-                    <div class="mt-2 ">
-                        <select id="team" name="team" autocomplete="team-name"
-                        class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm   
-                        sm:leading-6">
-                            <option value="" selected>Select Team</option>
-                            @foreach ($teams as $team)
-                                <option value="{{ $team->id }}"
-                                    {{ isset($newTeam) && $newTeam->id === $team->id ? 'selected' : '' }}>
-                                    {{ $team->name }} - {{ $team->sport_category }}</option>
-                            @endforeach
-                            <option value="add-new-team">Add New Team</option>
-                        </select>
-                    </div>
-                </div>
-            @endif
-        </li>
+    <div class="flex items-center mb-6">
+        <img width="70" height="70" class="mr-4" src="{{ asset('images/userlogo.png') }}" alt="ITAM Logo" />
+        <div class="flex flex-col">
+            <div class="text-xl font-bold leading-tight">ITAM</div>
+            <div class="text-xl font-bold leading-tight">INVITATIONAL</div>
+            <div class="text-xl font-bold leading-tight">SPORTSFEST</div>
+            <div class="text-sm mt-1">COMPILER</div>
+        </div>
+    </div>
 
+    <div class="mb-6">
+        <label for="team" class="block text-sm font-medium leading-6 text-white mb-1">Select Team</label>
+        <select id="team" name="team" autocomplete="team-name"
+            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            <option value="" selected>Select Team</option>
+            @foreach ($teams as $team)
+                <option value="{{ $team->id }}"
+                    {{ isset($newTeam) && $newTeam->id === $team->id ? 'selected' : '' }}>
+                    {{ $team->name }} - {{ $team->sport_category }}</option>
+            @endforeach
+            <option value="add-new-team">Add New Team</option>
+        </select>
+    </div>
+
+    <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
             <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <ion-icon name="home"></ion-icon>
                 Home
             </a>
-            
-        @if (Auth::user()->is_active)
+        </li>
         <li class="nav-item">
             <a href="{{ route('my-documents') }}" class="nav-link {{ request()->routeIs('my-documents') ? 'active' : '' }}">
                 <ion-icon name="folder"></ion-icon>
-                Documents
+                My Documents
             </a>
         </li>
-        <!--
         <li class="nav-item">
             <a href="{{ route('my-calendar') }}" class="nav-link {{ request()->routeIs('my-calendar') ? 'active' : '' }}">
                 <ion-icon name="calendar"></ion-icon>
                 My Calendar
             </a>
         </li>
-        -->
         <li class="nav-item">
             <a href="{{ route('my-players') }}" class="nav-link {{ request()->routeIs('my-players') ? 'active' : '' }}">
                 <ion-icon name="people"></ion-icon>                    
-                My Player's
-                </a>
-            </li>
-        @endif
+                My Players
+            </a>
+        </li>
     </ul>
-    <hr />
-    <div class="m">
-        <ul class="nav nav-pills flex-column">
-            @if (Auth::user()->is_active)
-                <li>
-                    <a href="#" class="nav-link text-white">
-                        <ion-icon name="settings"></ion-icon>
-                        Settings
-                    </a>
-                </li>
-            @endif
-            <li>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="nav-link text-white"
-                        style="background: none; border: none; padding: 0; cursor: pointer;">
-                        <ion-icon name="log-out"></ion-icon>Logout
-                    </button>
-                </form>
-            </li>
-        </ul>
-    </div>
+
+    <hr class="my-6" />
+
+    <ul class="nav nav-pills flex-column mt-auto">
+        <li>
+            <a href="#" class="nav-link text-white">
+                <ion-icon name="settings"></ion-icon>
+                Settings
+            </a>
+        </li>
+        <li>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="nav-link text-white w-full text-left"
+                    style="background: none; border: none; padding: 0; cursor: pointer;">
+                    <ion-icon name="log-out"></ion-icon>Logout
+                </button>
+            </form>
+        </li>
+    </ul>
 </div>
 
 <script>
