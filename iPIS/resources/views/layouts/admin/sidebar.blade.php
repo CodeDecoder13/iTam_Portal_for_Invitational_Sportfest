@@ -106,10 +106,15 @@
 </style>
 
 <div id="sidebar" class="flex flex-col flex-grow min-h-screen p-3 text-white sticky">
-    <a href="/" class="d-flex side-head align-items-center mb-3 mb-md-3 me-md-auto text-white text-decoration-none">
-        <img width="50" height="32" class="img-fluid" src="/images/logorac.png" />
-        <span class="fs-4">ITAM INVITATIONAL SPORTFEST COMPILER</span>
-    </a>
+<div class="flex items-center mb-6">
+        <img width="70" height="70" class="mr-4" src="{{ asset('images/logorac.png') }}" alt="ITAM Logo" />
+        <div class="flex flex-col">
+            <div class="text-xl font-bold leading-tight">ITAM</div>
+            <div class="text-xl font-bold leading-tight">INVITATIONAL</div>
+            <div class="text-xl font-bold leading-tight">SPORTSFEST</div>
+            <div class="text-sm mt-1">COMPILER</div>
+        </div>
+    </div>
     <ul class="nav nav-pills flex-column mb-auto">
     <li class="nav-item">
         <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->is('admin/dashboard*') ? 'active' : '' }}">
