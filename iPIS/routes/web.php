@@ -7,7 +7,7 @@ use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TestingController;
 use App\Http\Controllers\DocumentCheckerController;
-
+use App\Http\Controllers\PlayerDocumentController;
 Route::get('/', function () {
     return view('auth.login');
 });
@@ -60,6 +60,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/players-team-documents', [AdminController::class, 'teamdocuments'])->name('admin.playersTeamDocuments');
     Route::get('/summary-of-players', [AdminController::class, 'documentChecker'])->name('admin.SummaryOfPlayers');
  
+    
 });
 // usermanagement routes
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
@@ -73,6 +74,12 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::post('/admin/coach/update', [AdminController::class, 'updateUser'])->name('admin.users.update');
     Route::delete('/admin/delete-coach', [AdminController::class, 'deleteCoach'])->name('delete.coach');
     Route::post('/store-user-accounts', [AdminController::class, 'storeUser'])->name('admin.store-user');
+});
+// added for Document Module
+Route::prefix('admin')->middleware(['auth:admin'])->group(function () {     
+    Route::get('/player-document/{playerId}/{documentType}', [PlayerDocumentController::class, 'getDocument']);
+    Route::get('/player-comments/{playerId}/{documentType}', [PlayerDocumentController::class, 'getComments']);
+    Route::post('/player-comments', [PlayerDocumentController::class, 'addComment']);
 });
 //added for document checker
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {

@@ -41,7 +41,7 @@
                         <span  class="status">{{ $user->is_active ? 'Activate' : 'Deactivate' }}</span>
                     </div>
                     <div class="col-span-1 flex justify-end space-x-2">
-                         <button class="bg-green-700 text-white px-2 py-1 rounded-lg" onclick="updateStatus({{ $user->id }}, 'activate')">Activate</button>
+                        <button class="bg-green-700 text-white px-2 py-1 rounded-lg" onclick="updateStatus({{ $user->id }}, 'activate')">Activate</button>
                         <button class="bg-red-700 text-white px-2 py-1 rounded-lg" onclick="updateStatus({{ $user->id }}, 'deactivate')">Deactivate</button>   
                         <!-- Edit Button -->
                         <button class="bg-yellow-700 text-white px-2 py-1 rounded-lg" 
@@ -55,7 +55,15 @@
                                 data-user-schoolname="{{ $user->school_name }}">
                             Edit
                         </button>
-                       
+                       <!-- <button type="button" class="view-user-btn btn btn-info btn-sm"
+                        data-username="{{ $user->first_name }} {{ $user->last_name }}" 
+                        data-role="{{ $user->role }}" 
+                        data-team="{{ $user->team->name ?? 'N/A' }}" 
+                        data-school-name="{{ $user->school_name ?? 'N/A' }}" 
+                        data-sport="{{ $user->team->sport_category ?? 'N/A' }}" 
+                        data-status="{{ $user->is_active == 1 ? 'Active' : 'Inactive' }}">
+                        <i class="fas fa-eye"></i> View
+                    </button> -->
 
                     </div>
                 </div>   

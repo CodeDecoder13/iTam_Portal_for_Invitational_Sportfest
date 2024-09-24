@@ -111,18 +111,18 @@
         <span class="fs-4">ITAM INVITATIONAL SPORTFEST COMPILER</span>
     </a>
     <ul class="nav nav-pills flex-column mb-auto">
-        
-        <li class="nav-item">
-            <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                <ion-icon name="home"></ion-icon>
-                Home
-            </a>
-        <li class="nav-item">
-            <a href="{{ route('admin.documents') }}" class="nav-link {{ request()->routeIs('admin.documents') ? 'active' : '' }}">
-                <ion-icon name="folder"></ion-icon>
-                Documents
-            </a>
-        </li>
+    <li class="nav-item">
+        <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->is('admin/dashboard*') ? 'active' : '' }}">
+            <ion-icon name="home"></ion-icon>
+            Home
+        </a>
+    </li>
+    <li class="nav-item">
+        <a href="{{ route('admin.documents') }}" class="nav-link {{ request()->is('admin/documents*') ? 'active' : '' }}">
+            <ion-icon name="folder"></ion-icon>
+            Documents
+        </a>
+    </li>
         <!--
         <li class="nav-item">
             <a href="{{ route('admin.calendar') }}" class="nav-link {{ request()->routeIs('admin.calendar') ? 'active' : '' }}">
@@ -140,22 +140,22 @@
         </li>
         -->
         @if (Auth::guard('admin')->check() && (Auth::guard('admin')->user()->role === 'SysAdmin' || Auth::guard('admin')->user()->role === 'SADO'))
-        <li class="nav-item">
-            <a href="{{ route('admin.user-management') }}" class="nav-link {{ request()->routeIs('admin.user-management') ? 'active' : '' }}">
-                <ion-icon name="people"></ion-icon>
-                User Management
-            </a>
-        </li>
-        @endif
+    <li class="nav-item">
+        <a href="{{ route('admin.user-management') }}" class="nav-link {{ request()->is('admin/user-management*') ? 'active' : '' }}">
+            <ion-icon name="people"></ion-icon>
+            User Management
+        </a>
+    </li>
+    @endif
+    <li class="nav-item">
+        <a href="{{ route('admin.coach-approval') }}" class="nav-link {{ request()->is('admin/coach-approval*') ? 'active' : '' }}">
+            <ion-icon name="walk"></ion-icon>
+            Coach Approval
+        </a>
+    </li>
+</ul>
         
-        <li class="nav-item">
-            <a href="{{ route('admin.coach-approval') }}" class="nav-link {{ request()->routeIs('admin.coach-approval') ? 'active' : '' }}">
-                <ion-icon name="walk"></ion-icon>
-                Coach Approval
-            </a>
-        </li>
     </ul>
-    <hr />
     <div class="m">
         <ul class="nav nav-pills flex-column">
             <li>
