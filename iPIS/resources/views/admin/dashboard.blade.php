@@ -73,7 +73,7 @@
     <section class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         <div class="rounded-lg shadow-md">
             <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
-                <h3 class="text-xl font-bold mb-2">Recent Activities</h3>
+                <h3 class="text-xl font-bold mb-2">Recent Douments Activities</h3>
             </div>
             <div class="rounded-b-lg p-4 py-2">
                 <ul>

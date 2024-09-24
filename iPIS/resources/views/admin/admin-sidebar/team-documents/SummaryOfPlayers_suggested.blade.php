@@ -177,15 +177,16 @@
                 var modal = $(this);
                 var fileName = button.data('file_name');
 
-                // Update the location based on the new file structure
+                 // Update the location based on the new file structure
                 var location = `/storage/${schoolName}/${sportCategory}/${teamId}/${playerId}/`;
-                var iframeSrc;
+                var iframeSrc = location + fileName;
 
                 modal.find('.modal-title').text(docType);
-                var content = '';
+        var documentType = docType.toLowerCase().replace(' ', '_');
 
-                // Adjust the file extension based on your needs
-                iframeSrc = location + fileName;
+                // Set the iframe source
+        modal.find('#iframecontent').attr('src', iframeSrc);
+
 
                 var contentApproved = `
                     <div class="text-center">
@@ -237,17 +238,35 @@ var contentDefault = `
         </form>
     </div>`;
                
-                    var contentStart = `
+    var contentStart = `
     <div class="d-flex flex-column h-100">
-        <div class="flex-grow-1 mb-3">
-            <iframe id="iframecontent" class="w-100 h-100" src="${iframeSrc}" style="min-height: 70vh;"></iframe>
-        </div>
-        <div class="d-flex justify-content-center">
-            <div class="text-center">
-                <!-- Buttons will go here -->
+        <div class="row">
+            <div class="col-md-8 mb-3">
+                <iframe id="iframecontent" class="w-100" src="${iframeSrc}" style="height: 70vh;"></iframe>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Comments</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="commentsContainer">
+                            <!-- Comments will be dynamically added here -->
+                        </div>
+                        <div class="form-group mt-3">
+                            <textarea class="form-control" rows="3" placeholder="Post additional message to the thread."></textarea>
+                        </div>
+                        <button class="btn btn-success w-100 mt-2">Add Comment</button>
+                    </div>
+                </div>
             </div>
         </div>
+        <div class="d-flex justify-content-center mt-3">
+            <!-- Buttons will go here -->
+        </div>
     </div>`;
+
+    
 
 
                 checkUrl(iframeSrc, function(exists) {
@@ -275,6 +294,11 @@ var contentDefault = `
                     modal.find('#documentContent').html(content);
                 });
             });
+
+            // Add comment functionality
+            
+            
+            
         </script>
 
 

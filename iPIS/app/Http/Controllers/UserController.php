@@ -17,7 +17,10 @@ class UserController extends Controller
 {
     public function dashboard()
     {
-        return view('dashboard');
+        $coachId = Auth::user()->id;
+        $teams = Team::where('coach_id', $coachId)->get();
+        return view('dashboard', compact('teams'));
+       // return view('dashboard');
     }
 
     public function myDocuments()

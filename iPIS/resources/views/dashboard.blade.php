@@ -77,6 +77,8 @@
                     </div>
                 </div>
 
+            
+
         @else
             <!-- Hold message for inactive users -->
             <h1 class="text-3xl font-bold mb-4">Dashboard</h1>
@@ -100,4 +102,14 @@
             </div>
         @endif
     </div>
+    <!-- New Module: No Team Yet -->
+    @if ($teams->isEmpty())
+                <div class="mt-8 bg-white shadow-md rounded-lg p-6 text-center w-full">
+                    <h2 class="text-2xl font-bold mb-4">No Team Yet</h2>
+                    <p class="text-gray-600 mb-4">It seems like no team has been created yet. Add a team now to get started.</p>
+                    <button onclick="window.location.href='{{ route('add-teams') }}'" class="px-4 py-2 bg-green-700 text-white rounded-full hover:bg-green-800 focus:outline-none">
+                        Add Team
+                    </button>
+                </div>
+            @endif
 </x-app-layout>
