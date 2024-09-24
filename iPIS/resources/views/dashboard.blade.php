@@ -29,7 +29,7 @@
                 </div>
                 <div class="rounded-lg shadow-md">
                     <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
-                        <h3 class="text-xl font-bold mb-2">Recent Activities</h3>
+                        <h3 class="text-xl font-bold mb-2">Upcoming Games</h3>
                     </div>
                     <div class="rounded-b-lg p-4 py-2">
                         <ul>

@@ -91,65 +91,58 @@
                     </div>
                 </div>
 
-                <!-- Modal for Uploading Birth Certificate -->
-                <div class="modal fade" id="uploadBirthCertificateModal-{{ $player->id }}" tabindex="-1"
-                    aria-labelledby="uploadBirthCertificateModalLabel-{{ $player->id }}" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="uploadBirthCertificateModalLabel-{{ $player->id }}">
-                                    Upload PSA Birth Certificate</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body text-center">
-                                <p>No PSA Birth Certificate is currently attached. Please upload the necessary document
-                                    to proceed.</p>
-                                <form action="{{ route('upload.player.birth_certificate', $player->id) }}"
-                                    method="POST" enctype="multipart/form-data">
-                                    @csrf
-                                    <div class="mb-3">
-                                        <label for="birthCertificate-{{ $player->id }}" class="form-label">PSA Birth
-                                            Certificate</label>
-                                        <input class="form-control" type="file"
-                                            id="birthCertificate-{{ $player->id }}" name="birth_certificate">
-                                    </div>
-                                    <button type="submit" class="btn btn-green">Upload</button>
-                                </form>
-                            </div>
-                        </div>
+               <!-- Modal for Uploading Birth Certificate -->
+<div class="modal fade" id="uploadBirthCertificateModal-{{ $player->id }}" tabindex="-1"
+    aria-labelledby="uploadBirthCertificateModalLabel-{{ $player->id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <h5 class="modal-title mb-3" id="uploadBirthCertificateModalLabel-{{ $player->id }}">
+                    No Attached File
+                </h5>
+                <p>No files are currently attached. Please upload the necessary documents to proceed.</p>
+                <form action="{{ route('upload.player.birth_certificate', $player->id) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="flex justify-center items-center space-x-2">
+                        <input class="hidden" type="file" id="birthCertificate-{{ $player->id }}" name="birth_certificate" onchange="toggleUploadButton({{ $player->id }})">
+                        <button type="button" class="bg-green-600 text-white py-2 px-4 rounded-full" onclick="document.getElementById('birthCertificate-{{ $player->id }}').click();">Attach File</button>
+                        <button type="submit" id="uploadButton-{{ $player->id }}" class="bg-green-600 text-white py-2 px-4 rounded-full hidden">Upload</button>
                     </div>
-                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
-                <!-- Modal for Uploading Parental Consent -->
-                <div class="modal fade" id="uploadParentalConsentModal-{{ $player->id }}" tabindex="-1"
-                    aria-labelledby="uploadParentalConsentModalLabel-{{ $player->id }}" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="uploadParentalConsentModalLabel-{{ $player->id }}">Upload
-                                    Parental Consent</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body text-center">
-                                <p>No Parental Consent is currently attached. Please upload the necessary document to
-                                    proceed.</p>
-                                <form action="{{ route('upload.player.parental_consent', $player->id) }}"
-                                    method="POST" enctype="multipart/form-data">
-                                    @csrf
-                                    <div class="mb-3">
-                                        <label for="parentalConsent-{{ $player->id }}" class="form-label">Parental
-                                            Consent</label>
-                                        <input class="form-control" type="file"
-                                            id="parentalConsent-{{ $player->id }}" name="parental_consent">
-                                    </div>
-                                    <button type="submit" class="btn btn-green">Upload</button>
-                                </form>
-                            </div>
-                        </div>
+<!-- Modal for Uploading Parental Consent -->
+<div class="modal fade" id="uploadParentalConsentModal-{{ $player->id }}" tabindex="-1"
+    aria-labelledby="uploadParentalConsentModalLabel-{{ $player->id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <h5 class="modal-title mb-3" id="uploadParentalConsentModalLabel-{{ $player->id }}">
+                    No Attached File
+                </h5>
+                <p>No files are currently attached. Please upload the necessary documents to proceed.</p>
+                <form action="{{ route('upload.player.parental_consent', $player->id) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="flex justify-center items-center space-x-2">
+                        <input class="hidden" type="file" id="parentalConsent-{{ $player->id }}" name="parental_consent" onchange="toggleUploadButton({{ $player->id }})">
+                        <button type="button" class="bg-green-600 text-white py-2 px-4 rounded-full" onclick="document.getElementById('parentalConsent-{{ $player->id }}').click();">Attach File</button>
+                        <button type="submit" id="uploadButton-{{ $player->id }}" class="bg-green-600 text-white py-2 px-4 rounded-full hidden">Upload</button>
                     </div>
-                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
                 <!-- Default to View Birth Certificate Modal if uploaded -->
                 @if ($player->birth_certificate_status != 0)
@@ -240,10 +233,25 @@
                 @endif
             @endforeach
         </div>
+        
     </section>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap JS (requires Popper.js) -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script>
+    function toggleUploadButton(playerId) {
+        const fileInput = document.getElementById(`birthCertificate-${playerId}`) || document.getElementById(`parentalConsent-${playerId}`);
+        const uploadButton = document.getElementById(`uploadButton-${playerId}`);
+        if (fileInput.files.length > 0) {
+            uploadButton.classList.remove('hidden');
+        } else {
+            uploadButton.classList.add('hidden');
+        }
+    }
+</script>
+
+   
+
 </x-app-layout>
