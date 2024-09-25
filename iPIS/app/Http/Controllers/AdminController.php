@@ -110,31 +110,38 @@ class AdminController extends Controller
         return view('admin.admin-sidebar.calendar');
     }
 
-    public function playersTeams(Request $request)
+    public function schoolManagement(Request $request)
     {
-        $query = Team::query();
-
+        $query = Team::with(['coach']); // Eager load the coach relationship
 
         if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%')
-                ->orWhere('sport_category', 'like', '%' . $request->search . '%');
+            $query->where(function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->search . '%')
+                ->orWhereHas('coach', function($query) use ($request) {
+                    $query->where('school_name', 'like', '%' . $request->search . '%');
+                });
+            });
         }
 
-        if ($request->has('sport')) {
-            $query->where('sport_category', $request->sport);
-        }
         if ($request->has('team_name')) {
-            $query->where('name', $request->name);
+            $query->where('name', $request->team_name);
         }
-        /*if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }*/
 
         $teams = $query->paginate(10);
 
-        return view('admin.admin-sidebar.players-teams', compact('teams'));
+        // Debugging: Log the teams and their associated coach data
+        foreach ($teams as $team) {
+            Log::info("Team ID: {$team->id}, Name: {$team->name}, Coach: " . ($team->coach ? $team->coach->school_name : 'No Coach'));
+        }
+
+        return view('admin.admin-sidebar.school-management', compact('teams'));
     }
 
+    public function cardSchoolManagement($id)
+    {
+        $team = Team::with('coach')->findOrFail($id);
+        return view('admin.admin-sidebar.sub-school-management.card-school-management', compact('team'));
+    }
 
     public function usersManagement()
     {
