@@ -128,22 +128,22 @@
             Documents
         </a>
     </li>
-        <!--
+        
         <li class="nav-item">
             <a href="{{ route('admin.calendar') }}" class="nav-link {{ request()->routeIs('admin.calendar') ? 'active' : '' }}">
                 <ion-icon name="calendar"></ion-icon>
                 Calendar
             </a>
         </li>
-        -->
-         <!--
+        
+         
         <li class="nav-item">
             <a href="{{ route('admin.players-teams') }}" class="nav-link {{ request()->routeIs('admin.players-teams') ? 'active' : '' }}">
                 <ion-icon name="person"></ion-icon>
                 Players & Teams
             </a>
         </li>
-        -->
+        
         @if (Auth::guard('admin')->check() && (Auth::guard('admin')->user()->role === 'SysAdmin' || Auth::guard('admin')->user()->role === 'SADO'))
     <li class="nav-item">
         <a href="{{ route('admin.user-management') }}" class="nav-link {{ request()->is('admin/user-management*') ? 'active' : '' }}">
