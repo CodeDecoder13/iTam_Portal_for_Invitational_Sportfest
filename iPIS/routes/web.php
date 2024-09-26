@@ -52,15 +52,26 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/documents', [AdminController::class, 'documents'])->name('admin.documents');
     Route::get('/calendar', [AdminController::class, 'calendar'])->name('admin.calendar');
-    Route::get('/players-teams', [AdminController::class, 'playersTeams'])->name('admin.players-teams');
+    Route::get('/school-management', [AdminController::class, 'schoolManagement'])->name('admin.school-management');
     Route::get('/user-management', [AdminController::class, 'usersManagement'])->name('admin.user-management');
     Route::get('/coach-approval', [AdminController::class, 'coachApproval'])->name('admin.coach-approval');
     Route::post('/update-status/{id}', [AdminController::class, 'updateStatus'])->name('admin.update-status');
     Route::get('/teams/{id}', [AdminController::class, 'showteam'])->name('admin.showteams');
     Route::get('/players-team-documents', [AdminController::class, 'teamdocuments'])->name('admin.playersTeamDocuments');
     Route::get('/summary-of-players', [AdminController::class, 'documentChecker'])->name('admin.SummaryOfPlayers');
- 
     
+});
+
+// added for school management
+Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
+    Route::get('/school-management/card-school-management/{id}', [AdminController::class, 'cardSchoolManagement'])->name('admin.card-school-management');
+    Route::get('/player-management/{id}', [AdminController::class, 'playerManagement'])->name('admin.player-management');
+    Route::get('/team-management/{id}', [AdminController::class, 'teamManagement'])->name('admin.team-management');
+    Route::get('/document-management', [AdminController::class, 'documentManagement'])->name('admin.document-management');
+    Route::post('/store-team/{id}', [AdminController::class, 'storeTeam'])->name('admin.store-team');
+    Route::delete('/delete-team/{id}', [AdminController::class, 'deleteTeam'])->name('admin.delete-team');
+    Route::get('/logs-management/{id}', [AdminController::class, 'logsManagement'])->name('admin.logs-management');
+    Route::get('/document-management/{id}', [AdminController::class, 'documentManagement'])->name('admin.document-management');
 });
 // usermanagement routes
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {

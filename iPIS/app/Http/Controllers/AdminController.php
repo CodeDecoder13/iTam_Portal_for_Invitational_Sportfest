@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
-
 use App\Models\Team;
 use App\Models\User;
 use App\Models\Admin;
@@ -18,7 +16,6 @@ use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
 {
-
     public function dashboard()
     {
         // Fetch the total number of teams and players grouped by sport category
@@ -109,31 +106,27 @@ class AdminController extends Controller
     {
         return view('admin.admin-sidebar.calendar');
     }
-
-    public function playersTeams(Request $request)
+    public function schoolManagement(Request $request)
     {
-        $query = Team::query();
-
+        $query = User::query(); // Start with all users
 
         if ($request->has('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%')
-                ->orWhere('sport_category', 'like', '%' . $request->search . '%');
+            $query->where(function($q) use ($request) {
+                $q->where('first_name', 'like', '%' . $request->search . '%')
+                ->orWhere('last_name', 'like', '%' . $request->search . '%')
+                ->orWhere('school_name', 'like', '%' . $request->search . '%')
+                ->orWhere('email', 'like', '%' . $request->search . '%');
+            });
         }
 
-        if ($request->has('sport')) {
-            $query->where('sport_category', $request->sport);
-        }
-        if ($request->has('team_name')) {
-            $query->where('name', $request->name);
-        }
-        /*if ($request->has('status')) {
-            $query->where('status', $request->status);
-        }*/
+        $users = $query->paginate(10);
 
-        $teams = $query->paginate(10);
+        // Debugging: Log the users data
+        \Log::info("Fetched users for school management:", $users->toArray());
 
-        return view('admin.admin-sidebar.players-teams', compact('teams'));
+        return view('admin.admin-sidebar.school-management', compact('users'));
     }
+        
 
 
     public function usersManagement()
@@ -406,28 +399,153 @@ class AdminController extends Controller
 
     // AdminController.php
     public function deleteCoach(Request $request)
-    {
-        try {
-            // Find the user by the ID from the request
-            $user = User::find($request->id);
+{
+    try {
+        Log::info('Attempting to delete user with ID: ' . $request->id);
+        
+        // Find the user by the ID from the request
+        $user = User::find($request->id);
 
-            if ($user && $user->delete()) {
+        if ($user) {
+            Log::info('User found: ', $user->toArray());
+            if ($user->delete()) {
+                Log::info('User deleted successfully');
                 return response()->json([
                     'status' => 200,
                     'message' => 'User deleted successfully.'
                 ]);
             } else {
+                Log::error('Failed to delete user');
                 return response()->json([
                     'status' => 400,
                     'message' => 'Failed to delete user.'
                 ]);
             }
-        } catch (\Exception $e) {
-            // Return an error response in case of exception
+        } else {
+            Log::error('User not found with ID: ' . $request->id);
             return response()->json([
-                'status' => 500,
-                'message' => 'Error: ' . $e->getMessage()
+                'status' => 404,
+                'message' => 'User not found.'
             ]);
         }
+    } catch (\Exception $e) {
+        Log::error('Error deleting user: ' . $e->getMessage());
+        return response()->json([
+            'status' => 500,
+            'message' => 'Error: ' . $e->getMessage()
+        ]);
     }
+}
+    //card school management
+    public function cardSchoolManagement($id)
+    {
+        $user = User::findOrFail($id);
+        
+        // Fetch team and player information for the specific user
+        $team = Team::where('coach_id', $id)->first();
+        $players = $team ? Player::where('team_id', $team->id)->get() : collect();
+        
+    
+
+        return view('admin.admin-sidebar.sub-school-management.card-school-management', compact('user', 'team', 'players'));
+    }
+    // added player management 
+    public function playerManagement($id)
+    {
+        $user = User::findOrFail($id);
+        
+        // Fetch all teams coached by this user
+        $teams = Team::where('coach_id', $id)->get();
+        
+        // Fetch all players for these teams
+        $players = Player::whereIn('team_id', $teams->pluck('id'))->get();
+        
+ 
+        return view('admin.admin-sidebar.sub-school-management.player-management', compact('user', 'teams', 'players'));
+    }
+    //team management
+    public function teamManagement($id)
+    {
+        $user = User::findOrFail($id);
+        
+        // Fetch all teams coached by this user
+        $teams = Team::where('coach_id', $id)->get();
+        
+        // Fetch all players for these teams
+        $players = Player::whereIn('team_id', $teams->pluck('id'))->get();
+        
+        
+
+        return view('admin.admin-sidebar.sub-school-management.team-management', compact('user', 'teams', 'players'));
+    }
+
+    //store teams
+    public function storeTeam(Request $request, $id)
+    {
+        // Validate the incoming request
+        $validator = Validator::make($request->all(), [
+            'sport' => 'required|string',
+            'team_name' => 'required|string|max:255',
+            'team_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:25600',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Find the user (coach) by ID
+        $coach = User::findOrFail($id);
+
+        // Handle the team logo upload
+        if ($request->hasFile('team_logo')) {
+            $teamLogoPath = $request->file('team_logo')->store('public/team_logos');
+            $teamLogoPath = str_replace('public/', '', $teamLogoPath);
+        } else {
+            $teamLogoPath = null;
+        }
+
+        // Create or update the team
+        $team = Team::updateOrCreate(
+            ['name' => $request->input('team_name'), 'coach_id' => $coach->id],
+            [
+                'sport_category' => $request->input('sport'),
+                'logo_path' => $teamLogoPath,
+            ]
+        );
+
+        // Define the path for the sport category folder
+        $teamFolderPath = "public/{$coach->school_name}/{$team->sport_category}";
+
+        // Check if the folder already exists
+        if (!Storage::exists($teamFolderPath)) {
+            // Create the folder
+            Storage::makeDirectory($teamFolderPath);
+        }
+
+        // Return a response
+        return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
+    }
+    //delete team
+    public function deleteTeam($id)
+    {
+        try {
+            $team = Team::findOrFail($id);
+            $team->delete();
+
+            return response()->json(['message' => 'Team deleted successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error deleting team', 'error' => $e->getMessage()], 500);
+        }
+    }
+    //logs management
+    public function logsManagement()
+    {
+        return view('admin.admin-sidebar.sub-school-management.logs-management');
+    }
+     //document management
+     public function documentManagement()
+     {
+         return view('admin.admin-sidebar.sub-school-management.document-management');
+     }
+      
 }

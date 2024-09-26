@@ -1,7 +1,16 @@
 <x-app-layout>
     <section class="grid grid-cols-1">
         <h1 class="font-bold mb-2 text-3xl">Summary Of Players</h1>
-        <h3>Fill in player's summary to complete your requirements.</h3>
+        <p>Fill in player's summary to complete your requirements.</p>
+        <div class="w-full flex flex-col items-end justify-end space-y-2">
+                <a href="{{ route('my-documents') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Go Back
+                    </a>
+            </div>
+            
         <div class="grid grid-cols-1 mt-5">
             <div class="grid grid-cols-12 px-4 py-3 bg-green-700 text-white rounded-lg border">
                 <div class="font-bold col-span-2">Jersey No.</div>

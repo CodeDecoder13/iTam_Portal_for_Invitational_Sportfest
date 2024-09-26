@@ -115,6 +115,7 @@
         </div>
     </div>
 
+    @if (Auth::user()->is_active)
     <div class="mb-6">
         <label for="team" class="block text-sm font-medium leading-6 text-white mb-1">Select Team</label>
         <select id="team" name="team" autocomplete="team-name"
@@ -128,6 +129,7 @@
             <option value="add-new-team">Add New Team</option>
         </select>
     </div>
+    @endif
 
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
@@ -136,6 +138,7 @@
                 Home
             </a>
         </li>
+        @if (Auth::user()->is_active)
         <li class="nav-item">
             <a href="{{ route('my-documents') }}" class="nav-link {{ request()->routeIs('my-documents') ? 'active' : '' }}">
                 <ion-icon name="folder"></ion-icon>
@@ -155,9 +158,9 @@
             </a>
         </li>
     </ul>
-
+    @endif
     <hr class="my-6" />
-
+    @if (Auth::user()->is_active)
     <ul class="nav nav-pills flex-column mt-auto">
         <li>
             <a href="#" class="nav-link text-white">
@@ -165,6 +168,8 @@
                 Settings
             </a>
         </li>
+        
+        
         <li>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
@@ -175,7 +180,9 @@
             </form>
         </li>
     </ul>
+    @endif
 </div>
+
 
 <script>
     const teamSelect = document.getElementById('team');
