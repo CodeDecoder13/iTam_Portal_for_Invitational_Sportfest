@@ -27,6 +27,7 @@
 
         <!-- Loop through Admins -->
         @foreach ($data['admins'] as $admin)
+        @if ($admin->role !== 'SysAdmin')
             <div class="grid grid-cols-12 px-4 py-3 rounded-lg border mt-2">
                 <div class="col-span-3">{{ $admin->created_at->format('F d, Y') }}</div>
                 <div class="col-span-3">{{ $admin->name }}</div>
@@ -43,6 +44,7 @@
                     </button>
                 </div>
             </div>
+        @endif
         @endforeach
     </div>
 
@@ -87,8 +89,6 @@
                                 <select id="role" name="role" required
                                     class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                     <option value="" disabled selected>Select Role</option>
-                                    <option value="SysAdmin" {{ old('role') == 'SysAdmin' ? 'selected' : '' }}>SysAdmin
-                                    </option>
                                     <option value="SADO" {{ old('role') == 'SADO' ? 'selected' : '' }}>SADO</option>
                                     <option value="RAC OFFICER" {{ old('role') == 'RAC OFFICER' ? 'selected' : '' }}>
                                         RAC OFFICER</option>
@@ -164,8 +164,6 @@
                                 <select id="editRole" name="role" required
                                     class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                     <option value="" disabled selected>Select Role</option>
-                                    <option value="SysAdmin" {{ old('role') == 'SysAdmin' ? 'selected' : '' }}>
-                                        SysAdmin</option>
                                     <option value="SADO" {{ old('role') == 'SADO' ? 'selected' : '' }}>SADO</option>
                                     <option value="RAC OFFICER" {{ old('role') == 'RAC OFFICER' ? 'selected' : '' }}>
                                         RAC OFFICER</option>

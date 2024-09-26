@@ -64,7 +64,14 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
 
 // added for school management
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
-    Route::get('/admin/school-management/{id}', [AdminController::class, 'cardSchoolManagement'])->name('admin.card-school-management');
+    Route::get('/school-management/card-school-management/{id}', [AdminController::class, 'cardSchoolManagement'])->name('admin.card-school-management');
+    Route::get('/player-management/{id}', [AdminController::class, 'playerManagement'])->name('admin.player-management');
+    Route::get('/team-management/{id}', [AdminController::class, 'teamManagement'])->name('admin.team-management');
+    Route::get('/document-management', [AdminController::class, 'documentManagement'])->name('admin.document-management');
+    Route::post('/store-team/{id}', [AdminController::class, 'storeTeam'])->name('admin.store-team');
+    Route::delete('/delete-team/{id}', [AdminController::class, 'deleteTeam'])->name('admin.delete-team');
+    Route::get('/logs-management/{id}', [AdminController::class, 'logsManagement'])->name('admin.logs-management');
+    Route::get('/document-management/{id}', [AdminController::class, 'documentManagement'])->name('admin.document-management');
 });
 // usermanagement routes
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {

@@ -103,6 +103,7 @@
         @endif
     </div>
     <!-- New Module: No Team Yet -->
+    @if (Auth::user()->is_active)
     @if ($teams->isEmpty())
                 <div class="mt-8 bg-white shadow-md rounded-lg p-6 text-center w-full">
                     <h2 class="text-2xl font-bold mb-4">No Team Yet</h2>
@@ -112,4 +113,5 @@
                     </button>
                 </div>
             @endif
+    @endif
 </x-app-layout>

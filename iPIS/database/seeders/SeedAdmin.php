@@ -17,7 +17,8 @@ class SeedAdmin extends Seeder
         Admin::create([
             'name'=>'Admin',
             'email'=>'Admin@email.com',
-            'password'=>'password'
+            'password'=>'password',
+            
         ]);
     }
 }
