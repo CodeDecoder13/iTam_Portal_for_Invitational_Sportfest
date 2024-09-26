@@ -16,7 +16,7 @@
             <p class="text-4xl">{{ $totalRegistrations }}</p>
         </div>
 
-        <!-- Display dynamic data for each category -->
+        <!-- Deisplay dynamic data for each category -->
         <div class="bg-gray-50 hover:bg-green-700 hover:text-white p-4 rounded-lg transition duration-300">
             <h2 class="text-lg">Boys Basketball Developmental</h2>
             <p class="text-4xl">{{ $categories['Boys Basketball Developmental'] }}</p>
@@ -73,7 +73,7 @@
     <section class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         <div class="rounded-lg shadow-md">
             <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
-                <h3 class="text-xl font-bold mb-2">Recent Activities</h3>
+                <h3 class="text-xl font-bold mb-2">Recent Douments Activities</h3>
             </div>
             <div class="rounded-b-lg p-4 py-2">
                 <ul>

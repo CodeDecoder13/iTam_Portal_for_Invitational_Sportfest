@@ -42,7 +42,7 @@
                     </div>
                     <div class="col-span-1 flex justify-end space-x-2">
                         <button class="bg-green-700 text-white px-2 py-1 rounded-lg" onclick="updateStatus({{ $user->id }}, 'activate')">Activate</button>
-                        <button class="bg-red-700 text-white px-2 py-1 rounded-lg" onclick="updateStatus({{ $user->id }}, 'deactivate')">Deactivate</button>    
+                        <button class="bg-red-700 text-white px-2 py-1 rounded-lg" onclick="updateStatus({{ $user->id }}, 'deactivate')">Deactivate</button>   
                         <!-- Edit Button -->
                         <button class="bg-yellow-700 text-white px-2 py-1 rounded-lg" 
                                 data-bs-toggle="modal" 
@@ -55,6 +55,15 @@
                                 data-user-schoolname="{{ $user->school_name }}">
                             Edit
                         </button>
+                       <!-- <button type="button" class="view-user-btn btn btn-info btn-sm"
+                        data-username="{{ $user->first_name }} {{ $user->last_name }}" 
+                        data-role="{{ $user->role }}" 
+                        data-team="{{ $user->team->name ?? 'N/A' }}" 
+                        data-school-name="{{ $user->school_name ?? 'N/A' }}" 
+                        data-sport="{{ $user->team->sport_category ?? 'N/A' }}" 
+                        data-status="{{ $user->is_active == 1 ? 'Active' : 'Inactive' }}">
+                        <i class="fas fa-eye"></i> View
+                    </button> -->
 
                     </div>
                 </div>   
@@ -394,7 +403,6 @@
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                     <button type="submit" id="EditCoach" class="btn btn-primary">Save User</button>
                                     <button type="button" class="btn btn-danger delete-btn" data-id="{{ $user->id }}">Delete User</button>
-
                                 </div>
                             </div>
                         </div>
@@ -521,30 +529,31 @@
         });
         });
         // Edit User modal
-        // Edit User modal
         document.querySelectorAll('[data-bs-target="#editUserModal"]').forEach(button => {
-            button.addEventListener('click', function () {
-                // Get user details from the button's data attributes
-                const userId = this.getAttribute('data-user-id');
-                const userFirstName = this.getAttribute('data-user-firstname');
-                const userLastName = this.getAttribute('data-user-lastname');
-                const userEmail = this.getAttribute('data-user-email');
-                const userRole = this.getAttribute('data-user-role');
-                const userSchoolName = this.getAttribute('data-user-schoolname');
-                
-                // Populate the modal form
-                document.getElementById('edituserid').value = userId;
-                document.getElementById('editFirstName').value = userFirstName;
-                document.getElementById('editLastName').value = userLastName;
-                document.getElementById('editEmail').value = userEmail;
-                document.getElementById('editRole').value = userRole;
-                document.getElementById('editSchoolName').value = userSchoolName;
+    button.addEventListener('click', function () {
+        const userId = this.getAttribute('data-user-id');
+        const userFirstName = this.getAttribute('data-user-firstname');
+        const userLastName = this.getAttribute('data-user-lastname');
+        const userEmail = this.getAttribute('data-user-email');
+        const userRole = this.getAttribute('data-user-role');
+        const userSchoolName = this.getAttribute('data-user-schoolname');
+        
+        // Populate the modal form
+        document.getElementById('edituserid').value = userId;
+        document.getElementById('editFirstName').value = userFirstName;
+        document.getElementById('editLastName').value = userLastName;
+        document.getElementById('editEmail').value = userEmail;
+        document.getElementById('editRole').value = userRole;
+        document.getElementById('editSchoolName').value = userSchoolName;
 
-                // Clear password fields
-                document.getElementById('editPassword').value = '';
-                document.getElementById('editConfirmPassword').value = '';
-            });
-        });
+        // Set the delete button's data-id attribute
+        document.querySelector('#editUserModal .delete-btn').setAttribute('data-id', userId);
+
+        // Clear password fields
+        document.getElementById('editPassword').value = '';
+        document.getElementById('editConfirmPassword').value = '';
+    });
+});
 
         // Update user
         document.getElementById('EditCoach').addEventListener('click', function () {
@@ -618,40 +627,40 @@
 
         //delete ajax
         $(document).on('click', '.delete-btn', function() {
-    var id = $(this).data('id'); // Get the correct user ID from the button
+    var id = $(this).data('id');
+    console.log('Attempting to delete user with ID:', id);
 
-    // Confirmation dialog before deletion
     if (confirm('Are you sure you want to delete this user?')) {
         $.ajax({
-            url: '{{ route('delete.coach') }}', // The correct route for deletion
-            type: 'DELETE', // HTTP method for deletion
-            data: { id: id }, // Send the user ID in the request
+            url: '{{ route('delete.coach') }}',
+            type: 'DELETE',
+            data: { id: id },
             headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // CSRF token for security
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
-                console.log(response); // Debugging: log the response
+                console.log('Delete response:', response);
                 if (response.status === 200) {
-                    alert(response.message); // Show success message
-                    window.location.reload();
-                    // Remove the deleted user row from the UI without reloading the table
-                    $('button[data-id="' + id + '"]').closest('tr').remove();
+                    alert(response.message);
+                    // Close the modal
+                    $('#editUserModal').modal('hide');
+                    // Remove the user row from the table
+                    $('div[data-user-id="' + id + '"]').remove();
+                    window.location.reload(); // Reload page after success
                 } else {
-                    alert(response.message); // Show error message
+                    alert(response.message);
                 }
             },
             error: function(xhr, status, error) {
-                console.error(xhr); // Debugging: log the error
-                alert('Error: ' + error); // Show a generic error message
+                console.error('Delete error:', xhr.responseText);
+                alert('Error: ' + error);
             }
         });
     }
 });
+      
 
 
-
-
-       
 
         </script>
 </x-app-layout>

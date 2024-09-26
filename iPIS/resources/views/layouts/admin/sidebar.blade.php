@@ -106,56 +106,61 @@
 </style>
 
 <div id="sidebar" class="flex flex-col flex-grow min-h-screen p-3 text-white sticky">
-    <a href="/" class="d-flex side-head align-items-center mb-3 mb-md-3 me-md-auto text-white text-decoration-none">
-        <img width="50" height="32" class="img-fluid" src="/images/logorac.png" />
-        <span class="fs-4">ITAM INVITATIONAL SPORTFEST COMPILER</span>
-    </a>
+<div class="flex items-center mb-6">
+        <img width="70" height="70" class="mr-4" src="{{ asset('images/logorac.png') }}" alt="ITAM Logo" />
+        <div class="flex flex-col">
+            <div class="text-xl font-bold leading-tight">ITAM</div>
+            <div class="text-xl font-bold leading-tight">INVITATIONAL</div>
+            <div class="text-xl font-bold leading-tight">SPORTSFEST</div>
+            <div class="text-sm mt-1">COMPILER</div>
+        </div>
+    </div>
     <ul class="nav nav-pills flex-column mb-auto">
+    <li class="nav-item">
+        <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->is('admin/dashboard*') ? 'active' : '' }}">
+            <ion-icon name="home"></ion-icon>
+            Home
+        </a>
+    </li>
+    <li class="nav-item">
+        <a href="{{ route('admin.documents') }}" class="nav-link {{ request()->is('admin/documents*') ? 'active' : '' }}">
+            <ion-icon name="folder"></ion-icon>
+            Documents
+        </a>
+    </li>
         
-        <li class="nav-item">
-            <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                <ion-icon name="home"></ion-icon>
-                Home
-            </a>
-        <li class="nav-item">
-            <a href="{{ route('admin.documents') }}" class="nav-link {{ request()->routeIs('admin.documents') ? 'active' : '' }}">
-                <ion-icon name="folder"></ion-icon>
-                Documents
-            </a>
-        </li>
-        <!--
         <li class="nav-item">
             <a href="{{ route('admin.calendar') }}" class="nav-link {{ request()->routeIs('admin.calendar') ? 'active' : '' }}">
                 <ion-icon name="calendar"></ion-icon>
                 Calendar
             </a>
         </li>
-        -->
-         <!--
-        <li class="nav-item">
-            <a href="{{ route('admin.players-teams') }}" class="nav-link {{ request()->routeIs('admin.players-teams') ? 'active' : '' }}">
-                <ion-icon name="person"></ion-icon>
-                Players & Teams
-            </a>
-        </li>
-        -->
+        
         @if (Auth::guard('admin')->check() && (Auth::guard('admin')->user()->role === 'SysAdmin' || Auth::guard('admin')->user()->role === 'SADO'))
         <li class="nav-item">
-            <a href="{{ route('admin.user-management') }}" class="nav-link {{ request()->routeIs('admin.user-management') ? 'active' : '' }}">
-                <ion-icon name="people"></ion-icon>
-                User Management
+            <a href="{{ route('admin.school-management') }}" class="nav-link {{ request()->is('admin/school-management*') ? 'active' : '' }}">
+                <ion-icon name="school"></ion-icon>
+                School Management
             </a>
         </li>
         @endif
+        @if (Auth::guard('admin')->check() && (Auth::guard('admin')->user()->role === 'SysAdmin' || Auth::guard('admin')->user()->role === 'SADO'))
+    <li class="nav-item">
+        <a href="{{ route('admin.user-management') }}" class="nav-link {{ request()->is('admin/user-management*') ? 'active' : '' }}">
+            <ion-icon name="people"></ion-icon>
+            User Management
+        </a>
+    </li>
+    @endif
+    <li class="nav-item">
+        <a href="{{ route('admin.coach-approval') }}" class="nav-link {{ request()->is('admin/coach-approval*') ? 'active' : '' }}">
+            <ion-icon name="walk"></ion-icon>
+            Coach Approval
+        </a>
+    </li>
+</ul>
         
-        <li class="nav-item">
-            <a href="{{ route('admin.coach-approval') }}" class="nav-link {{ request()->routeIs('admin.coach-approval') ? 'active' : '' }}">
-                <ion-icon name="walk"></ion-icon>
-                Coach Approval
-            </a>
-        </li>
     </ul>
-    <hr />
     <div class="m">
         <ul class="nav nav-pills flex-column">
             <li>

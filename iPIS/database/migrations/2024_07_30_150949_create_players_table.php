@@ -25,6 +25,8 @@ return new class extends Migration
             $table->integer('birth_certificate_status')->default(0);
             $table->string('parental_consent')->nullable();
             $table->integer('parental_consent_status')->default(0);
+            $table->text('birth_certificate_comments')->nullable();
+        $table->text('parental_consent_comments')->nullable();
             $table->timestamp('last_update')->useCurrent();
             $table->timestamps();
         });

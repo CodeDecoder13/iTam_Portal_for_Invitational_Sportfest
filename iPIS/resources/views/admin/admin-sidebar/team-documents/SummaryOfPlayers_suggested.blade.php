@@ -2,7 +2,14 @@
         <section class="grid grid-cols-1">
             <h1 class="font-bold mb-2 text-3xl">Summary Of Players</h1>
             <h3>Fill in player's summary to complete your requirements.</h3>
-
+            <div class="w-full flex flex-col items-end justify-end space-y-2">
+                <a href="{{ route('admin.documents') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Go Back
+                    </a>
+            </div>
             <form method="GET" action="{{ route('admin.SummaryOfPlayers') }}" class="grid grid-cols-1 mt-5">
                 <div class="grid grid-cols-12 gap-4 px-4 py-3 rounded-lg bg-gray-100">
                     <div class="col-span-5">
@@ -177,70 +184,96 @@
                 var modal = $(this);
                 var fileName = button.data('file_name');
 
-                // Update the location based on the new file structure
+                 // Update the location based on the new file structure
                 var location = `/storage/${schoolName}/${sportCategory}/${teamId}/${playerId}/`;
-                var iframeSrc;
+                var iframeSrc = location + fileName;
 
                 modal.find('.modal-title').text(docType);
-                var content = '';
+        var documentType = docType.toLowerCase().replace(' ', '_');
 
-                // Adjust the file extension based on your needs
-                iframeSrc = location + fileName;
+                // Set the iframe source
+        modal.find('#iframecontent').attr('src', iframeSrc);
+
 
                 var contentApproved = `
-                        <div class="col-md-4 d-flex flex-column justify-content-center">
-                            <h1 class="text-center mb-2 text-success">File Approved</h1>
-                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/4">
-                                @csrf
-                                @method('POST')
-                                <button class="btn btn-primary mb-2 w-full">Download</button>
-                            </form>
-                        </div>
+                    <div class="text-center">
+                        <h5 class="text-success mb-3">File Approved</h5>
+                        <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/4">
+                            @csrf
+                            @method('POST')
+                            <button class="btn btn-primary">Download</button>
+                        </form>
                     </div>`;
-                var contentReject = `<div class="col-md-4 d-flex flex-column justify-content-center">
-                    <h1 class="text-center mb-2 text-danger">File Rejected</h1>
-                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/2">
-                                @csrf
-                                <button class="btn btn-success mb-2 w-full">Approve</button>
-                            </form>
-                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/4">
-                                @csrf
-                                @method('POST')
-                                <button class="btn btn-primary mb-2 w-full">Download</button>
-                            </form>
-                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/0">
-                                @csrf
-                                @method('POST')
-                                <button class="btn btn-warning w-full">Delete</button>
-                            </form>
+                    var contentReject = `
+    <div class="text-center">
+        <h5 class="text-danger mb-3">File Rejected</h5>
+        <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/2" class="d-inline-block me-2">
+            @csrf
+            <button class="btn btn-success">Approve</button>
+        </form>
+        <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/4" class="d-inline-block me-2">
+            @csrf
+            @method('POST')
+            <button class="btn btn-primary">Download</button>
+        </form>
+        <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/0" class="d-inline-block">
+            @csrf
+            @method('POST')
+            <button class="btn btn-warning">Delete</button>
+        </form>
+    </div>`;
+
+var contentDefault = `
+    <div class="text-center">
+        <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/2" class="d-inline-block me-2">
+            @csrf
+            <button class="btn btn-success">Approve</button>
+        </form>
+        <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/3" class="d-inline-block me-2">
+            @csrf
+            <button class="btn btn-danger">Reject</button>
+        </form>
+        <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/4" class="d-inline-block me-2">
+            @csrf
+            @method('POST')
+            <button class="btn btn-primary">Download</button>
+        </form>
+        <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/0" class="d-inline-block">
+            @csrf
+            @method('POST')
+            <button class="btn btn-warning">Delete</button>
+        </form>
+    </div>`;
+               
+    var contentStart = `
+    <div class="d-flex flex-column h-100">
+        <div class="row">
+            <div class="col-md-8 mb-3">
+                <iframe id="iframecontent" class="w-100" src="${iframeSrc}" style="height: 70vh;"></iframe>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Comments</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="commentsContainer">
+                            <!-- Comments will be dynamically added here -->
                         </div>
-                    </div>`;
-                var contentDefault = `<div class="col-md-4 d-flex flex-column justify-content-center">
-                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/2">
-                                @csrf
-                                <button class="btn btn-success mb-2 w-full">Approve</button>
-                            </form>
-                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/3">
-                                @csrf
-                                <button class="btn btn-danger mb-2 w-full">Reject</button>
-                            </form>
-                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/4">
-                                @csrf
-                                @method('POST')
-                                <button class="btn btn-primary mb-2 w-full">Download</button>
-                            </form>
-                            <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/0">
-                                @csrf
-                                @method('POST')
-                                <button class="btn btn-warning w-full">Delete</button>
-                            </form>
+                        <div class="form-group mt-3">
+                            <textarea class="form-control" rows="3" placeholder="Post additional message to the thread."></textarea>
                         </div>
-                    </div>`;
-                var contentStart = `<div class="row mb-4">
-                        <div class="col-md-8">
-                            <h5>Document: ${docType}</h5>
-                            <iframe id="iframecontent" class="w-full min-h-96" src="${iframeSrc}"></iframe>
-                        </div>`;
+                        <button class="btn btn-success w-100 mt-2">Add Comment</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-center mt-3">
+            <!-- Buttons will go here -->
+        </div>
+    </div>`;
+
+    
 
 
                 checkUrl(iframeSrc, function(exists) {
@@ -268,6 +301,11 @@
                     modal.find('#documentContent').html(content);
                 });
             });
+
+            // Add comment functionality
+            
+            
+            
         </script>
 
 

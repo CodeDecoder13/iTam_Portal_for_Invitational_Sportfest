@@ -60,5 +60,6 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     return $this->hasOne(Team::class, 'coach_id');
 }
+
    
 }
