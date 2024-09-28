@@ -46,6 +46,15 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/player/{playerId}/download-document', [UserController::class, 'downloadDocument'])->name('download.player.document');
    
 });
+// added for myteam page
+Route::middleware(['auth','verified'])->group(function () { 
+    Route::get('/my-team', [UserController::class, 'myTeam'])->name('my-team');
+    Route::post('/store-myTeam', [UserController::class, 'storeMyTeam'])->name('store.myTeam');
+    Route::get('/my-team/team-management/{id}', [UserController::class, 'teamManagement'])->name('team-management');
+    Route::get('/my-team/team-management/sub-player-management/{id}', [UserController::class, 'subPlayerManagement'])->name('sub-player-management');
+    Route::get('/my-team/team-management/sub-documents-management/{id}', [UserController::class, 'subDocumentsManagement'])->name('sub-documents-management');
+
+});
 
 // added for admin sidebar
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
@@ -71,7 +80,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::post('/store-team/{id}', [AdminController::class, 'storeTeam'])->name('admin.store-team');
     Route::delete('/delete-team/{id}', [AdminController::class, 'deleteTeam'])->name('admin.delete-team');
     Route::get('/logs-management/{id}', [AdminController::class, 'logsManagement'])->name('admin.logs-management');
-    Route::get('/document-management/{id}', [AdminController::class, 'documentManagement'])->name('admin.document-management');
+    Route::get('/document-management/{id}', [AdminController::class, 'documentManagement'])->name('admin.document-management.show');
 });
 // usermanagement routes
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {

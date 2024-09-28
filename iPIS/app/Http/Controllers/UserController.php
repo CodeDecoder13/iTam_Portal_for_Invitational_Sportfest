@@ -435,5 +435,104 @@ class UserController extends Controller
             return response()->json(['status' => 400, 'message' => 'Error: ' . $e->getMessage()]);
         }
     }
+    // added for sidebar my team
+    public function myTeam(Request $request)
+    {
+        $coachId = Auth::id();
+        
+        $query = Team::where('coach_id', $coachId);
+
+        // Handle search
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('sport_category', 'like', "%{$search}%");
+            });
+        }
+
+        // Handle filters
+        if ($request->has('sport') && $request->input('sport') !== '') {
+            $query->where('sport_category', $request->input('sport'));
+        }
+
+        if ($request->has('status') && $request->input('status') !== '') {
+            $query->where('is_active', $request->input('status') === 'active');
+        }
+
+        $teams = $query->paginate(10);
+
+        // Get unique sport categories for the filter dropdown
+        $sportCategories = Team::where('coach_id', $coachId)
+                               ->distinct()
+                               ->pluck('sport_category');
+
+        return view('user-sidebar.my-team', compact('teams', 'sportCategories'));
+    }
+    public function storeMyTeam(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'sport' => 'required|string',
+            'team_name' => 'required|string|max:255',
+            'team_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:25600',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $teamLogoPath = null;
+        if ($request->hasFile('team_logo')) {
+            $teamLogoPath = $request->file('team_logo')->store('team_logos', 'public');
+        }
+
+        $team = Team::create([
+            'name' => $request->team_name,
+            'sport_category' => $request->sport,
+            'coach_id' => Auth::id(),
+            'logo_path' => $teamLogoPath,
+            'is_active' => true,
+        ]);
+
+        return response()->json(['success' => true, 'team' => $team]);
+    }
+    //individual team management
+    public function teamManagement($id)
+    {
+        $team = Team::with(['players', 'coach'])->findOrFail($id);
+        $user = $team->coach; // This assumes the coach is stored in the 'coach' relationship
+
+        // Get the count of active and inactive players
+        $activePlayers = $team->players->where('is_active', true)->count();
+        $inactivePlayers = $team->players->where('is_active', false)->count();
+
+    
+
+        return view('user-sidebar.sub-team-management.team-management', compact('team', 'user', 'activePlayers', 'inactivePlayers'));
+    }
+    // added for sub player management
+    public function subPlayerManagement($id)
+    {
+        $user = Auth::user();
+        $team = Team::where('coach_id', $user->id)
+                    ->where('id', $id)
+                    ->firstOrFail();
+        
+        $players = $team->players; 
+
+        return view('user-sidebar.sub-team-management.sub-player-management', compact('team', 'players'));
+    }
+    // added for sub documents management
+    public function subDocumentsManagement($id)
+{
+    $user = Auth::user();
+    $team = Team::where('coach_id', $user->id)
+                ->where('id', $id)
+                ->firstOrFail();
+    
+    $players = $team->players()->with('team')->get();
+
+    return view('user-sidebar.sub-team-management.sub-documents-management', compact('team', 'players'));
+}
 
 }
