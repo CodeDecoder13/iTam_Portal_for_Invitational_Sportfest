@@ -152,7 +152,8 @@
     </ul>
     @endif
     <hr class="my-6" />
-    @if (Auth::user()->is_active)
+   
+    <!--
     <ul class="nav nav-pills flex-column mt-auto">
         <li>
             <a href="#" class="nav-link text-white">
@@ -160,8 +161,8 @@
                 Settings
             </a>
         </li>
-        
-        
+        -->
+        @if (Auth::user()->is_active)
         <li>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
