@@ -522,6 +522,7 @@ class UserController extends Controller
 
         return view('user-sidebar.sub-team-management.sub-player-management', compact('team', 'players'));
     }
+    
     // added for sub documents management
     public function subDocumentsManagement($id)
 {
@@ -534,5 +535,84 @@ class UserController extends Controller
 
     return view('user-sidebar.sub-team-management.sub-documents-management', compact('team', 'players'));
 }
+ // added for sub players management
+ public function storeSubPlayers(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'team_id' => 'required|integer|exists:teams,id',
+                'firstName' => 'required|string|max:255',
+                'middleName' => 'nullable|string|max:255',
+                'lastName' => 'required|string|max:255',
+                'birthday' => 'required|date',
+                'gender' => 'required|string|in:Male,Female',
+                'jersey_no' => 'required|integer|min:1|max:99',
+            ]);
 
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $player = Player::create([
+                'team_id' => $request->input('team_id'),
+                'first_name' => $request->input('firstName'),
+                'middle_name' => $request->input('middleName'),
+                'last_name' => $request->input('lastName'),
+                'birthday' => $request->input('birthday'),
+                'gender' => $request->input('gender'),
+                'jersey_no' => $request->input('jersey_no'),
+                'coach_id' => Auth::user()->id
+            ]);
+
+            // Call the createPlayerFolder method to create the player's folder
+            $this->createPlayerFolder($player);
+
+            return response()->json(['success' => true, 'message' => 'Player added successfully!']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while saving player.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    // added for update player sub player management
+    public function updateSubPlayers(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'player_id' => 'required|integer|exists:players,id',
+                'team_id' => 'required|integer|exists:teams,id',
+                'firstName' => 'required|string|max:255',
+                'middleName' => 'nullable|string|max:255',
+                'lastName' => 'required|string|max:255',
+                'birthday' => 'required|date',
+                'gender' => 'required|string|in:Male,Female',
+                'jersey_no' => 'required|integer|min:1|max:99',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            }
+
+            $player = Player::findOrFail($request->input('player_id'));
+            $player->update([
+                'team_id' => $request->input('team_id'),
+                'first_name' => $request->input('firstName'),
+                'middle_name' => $request->input('middleName'),
+                'last_name' => $request->input('lastName'),
+                'birthday' => $request->input('birthday'),
+                'gender' => $request->input('gender'),
+                'jersey_no' => $request->input('jersey_no')
+            ]);
+
+            return response()->json(['success' => true, 'message' => 'Player updated successfully!']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while updating player.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

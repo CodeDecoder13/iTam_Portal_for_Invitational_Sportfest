@@ -5,12 +5,21 @@
                 <h1 class="font-bold mb-2 text-3xl">Summary Of Players</h1>
                 <h3>Fill in player's summary to complete your requirements.</h3>
             </div>
+            
             <div class="w-full flex justify-end items-end">
                 <!-- Button to trigger the Bootstrap modal -->
                 <button class="btn btn-success h-2/3" data-bs-toggle="modal" data-bs-target="#addPlayerModal">
                     <sup>+</sup>Add New Player
                 </button>
             </div>
+        </div>
+        <div class="w-full flex justify-end mt-4">
+            <a href="{{ route('team-management', ['id' => $team->id]) }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Go Back
+            </a>
         </div>
         <div class="grid grid-cols-1 mt-5">
             <!-- Header Row -->
@@ -130,15 +139,63 @@
 
     <!-- Bootstrap Modal for Editing Players -->
     <div class="modal fade" id="editPlayerModal" tabindex="-1" aria-labelledby="editPlayerModalLabel" aria-hidden="true">
-        <!-- Similar structure to addPlayerModal, but with pre-filled data for editing -->
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-blue-700">
+                    <h5 class="modal-title text-white" id="editPlayerModalLabel">Edit Player</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editPlayerForm">
+                        @csrf
+                        <input type="hidden" id="editPlayerId" name="player_id">
+                        <input type="hidden" id="editPlayerTeam" name="team_id">
+                        <div class="mb-3">
+                            <label for="editFirstName" class="form-label">First Name</label>
+                            <input type="text" id="editFirstName" name="firstName" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editMiddleName" class="form-label">Middle Name</label>
+                            <input type="text" id="editMiddleName" name="middleName" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editLastName" class="form-label">Last Name</label>
+                            <input type="text" id="editLastName" name="lastName" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editBirthday" class="form-label">Birthday</label>
+                            <input type="date" id="editBirthday" name="birthday" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editGender" class="form-label">Gender</label>
+                            <select id="editGender" name="gender" class="form-select">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editJerseyNo" class="form-label">Jersey Number</label>
+                            <input type="number" id="editJerseyNo" name="jersey_no" class="form-control" min="1" max="99">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" id="editPlayer" class="btn btn-primary">Save Changes</button>
+                            
+                            
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
+       
         // Add Player Form Submission
         $('#addPlayerForm').on('submit', function(e) {
             e.preventDefault();
             $.ajax({
-                url: "{{ route('store.players') }}",
+                url: "{{ route('store.sub-players') }}",
                 method: 'POST',
                 data: $(this).serialize(),
                 success: function(response) {
@@ -149,22 +206,81 @@
                         alert('Error adding player. Please try again.');
                     }
                 },
-                error: function() {
-                    alert('An error occurred. Please try again.');
+                error: function(xhr) {
+                    if (xhr.status === 422) {
+                        var errors = xhr.responseJSON.errors;
+                        var errorMessage = 'Validation errors:\n';
+                        for (var field in errors) {
+                            errorMessage += field + ': ' + errors[field].join(', ') + '\n';
+                        }
+                        alert(errorMessage);
+                    } else {
+                        alert('An error occurred. Please try again.');
+                    }
                 }
             });
         });
 
+        
         // Edit Player Functionality
-        $('#editPlayerModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
+        $(document).on('click', '[data-bs-toggle="modal"][data-bs-target="#editPlayerModal"]', function (event) {
+            var button = $(event.currentTarget);
             var player = button.data('player');
-            var modal = $(this);
+            var modal = $('#editPlayerModal');
+
             // Fill the form with player data
             modal.find('#editPlayerId').val(player.id);
+            modal.find('#editPlayerTeam').val(player.team_id);  // Make sure this line is present
             modal.find('#editFirstName').val(player.first_name);
-            // ... fill other fields ...
-        });
+            modal.find('#editMiddleName').val(player.middle_name);
+            modal.find('#editLastName').val(player.last_name);
+            modal.find('#editBirthday').val(player.birthday);
+            modal.find('#editGender').val(player.gender);
+            modal.find('#editJerseyNo').val(player.jersey_no);
+        });;
+
+            $('#editPlayerForm').on('submit', function(e) {
+            e.preventDefault();
+            var formData = $(this).serialize();
+            formData += '&_token=' + $('meta[name="csrf-token"]').attr('content');
+            
+            // Ensure team_id is included
+            var teamId = $('#editPlayerTeam').val();
+            if (!teamId) {
+                alert('Team ID is missing. Please try again.');
+                return;
+            }
+            formData += '&team_id=' + teamId;
+            
+            $.ajax({
+                url: "{{ route('update.sub-players') }}",
+                method: 'POST',
+                data: formData,
+                success: function(response) {
+                    if(response.success) {
+                        alert('Player updated successfully!');
+                        $('#editPlayerModal').modal('hide');
+                        location.reload();
+                    } else {
+                        alert('Error updating player. Please try again.');
+                    }
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseText);  // Log the full response for debugging
+                    if (xhr.status === 422) {
+                        var errors = xhr.responseJSON.errors;
+                        var errorMessage = 'Validation errors:\n';
+                        for (var field in errors) {
+                            errorMessage += field + ': ' + errors[field].join(', ') + '\n';
+                        }
+                        alert(errorMessage);
+                    } else {
+                        alert('An error occurred. Please try again.');
+                    }
+                }
+            });
+        });     
+
 
         // Delete Player Functionality
         $('.delete-btn').on('click', function() {

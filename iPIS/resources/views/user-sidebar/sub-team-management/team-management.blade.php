@@ -9,8 +9,38 @@
                     <p><strong>Players:</strong> {{ $team->players->count() ?? 'N/A' }}</p>
                 </div>
                 <div>
-                    <p><strong>Incomplete Documents:</strong> {{ $team->players->where('birth_certificate_status', 'pending')->count() + $team->players->where('parental_consent_status', 'pending')->count() ?? 'N/A' }}</p>
-                    <p><strong>Status:</strong> <span id="userStatus" class="{{ $team->is_active ? 'text-green-600' : 'text-red-600' }}">{{ $team->is_active ? 'Active' : 'Inactive' }}</span></p>
+                    <p><strong>Document Status:</strong></p>
+                    <p class="mb-1">Birth Certificate:
+                        @if ($team->players->whereIn('birth_certificate_status', ['1', '2', '3'])->count() > 0)
+                            @if ($team->players->where('birth_certificate_status', '3')->count() > 0)
+                                <span class="text-red-500">Rejected</span>
+                            @elseif ($team->players->where('birth_certificate_status', '2')->count() > 0)
+                                <span class="text-green-500">Approved</span>
+                            @elseif ($team->players->where('birth_certificate_status', '1')->count() > 0)
+                                <span class="text-primary">Submitted</span>
+                            @endif
+                        @else
+                            <span class="text-muted">Not Submitted</span>
+                        @endif
+                    </p>
+                    <p class="mb-1">Parental Consent:
+                        @php
+                            $rejectedCount = $team->players->where('parental_consent_status', '3')->count();
+                            $approvedCount = $team->players->where('parental_consent_status', '2')->count();
+                            $submittedCount = $team->players->where('parental_consent_status', '1')->count();
+                            $totalPlayers = $team->players->count();
+                        @endphp
+                        @if ($rejectedCount > 0)
+                            <span class="text-red-500">Rejected ({{ $rejectedCount }}/{{ $totalPlayers }})</span>
+                        @elseif ($approvedCount > 0)
+                            <span class="text-green-500">Approved ({{ $approvedCount }}/{{ $totalPlayers }})</span>
+                        @elseif ($submittedCount > 0)
+                            <span class="text-primary">Submitted ({{ $submittedCount }}/{{ $totalPlayers }})</span>
+                        @else
+                            <span class="text-muted">Not Submitted (0/{{ $totalPlayers }})</span>
+                        @endif
+                    </p>
+                    <p><strong>Status:</strong> <span id="userStatus" class="{{ $team->coach->is_active ? 'text-green-600' : 'text-red-600' }}">{{ $team->coach->is_active ? 'Active' : 'Inactive' }}</span></p>
                 </div>
             </div>
         </div>

@@ -5,41 +5,10 @@
         <h1 class="font-bold mb-2 text-3xl">My Team Management</h1>
         <h3>Manage and Organize My Team</h3>
         <div class="w-full flex justify-end items-end mb-4">
-        <button onclick="openModal()" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
-                    Add New Team
-                </button>
+            <button onclick="openModal()" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
+                Add New Team
+            </button>
         </div>
-        <form method="GET" action="{{ route('my-team') }}" class="grid grid-cols-1 mt-5">
-            <div class="grid grid-cols-12 gap-4 px-4 py-3 rounded-lg bg-gray-100">
-                <div class="col-span-5">
-                    <input type="text" name="search" placeholder="Search" value="{{ request('search') }}"
-                        class="w-8/12 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="col-span-1 flex items-center">Filtered By:</div>
-                <div class="col-span-2">
-                    <select name="sport"
-                        class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">Sport Category</option>
-                        @foreach($sportCategories as $sport)
-                            <option value="{{ $sport }}" {{ request('sport') == $sport ? 'selected' : '' }}>{{ $sport }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-span-2">
-                    <select name="status"
-                        class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">Status</option>
-                        <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
-                        <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
-                    </select>
-                </div>
-                <div class="col-span-2">
-                    <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-                        Filter
-                    </button>
-                </div>
-            </div>
-        </form>
         
         <div class="grid grid-cols-12 px-4 py-3 bg-green-700 text-white rounded-lg border mt-4">
             <div class="col-span-3">Team Name</div>
@@ -52,16 +21,13 @@
                 <div class="col-span-3">{{ $team->name }}</div>
                 <div class="col-span-3">{{ $team->sport_category }}</div>
                 <div class="col-span-3">
-                    {{ $team->is_active ? 'Active' : 'Inactive' }}
+                    {{ $team->coach->is_active ? 'Active' : 'Inactive' }}
                 </div>
                 <div class="col-span-3">
                     <a href="{{ route('team-management', $team->id) }}" class="btn btn-primary">View</a>
-                    
                 </div>
             </div>
         @endforeach
-        
-       
     </section>
 
     <!-- Add Team Modal -->

@@ -52,6 +52,8 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::post('/store-myTeam', [UserController::class, 'storeMyTeam'])->name('store.myTeam');
     Route::get('/my-team/team-management/{id}', [UserController::class, 'teamManagement'])->name('team-management');
     Route::get('/my-team/team-management/sub-player-management/{id}', [UserController::class, 'subPlayerManagement'])->name('sub-player-management');
+    Route::post('/store-sub-players', [UserController::class, 'storeSubPlayers'])->name('store.sub-players');
+    Route::post('/update-sub-players', [UserController::class, 'updateSubPlayers'])->name('update.sub-players');
     Route::get('/my-team/team-management/sub-documents-management/{id}', [UserController::class, 'subDocumentsManagement'])->name('sub-documents-management');
 
 });
