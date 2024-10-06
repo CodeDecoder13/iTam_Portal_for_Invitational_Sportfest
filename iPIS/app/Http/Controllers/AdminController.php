@@ -102,10 +102,7 @@ class AdminController extends Controller
     }
     //return view('admin.admin-sidebar.team-documents.SummaryOfPlayers', compact('players', 'teams', 'users'));
 
-    public function calendar()
-    {
-        return view('admin.admin-sidebar.calendar');
-    }
+    
     public function schoolManagement(Request $request)
     {
         $query = User::query(); // Start with all users

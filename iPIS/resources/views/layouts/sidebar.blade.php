@@ -115,27 +115,19 @@
         </div>
     </div>
 
-    @if (Auth::user()->is_active)
-    <div class="mb-6">
-        <label for="team" class="block text-sm font-medium leading-6 text-white mb-1">Select Team</label>
-        <select id="team" name="team" autocomplete="team-name"
-            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-            <option value="" selected>Select Team</option>
-            @foreach ($teams as $team)
-                <option value="{{ $team->id }}"
-                    {{ isset($newTeam) && $newTeam->id === $team->id ? 'selected' : '' }}>
-                    {{ $team->name }} - {{ $team->sport_category }}</option>
-            @endforeach
-            <option value="add-new-team">Add New Team</option>
-        </select>
-    </div>
-    @endif
+   
 
     <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
             <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <ion-icon name="home"></ion-icon>
                 Home
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{ route('my-team') }}" class="nav-link {{ request()->routeIs('my-team') ? 'active' : '' }}">
+                <ion-icon name="people"></ion-icon>
+                My Team
             </a>
         </li>
         @if (Auth::user()->is_active)
@@ -160,7 +152,8 @@
     </ul>
     @endif
     <hr class="my-6" />
-    @if (Auth::user()->is_active)
+   
+    <!--
     <ul class="nav nav-pills flex-column mt-auto">
         <li>
             <a href="#" class="nav-link text-white">
@@ -168,8 +161,8 @@
                 Settings
             </a>
         </li>
-        
-        
+        -->
+        @if (Auth::user()->is_active)
         <li>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
@@ -184,13 +177,6 @@
 </div>
 
 
-<script>
-    const teamSelect = document.getElementById('team');
-    teamSelect.addEventListener('change', (e) => {
-        if (e.target.value === 'add-new-team') {
-            window.location.href = '/add-teams';
-        }
-    });
-</script>
+
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons.js"></script>

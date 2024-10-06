@@ -25,4 +25,13 @@ class Team extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+    public function homeGames()
+    {
+        return $this->hasMany(Game::class, 'team1_id');
+    }
+
+    public function awayGames()
+    {
+        return $this->hasMany(Game::class, 'team2_id');
+    }
 }
