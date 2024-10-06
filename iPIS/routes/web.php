@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TestingController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\DocumentCheckerController;
 use App\Http\Controllers\PlayerDocumentController;
 Route::get('/', function () {
@@ -29,6 +30,8 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/my-documents/{type}/{sport_category}/{name}', [UserController::class, 'myDocuments_sub'])->name('my-documents.sub');
     Route::post('/upload/player/documents/{playerId}', [UserController::class, 'uploadPlayerDocuments'])->name('upload.player.documents');
     Route::get('/my-calendar', [UserController::class, 'myCalendar'])->name('my-calendar');
+    Route::get('/get-games-user', [UserController::class, 'getGamesUser'])->name('get.games.user'); 
+    Route::get('/official-game-match/{id}', [UserController::class, 'fetchEventsGamesUser'])->name('official-game-match');
     Route::get('/my-players', [UserController::class, 'myPlayers'])->name('my-players');
     Route::get('/add-teams', [UserController::class, 'addTeams'])->name('add-teams');
     Route::post('/store/team', [UserController::class, 'storeTeam'])->name('store.team');
@@ -62,7 +65,7 @@ Route::middleware(['auth','verified'])->group(function () {
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::get('/documents', [AdminController::class, 'documents'])->name('admin.documents');
-    Route::get('/calendar', [AdminController::class, 'calendar'])->name('admin.calendar');
+    Route::get('/calendar', [CalendarController::class, 'calendar'])->name('admin.calendar');
     Route::get('/school-management', [AdminController::class, 'schoolManagement'])->name('admin.school-management');
     Route::get('/user-management', [AdminController::class, 'usersManagement'])->name('admin.user-management');
     Route::get('/coach-approval', [AdminController::class, 'coachApproval'])->name('admin.coach-approval');
@@ -71,6 +74,15 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/players-team-documents', [AdminController::class, 'teamdocuments'])->name('admin.playersTeamDocuments');
     Route::get('/summary-of-players', [AdminController::class, 'documentChecker'])->name('admin.SummaryOfPlayers');
     
+});
+//added for calendar
+Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
+    Route::get('/get-teams', [CalendarController::class, 'getTeams'])->name('admin.get.teams');
+    Route::post('/admin/store-game', [CalendarController::class, 'storeGame'])->name('admin.store.game');
+    Route::get('/get-games', [CalendarController::class, 'getGames'])->name('admin.get.games');
+    Route::get('/official-game/{id}', [CalendarController::class, 'fetchEventsGames'])->name('admin.official-game');
+    
+
 });
 
 // added for school management

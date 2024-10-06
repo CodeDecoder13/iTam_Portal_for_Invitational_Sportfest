@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\Models\Team;
 use App\Models\User;
 use App\Models\Player;
+use App\Models\Game;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -348,6 +349,53 @@ class UserController extends Controller
     public function myCalendar()
     {
         return view('user-sidebar.my-calendar');
+    }
+    public function getGamesUser(Request $request)
+    {
+        // Fetch games from the database
+        $games = Game::select('id', 'sport_category', 'team1_id', 'team2_id', 'game_date', 'start_time', 'end_time')
+            ->with(['team1', 'team2']) // Assuming you have relationships for team1 and team2 in Game model
+            ->get();
+
+        // Map the data to the format FullCalendar expects
+        $events = $games->map(function ($game) {
+            return [
+                'id' => $game->id,
+                'title' => $game->team1->name . ' - ' . $game->team2->name,  // Display teams names in the title
+                'start' => $game->game_date . 'T' . $game->start_time,  // Combine date and start time
+                'end' => $game->game_date . 'T' . $game->end_time,      // Combine date and end time
+                'extendedProps' => [
+                    'sport_category' => $game->sport_category,
+                    'team1_name' => $game->team1->name,
+                    'team2_name' => $game->team2->name,
+                ],
+            ];
+        });
+
+        return response()->json($events);
+    }
+    public function fetchEventsGamesUser($id)
+    {
+        // Fetch the game data by ID
+        $game = Game::with(['team1', 'team2', 'comments', 'team1.coach', 'team2.coach']) // Assuming you have relationships defined
+            ->findOrFail($id);
+
+        // Return the game data as JSON
+        return response()->json([
+            'team1' => [
+                'name' => $game->team1->name,
+                'score' => $game->team1_score,
+                'school' => $game->team1->coach ? $game->team1->coach->school_name : 'No School',  // Fetch school name from the user model
+            ],
+            'team2' => [
+                'name' => $game->team2->name,
+                'score' => $game->team2_score,
+                'school' => $game->team2->coach ? $game->team2->coach->school_name : 'No School',  // Fetch school name from the user model
+            ],
+            'game_date' => $game->game_date,
+            'sport_category' => $game->sport_category,
+            'comments' => $game->comments, 
+        ]);
     }
 
     public function myPlayers()
