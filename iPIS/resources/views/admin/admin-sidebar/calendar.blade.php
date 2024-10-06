@@ -186,6 +186,38 @@
             </button>
         </div>
     </div>
+    <!-- Edit Score Modal -->
+<div id="EditScoreModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden z-50">
+    <div class="relative p-6 border w-[400px] shadow-lg rounded-md bg-white">
+        <!-- Close Button -->
+        <button class="absolute top-0 right-0 mt-4 mr-4 text-gray-600 hover:text-gray-900" onclick="document.getElementById('EditScoreModal').classList.add('hidden')">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+        
+        <h3 class="text-xl font-medium text-gray-900 mb-6 text-center">Game Score</h3>
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex flex-col items-center">
+                <span class="text-2xl font-bold text-green-700">FITGC</span>
+                <span class="bg-green-700 text-white text-4xl font-bold w-16 h-16 flex items-center justify-center rounded">
+                    <span id="team1Score">3</span> <!-- Dynamic score for Team 1 -->
+                </span>
+            </div>
+            <span class="text-3xl font-bold">VS</span>
+            <div class="flex flex-col items-center">
+                <span class="text-2xl font-bold text-green-700">DLSUG</span>
+                <span class="bg-green-700 text-white text-4xl font-bold w-16 h-16 flex items-center justify-center rounded">
+                    <span id="team2Score">0</span> <!-- Dynamic score for Team 2 -->
+                </span>
+            </div>
+        </div>
+        <div class="flex justify-between space-x-2">
+            <button class="flex-1 px-4 py-2 bg-green-700 text-white rounded-md">Update</button>
+            <button class="flex-1 px-4 py-2 bg-yellow-500 text-white rounded-md">Set Default</button>
+        </div>
+    </div>
+</div>
 
 
     <!-- FullCalendar CSS -->
@@ -449,4 +481,17 @@
 
         });
     </script>
+    <script>
+         // Show the Edit Score Modal when the button is clicked
+    document.getElementById('editScoresBtn').addEventListener('click', function() {
+        document.getElementById('EditScoreModal').classList.remove('hidden');
+    });
+
+    // Optional: Close the modal when clicking outside of it
+    document.getElementById('EditScoreModal').addEventListener('click', function(event) {
+        if (event.target === this) {
+            this.classList.add('hidden');
+        }
+    });
+        </script>
 </x-app-layout>
