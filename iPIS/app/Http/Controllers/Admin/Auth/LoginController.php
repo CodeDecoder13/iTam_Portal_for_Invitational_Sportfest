@@ -16,7 +16,7 @@ class LoginController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): View
+    public function create(): View 
     {
         return view('admin.auth.login');
     }
@@ -47,12 +47,12 @@ class LoginController extends Controller
         return redirect('/admin/login');
     }
     protected function authenticated(Request $request, $user)
-{
-    if ($user instanceof Admin) {
-        return redirect()->intended('/admin/dashboard');
-    }
+    {
+        if ($user instanceof Admin) {
+            return redirect()->intended('/admin/dashboard');
+        }
 
-    return redirect()->intended('/dashboard');
-}
+        return redirect()->intended('/dashboard');
+    }
 
 }
