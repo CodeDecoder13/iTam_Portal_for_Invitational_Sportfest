@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Helpers\TeamHelper;
 
 class UserController extends Controller
 {
@@ -462,6 +463,17 @@ class UserController extends Controller
             // Create the folder
             Storage::makeDirectory($teamFolderPath);
         }
+         // Log the activity
+         ActivityLogHelper::logActivity(
+            $user->id,
+            $user->first_name,
+            $user->last_name,
+            $user->role,
+            $user->school_name,
+            
+            'team_registered',
+            'A new team is registered.'
+        );
 
         // Return a response
         return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
