@@ -6,7 +6,7 @@
 
     <section class="grid grid-cols-1">
         <h1 class="font-bold mb-2 text-3xl">Document Requirements</h1>
-        <h3>Manage and Organize Team Documents</h3>
+        <p>Manage and Organize Team Documents</p>
         <div class="grid grid-cols-1 mt-5">
             <div class="grid grid-cols-12 px-4 py-3 bg-green-700 text-white rounded-lg border">
                 <div class="font-bold col-span-3">Document</div>
