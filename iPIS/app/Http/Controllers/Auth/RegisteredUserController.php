@@ -67,16 +67,8 @@ class RegisteredUserController extends Controller
             Storage::makeDirectory($schoolFolderPath);
         }
 
-        // Log the activity
-        ActivityLogHelper::logActivity(
-            $user->id,
-            $user->first_name,
-            $user->last_name,
-            $user->role,
-            $user->school_name, // Pass the school_name
-            'user_registered',
-            'New user has registered.'
-        );
+       // After user is successfully created
+        ActivityLogHelper::logActivity($user, 'user_registered', 'registered a new user');
 
         event(new Registered($user));
 

@@ -47,7 +47,7 @@ class AdminController extends Controller
             ->orWhere('parental_consent_status', '!=', 2)
             ->count();
 
-            $activities = ActivityLog::with('user')->latest()->take(10)->get(); // Fetch the latest 10 activities
+            $activities = ActivityLog::orderBy('created_at', 'desc')->get();
 
         // Pass this data to the view
         return view('admin.dashboard', compact('totalRegistrations', 'categories', 'incompleteDocuments', 'activities'));

@@ -9,6 +9,7 @@ use App\Http\Controllers\TestingController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\DocumentCheckerController;
 use App\Http\Controllers\PlayerDocumentController;
+use App\Http\Controllers\ActivityLogController;
 Route::get('/', function () {
     return view('auth.login');
 });
@@ -73,6 +74,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/teams/{id}', [AdminController::class, 'showteam'])->name('admin.showteams');
     Route::get('/players-team-documents', [AdminController::class, 'teamdocuments'])->name('admin.playersTeamDocuments');
     Route::get('/summary-of-players', [AdminController::class, 'documentChecker'])->name('admin.SummaryOfPlayers');
+    Route::get('/activities', [ActivityLogController::class, 'getLatestActivities'])->name('admin.getLatestActivities');
     
 });
 //added for calendar

@@ -88,16 +88,14 @@
                 <h3 class="text-xl font-bold mb-2">Recent Activities</h3>
             </div>
             <div class="rounded-b-lg p-4 py-2">
-                <ul>
-                @forelse ($activities as $activity)
+                <ul id="activity-list">
+                @foreach($activities as $activity)
                     <li>
-                        <strong>{{ $activity->first_name }} {{ $activity->last_name }} ({{ $activity->role ?? 'No role' }} - {{ $activity->school_name ?? 'No school' }}):</strong>
-                        {{ $activity->description }}
+                    <strong>{{ $activity->first_name }} {{ $activity->last_name }} ({{ $activity->role ?? 'No role' }} - {{ $activity->school_name ?? 'No school' }}):</strong>
+                             {{ $activity->description }}
                         <small>({{ $activity->created_at->diffForHumans() }})</small>
                     </li>
-                @empty
-                    <li>No recent activities available</li>
-                @endforelse
+                @endforeach
                 </ul>
             </div>
         </div>
@@ -129,4 +127,50 @@
             </div>
         </div>
     </section>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    let lastActivityId = null; // Variable to keep track of the last activity ID
+
+    function fetchActivities() {
+        $.ajax({
+            url: '/activities',
+            method: 'GET',
+            success: function(data) {
+                // Check if there are new activities
+                if (data.length > 0) {
+                    // If this is the first fetch, initialize lastActivityId
+                    if (lastActivityId === null) {
+                        lastActivityId = data[0].id; // Set the lastActivityId to the first activity's ID
+                    }
+
+                    // Clear the existing list
+                    $('#activity-list').empty();
+
+                    // Loop through the activities and append them to the list
+                    data.forEach(function(activity) {
+                        $('#activity-list').append(
+                            '<li>' +
+                                '<strong>' + activity.first_name + ' ' + activity.last_name + ' (' + (activity.role || 'No role') + ' - ' + (activity.school_name || 'No school') + '):</strong> ' +
+                                activity.description + 
+                                ' <small>(' + activity.created_at + ')</small>' +
+                            '</li>'
+                        );
+
+                        // Update lastActivityId if the current activity ID is greater
+                        if (activity.id > lastActivityId) {
+                            lastActivityId = activity.id; // Update lastActivityId
+                        }
+                    });
+                }
+            },
+            error: function(xhr) {
+                console.error('Error fetching activities:', xhr);
+            }
+        });
+    }
+
+    // Fetch activities every 2 seconds
+    setInterval(fetchActivities, 2000);
+</script>
 </x-app-layout>
