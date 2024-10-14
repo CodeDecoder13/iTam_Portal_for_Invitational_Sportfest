@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Helpers\ActivityLogHelper;
+use App\Models\ActivityLog;
 
 class AdminController extends Controller
 {
@@ -45,9 +47,12 @@ class AdminController extends Controller
             ->orWhere('parental_consent_status', '!=', 2)
             ->count();
 
+            $activities = ActivityLog::orderBy('created_at', 'desc')->get();
+
         // Pass this data to the view
-        return view('admin.dashboard', compact('totalRegistrations', 'categories', 'incompleteDocuments'));
+        return view('admin.dashboard', compact('totalRegistrations', 'categories', 'incompleteDocuments', 'activities'));
     }
+   
     // added for documents
     public function documents()
     {

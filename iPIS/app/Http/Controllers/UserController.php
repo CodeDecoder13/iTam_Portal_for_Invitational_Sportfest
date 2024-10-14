@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Helpers\ActivityLogHelper;
 
 class UserController extends Controller
 {
@@ -462,6 +463,17 @@ class UserController extends Controller
             // Create the folder
             Storage::makeDirectory($teamFolderPath);
         }
+        $user = Auth::user(); // Ensure this line is added
+          // Log the activity for team addition
+          ActivityLogHelper::logActivity(
+            $user->id,
+            'team_added',
+            sprintf(
+                'added a new team: %s (%s)',
+                $team->name,
+                $team->sport_category
+            )
+        );
 
         // Return a response
         return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
@@ -541,6 +553,15 @@ class UserController extends Controller
             'logo_path' => $teamLogoPath,
             'is_active' => true,
         ]);
+
+         // Define the user variable
+        $user = Auth::user(); // Ensure this line is added
+        // Log the activity for team addition
+        ActivityLogHelper::logActivity(
+            $user,
+            'team_added',
+            sprintf('added a new team: %s (%s)', $team->name, $team->sport_category)
+        );
 
         return response()->json(['success' => true, 'team' => $team]);
     }

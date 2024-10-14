@@ -124,13 +124,14 @@
                 Home
             </a>
         </li>
+        @if (Auth::user()->is_active)
         <li class="nav-item">
             <a href="{{ route('my-team') }}" class="nav-link {{ request()->routeIs('my-team') ? 'active' : '' }}">
                 <ion-icon name="people"></ion-icon>
                 My Team
             </a>
         </li>
-        @if (Auth::user()->is_active)
+       
         <li class="nav-item">
             <a href="{{ route('my-documents') }}" class="nav-link {{ request()->routeIs('my-documents') ? 'active' : '' }}">
                 <ion-icon name="folder"></ion-icon>
