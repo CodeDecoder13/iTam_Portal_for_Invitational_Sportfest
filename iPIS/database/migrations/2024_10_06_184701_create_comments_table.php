@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('game_id')->constrained('games')->onDelete('cascade'); // Foreign key to games table
-            $table->string('admin'); // Assuming you want to store the user who made the comment
-            $table->text('text'); // The comment text
+            $table->foreignId('game_id')->constrained()->onDelete('cascade');
+            $table->foreignId('admin_id')->constrained()->onDelete('cascade'); // Foreign key to Admin
+            $table->text('content');
             $table->timestamps();
         });
     }

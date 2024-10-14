@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Team;
+use App\Models\Comment;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use App\Models\Game;
+use Illuminate\Support\Facades\Auth;
 
 
 class CalendarController extends Controller
@@ -117,9 +119,30 @@ class CalendarController extends Controller
             'game_date' => $game->game_date,
             'sport_category' => $game->sport_category,
             'comments' => $game->comments, 
+            
         ]);
     }
 
+    public function addComment(Request $request)
+    {
+        // Validate the incoming request
+        $request->validate([
+            'game_id' => 'required|exists:games,id',
+            'comment' => 'required|string|max:255',
+        ]);
+
+        // Create a new comment
+        $comment = Comment::create([
+            'game_id' => $request->game_id,
+            'admin_id' => Auth::id(), 
+            'content' => $request->comment,
+        ]);
+
+        // Load the admin relationship
+        $comment->load('admin'); // Ensure the admin relationship is loaded
+
+        return response()->json(['message' => 'Comment added successfully!', 'comment' => $comment], 201);
+    }
 
     
 }

@@ -81,6 +81,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::post('/admin/store-game', [CalendarController::class, 'storeGame'])->name('admin.store.game');
     Route::get('/get-games', [CalendarController::class, 'getGames'])->name('admin.get.games');
     Route::get('/official-game/{id}', [CalendarController::class, 'fetchEventsGames'])->name('admin.official-game');
+    Route::post('/admin/comments', [CalendarController::class, 'addComment'])->name('admin.add.comment');
     
 
 });
