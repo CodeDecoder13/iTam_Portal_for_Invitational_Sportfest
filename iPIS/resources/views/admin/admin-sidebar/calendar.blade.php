@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="container mx-auto p-6">
         <div class="flex justify-between items-center mb-6">
-        <h1 class="font-bold mb-2 text-3xl">Calendar</h1>
+            <h1 class="font-bold mb-2 text-3xl">Calendar</h1>
             <div>
                 <button id="openAddGameModal" class="bg-green-700 text-white px-4 py-2 rounded-md mr-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20"
@@ -97,10 +97,10 @@
                     </div>
                 </div>
 
-
+                <!--add button type on cancel avoid submit-->
                 <div class="flex justify-end">
-                    <button id="closeAddGameModal"
-                        class="px-6 py-3 bg-gray-200 text-black rounded-md mr-4 text-lg">Cancel</button>
+                    <button id="closeAddGameModal" class="px-6 py-3 bg-gray-200 text-black rounded-md mr-4 text-lg"
+                        type="button">Cancel</button>
                     <button class="px-6 py-3 bg-green-700 text-white rounded-md text-lg">Add Game</button>
                 </div>
             </form>
@@ -168,14 +168,14 @@
             </div>
 
             <div class="flex justify-end">
-            <button id="addCommentBtn" class="bg-green-700 text-white px-4 py-2 rounded-md flex items-center">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                </svg>
-                Add Comment
-            </button>
+                <button id="addCommentBtn" class="bg-green-700 text-white px-4 py-2 rounded-md flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Add Comment
+                </button>
             </div>
 
             <button class="absolute top-0 right-0 mt-4 mr-4 text-gray-600 hover:text-gray-900"
@@ -189,37 +189,42 @@
         </div>
     </div>
     <!-- Edit Score Modal -->
-<div id="EditScoreModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden z-50">
-    <div class="relative p-6 border w-[400px] shadow-lg rounded-md bg-white">
-        <!-- Close Button -->
-        <button class="absolute top-0 right-0 mt-4 mr-4 text-gray-600 hover:text-gray-900" onclick="document.getElementById('EditScoreModal').classList.add('hidden')">
-            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-        </button>
-        
-        <h3 class="text-xl font-medium text-gray-900 mb-6 text-center">Game Score</h3>
-        <div class="flex justify-between items-center mb-4">
-            <div class="flex flex-col items-center">
-                <span class="text-2xl font-bold text-green-700">FITGC</span>
-                <span class="bg-green-700 text-white text-4xl font-bold w-16 h-16 flex items-center justify-center rounded">
-                    <span id="team1Score">3</span> <!-- Dynamic score for Team 1 -->
-                </span>
+    <div id="EditScoreModal"
+        class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden z-50">
+        <div class="relative p-6 border w-[400px] shadow-lg rounded-md bg-white">
+            <!-- Close Button -->
+            <button class="absolute top-0 right-0 mt-4 mr-4 text-gray-600 hover:text-gray-900"
+                onclick="document.getElementById('EditScoreModal').classList.add('hidden')">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+
+            <h3 class="text-xl font-medium text-gray-900 mb-6 text-center">Game Score</h3>
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex flex-col items-center">
+                    <span class="text-2xl font-bold text-green-700">FITGC</span>
+                    <span
+                        class="bg-green-700 text-white text-4xl font-bold w-16 h-16 flex items-center justify-center rounded">
+                        <span id="team1Score">3</span> <!-- Dynamic score for Team 1 -->
+                    </span>
+                </div>
+                <span class="text-3xl font-bold">VS</span>
+                <div class="flex flex-col items-center">
+                    <span class="text-2xl font-bold text-green-700">DLSUG</span>
+                    <span
+                        class="bg-green-700 text-white text-4xl font-bold w-16 h-16 flex items-center justify-center rounded">
+                        <span id="team2Score">0</span> <!-- Dynamic score for Team 2 -->
+                    </span>
+                </div>
             </div>
-            <span class="text-3xl font-bold">VS</span>
-            <div class="flex flex-col items-center">
-                <span class="text-2xl font-bold text-green-700">DLSUG</span>
-                <span class="bg-green-700 text-white text-4xl font-bold w-16 h-16 flex items-center justify-center rounded">
-                    <span id="team2Score">0</span> <!-- Dynamic score for Team 2 -->
-                </span>
+            <div class="flex justify-between space-x-2">
+                <button class="flex-1 px-4 py-2 bg-green-700 text-white rounded-md">Update</button>
+                <button class="flex-1 px-4 py-2 bg-yellow-500 text-white rounded-md">Set Default</button>
             </div>
-        </div>
-        <div class="flex justify-between space-x-2">
-            <button class="flex-1 px-4 py-2 bg-green-700 text-white rounded-md">Update</button>
-            <button class="flex-1 px-4 py-2 bg-yellow-500 text-white rounded-md">Set Default</button>
         </div>
     </div>
-</div>
 
 
     <!-- FullCalendar CSS -->
@@ -278,8 +283,7 @@
                         url: '{{ route('admin.get.games') }}',
                         type: 'GET',
                         dataType: 'json',
-                        success: function(data) {
-                            console.log(data); // Log the data to inspect it
+                        success: function(data) { // Log the data to inspect it
                             successCallback(data);
                         },
                         error: function(xhr) {
@@ -320,7 +324,6 @@
                 url: `/admin/official-game/${gameId}`, //  '{{ route('admin.store.game') }}    `/official-game/${gameId}`
                 method: 'GET',
                 success: function(data) {
-                    console.log(data);
                     // Populate modal with game data
                     $('#team1Name').text(data.team1.name);
                     $('#team1Score').text(data.team1.score);
@@ -339,16 +342,14 @@
                         options
                     )); // Format: October 11, 2024  this is the date of the game has the same id still not showing in the view modal
                     $('#sportCategory2').text(data.sport_category); // not showing with same id
-                    console.log(gameDate.toLocaleDateString('en-US',
-                        options));
                     // Populate comments section
                     $('#commentsSection').empty(); // Clear previous comments
                     data.comments.forEach(function(comment) {
                         $('#commentsSection').append(
-                            `<p class="text-sm"><span class="font-semibold">${comment.admin}:</span> ${comment.text}</p>`
+                            `<p class="text-sm"><span class="font-semibold">${comment.admin_name}:</span> ${comment.content}</p>`
                         );
                     });
-                    
+
                     window.currentGameId = gameId;
                     // Show the modal
                     $('#viewGameModal').removeClass('hidden');
@@ -485,18 +486,18 @@
         });
     </script>
     <script>
-         // Show the Edit Score Modal when the button is clicked
-    document.getElementById('editScoresBtn').addEventListener('click', function() {
-        document.getElementById('EditScoreModal').classList.remove('hidden');
-    });
+        // Show the Edit Score Modal when the button is clicked
+        document.getElementById('editScoresBtn').addEventListener('click', function() {
+            document.getElementById('EditScoreModal').classList.remove('hidden');
+        });
 
-    // Optional: Close the modal when clicking outside of it
-    document.getElementById('EditScoreModal').addEventListener('click', function(event) {
-        if (event.target === this) {
-            this.classList.add('hidden');
-        }
-    });
-        </script>
+        // Optional: Close the modal when clicking outside of it
+        document.getElementById('EditScoreModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                this.classList.add('hidden');
+            }
+        });
+    </script>
 
 
     <script>

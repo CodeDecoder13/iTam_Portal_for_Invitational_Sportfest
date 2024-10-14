@@ -16,7 +16,7 @@ class CalendarController extends Controller
     {
         return view('admin.admin-sidebar.calendar');
     }
-    
+
 
     public function getSchool(Request $request)
     {
@@ -118,8 +118,13 @@ class CalendarController extends Controller
             ],
             'game_date' => $game->game_date,
             'sport_category' => $game->sport_category,
-            'comments' => $game->comments, 
-            
+            'comments' => $game->comments->map(function ($comment) {
+                return [
+                    'content' => $comment->content,
+                    'admin_name' => $comment->admin ? $comment->admin->name : 'Unknown Admin',
+                ];
+            }),
+
         ]);
     }
 
@@ -134,7 +139,7 @@ class CalendarController extends Controller
         // Create a new comment
         $comment = Comment::create([
             'game_id' => $request->game_id,
-            'admin_id' => Auth::id(), 
+            'admin_id' => Auth::id(),
             'content' => $request->comment,
         ]);
 
@@ -143,6 +148,4 @@ class CalendarController extends Controller
 
         return response()->json(['message' => 'Comment added successfully!', 'comment' => $comment], 201);
     }
-
-    
 }
