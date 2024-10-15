@@ -16,7 +16,7 @@
             <p class="text-4xl">{{ $totalRegistrations }}</p>
         </div>
 
-        <!-- Deisplay dynamic data for each category -->
+        <!-- Display dynamic data for each category -->
         <div class="bg-gray-50 hover:bg-green-700 hover:text-white p-4 rounded-lg transition duration-300">
             <h2 class="text-lg">Boys Basketball Developmental</h2>
             <p class="text-4xl">{{ $categories['Boys Basketball Developmental'] }}</p>
@@ -71,106 +71,93 @@
         </div>
     </div>
     
-    
-    <section class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <section class="container mx-auto p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Recent Documents Activities -->
         <div class="rounded-lg shadow-md">
             <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
                 <h3 class="text-xl font-bold mb-2">Recent Documents Activities</h3>
             </div>
-            <div class="rounded-b-lg p-4 py-2">
+            <div class="rounded-b-lg p-4 py-2 h-72 overflow-y-auto bg-white border border-gray-300">
                 <ul>
-                 
+                    <!-- Document activities go here -->
                 </ul>
             </div>
         </div>
+
+        <!-- Recent Activities -->
         <div class="rounded-lg shadow-md">
             <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
                 <h3 class="text-xl font-bold mb-2">Recent Activities</h3>
             </div>
-            <div class="rounded-b-lg p-4 py-2">
+            <div class="rounded-b-lg p-4 py-2 h-72 overflow-y-auto bg-white border border-gray-300">
                 <ul id="activity-list">
-                @foreach($activities as $activity)
-                    <li>
-                    <strong>{{ $activity->first_name }} {{ $activity->last_name }} ({{ $activity->role ?? 'No role' }} - {{ $activity->school_name ?? 'No school' }}):</strong>
-                             {{ $activity->description }}
-                        <small>({{ $activity->created_at->diffForHumans() }})</small>
-                    </li>
-                @endforeach
+                    @foreach($activities as $activity)
+                        <li class="truncate">
+                            <strong>{{ $activity->first_name }} {{ $activity->last_name }} ({{ $activity->role ?? 'No role' }} - {{ $activity->school_name ?? 'No school' }}):</strong>
+                            {{ $activity->description }}
+                            <small>({{ $activity->created_at->diffForHumans() }})</small>
+                        </li>
+                    @endforeach
                 </ul>
             </div>
         </div>
+
+        <!-- Standing -->
         <div class="rounded-lg shadow-md">
             <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
                 <h3 class="text-xl font-bold mb-2">Standing</h3>
             </div>
-            <div class="rounded-b-lg p-4 py-2">
+            <div class="rounded-b-lg p-4 py-2 h-72 overflow-y-auto bg-white border border-gray-300">
                 <ol type="1">
-                 <!--    <li type="1" class="border text-xs flex w-full">
-                        <div class="bg-yellow-100 p-2 w-1/12">1</div>
-                        <div class="my-2 ps-2 w-6/12 border-e-2">FTICGC</div>
-                        <div class="p-2 w-3/12">Wins</div>
-                        <div class="p-2 w-2/12 font-bold">06</div>
-                    </li>
-                    <li type="1" class="border text-xs flex w-full">
-                        <div class="bg-slate-300 p-2 w-1/12">1</div>
-                        <div class="my-2 ps-2 w-6/12 border-e-2">FTICGC</div>
-                        <div class="p-2 w-3/12">Wins</div>
-                        <div class="p-2 w-2/12 font-bold">06</div>
-                    </li>
-                    <li type="1" class="border text-xs flex w-full">
-                        <div class="bg-red-100 p-2 w-1/12">1</div>
-                        <div class="my-2 ps-2 w-6/12 border-e-2">FTICGC</div>
-                        <div class="p-2 w-3/12">Wins</div>
-                        <div class="p-2 w-2/12 font-bold">06</div>
-                    </li> -->
+                    <!-- Standing items go here -->
                 </ol>
             </div>
         </div>
     </section>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    let lastActivityId = null; // Variable to keep track of the last activity ID
+    <script>
+        let lastActivityId = null; // Variable to keep track of the last activity ID
 
-    function fetchActivities() {
-        $.ajax({
-            url: '/activities',
-            method: 'GET',
-            success: function(data) {
-                // Check if there are new activities
-                if (data.length > 0) {
-                    // If this is the first fetch, initialize lastActivityId
-                    if (lastActivityId === null) {
-                        lastActivityId = data[0].id; // Set the lastActivityId to the first activity's ID
-                    }
-
-                    // Clear the existing list
-                    $('#activity-list').empty();
-
-                    // Loop through the activities and append them to the list
-                    data.forEach(function(activity) {
-                        $('#activity-list').append(
-                            '<li>' +
-                                '<strong>' + activity.first_name + ' ' + activity.last_name + ' (' + (activity.role || 'No role') + ' - ' + (activity.school_name || 'No school') + '):</strong> ' +
-                                activity.description + 
-                                ' <small>(' + activity.created_at + ')</small>' +
-                            '</li>'
-                        );
-
-                        // Update lastActivityId if the current activity ID is greater
-                        if (activity.id > lastActivityId) {
-                            lastActivityId = activity.id; // Update lastActivityId
+        function fetchActivities() {
+            $.ajax({
+                url: '/admin/activities',
+                method: 'GET',
+                success: function(data) {
+                    // Check if there are new activities
+                    if (data.length > 0) {
+                        // If this is the first fetch, initialize lastActivityId
+                        if (lastActivityId === null) {
+                            lastActivityId = data[0].id; // Set the lastActivityId to the first activity's ID
                         }
-                    });
-                }
-            },
-            error: function(xhr) {
-                console.error('Error fetching activities:', xhr);
-            }
-        });
-    }
 
-    // Fetch activities every 2 seconds
-    setInterval(fetchActivities, 2000);
-</script>
+                        // Clear the existing list
+                        $('#activity-list').empty();
+
+                        // Loop through the activities and append them to the list
+                        data.forEach(function(activity) {
+                            $('#activity-list').append(
+                                '<li>' +
+                                    '<strong>' + activity.first_name + ' ' + activity.last_name + ' (' + (activity.role || 'No role') + ' - ' + (activity.school_name || 'No school') + '):</strong> ' +
+                                    activity.description + 
+                                    ' <small>(' + activity.created_at + ')</small>' +
+                                '</li>'
+                            );
+
+                            // Update lastActivityId if the current activity ID is greater
+                            if (activity.id > lastActivityId) {
+                                lastActivityId = activity.id; // Update lastActivityId
+                            }
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error fetching activities:', xhr);
+                }
+            });
+        }
+
+        // Fetch activities every 2 seconds
+        setInterval(fetchActivities, 2000);
+    </script>
 </x-app-layout>

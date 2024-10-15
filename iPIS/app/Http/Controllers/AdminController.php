@@ -328,9 +328,9 @@ class AdminController extends Controller
     {
         try {
             // Select all users with their corresponding team info
-            $users = User::select('users.id', 'users.first_name', 'users.last_name', 'users.email', 'users.school_name', 'users.role', 'users.is_active', 'users.created_at')
+            $users = User::select('users.id', 'users.first_name', 'users.last_name', 'users.email', 'users.school_name','users.gender','users.birth_date', 'users.role', 'users.is_active', 'users.created_at')
                 ->leftJoin('teams', 'teams.coach_id', '=', 'users.id') // Joining teams table on coach_id
-                ->groupBy('users.id', 'users.first_name', 'users.last_name', 'users.email', 'users.school_name', 'users.role', 'users.is_active', 'users.created_at')
+                ->groupBy('users.id', 'users.first_name', 'users.last_name', 'users.email', 'users.school_name','users.gender','users.birth_date', 'users.role', 'users.is_active', 'users.created_at')
                 ->get();
 
 
@@ -370,29 +370,26 @@ class AdminController extends Controller
     }
 
 
-    public function updateStatus($id, Request $request)
-    {
-        try {
-            $user = User::findOrFail($id);
-            if ($request->action === 'activate') {
-                $user->is_active = 1;
-            } elseif ($request->action === 'deactivate') {
-                $user->is_active = 0;
-            }
-            $user->save();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Status updated successfully',
-                'user' => $user
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'An error occurred while updating the status'
-            ], 500);
-        }
+    public function updateStatus(Request $request, $userId)
+{
+    $user = User::find($userId);
+    if (!$user) {
+        return response()->json(['success' => false, 'message' => 'User not found.']);
     }
+
+    // Update status based on action
+    if ($request->action === 'activate') {
+        $user->is_active = 1; // Activate user
+    } elseif ($request->action === 'deactivate') {
+        $user->is_active = 0; // Deactivate user
+    } else {
+        return response()->json(['success' => false, 'message' => 'Invalid action.']);
+    }
+
+    $user->save();
+    return response()->json(['success' => true, 'message' => 'Status updated successfully.']);
+}
+
     public function teamdocuments()
     {
         return view('admin.admin-sidebar.players-team-documents');
