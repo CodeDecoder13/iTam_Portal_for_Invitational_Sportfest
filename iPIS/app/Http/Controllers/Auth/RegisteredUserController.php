@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Storage;
+use App\Helpers\ActivityLogHelper;
 
 class RegisteredUserController extends Controller
 {
@@ -65,6 +66,9 @@ class RegisteredUserController extends Controller
             // Create the folder
             Storage::makeDirectory($schoolFolderPath);
         }
+
+       // After user is successfully created
+        ActivityLogHelper::logActivity($user, 'user_registered', 'registered a new user');
 
         event(new Registered($user));
 

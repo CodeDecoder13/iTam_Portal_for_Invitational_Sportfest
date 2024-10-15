@@ -120,6 +120,7 @@
                                         <button type="button" class="bg-green-600 text-white py-2 px-4 rounded-full" onclick="document.getElementById('birthCertificate-{{ $player->id }}').click();">Attach File</button>
                                         <button type="submit" id="uploadButton-birthCertificate-{{ $player->id }}" class="bg-green-600 text-white py-2 px-4 rounded-full hidden">Upload</button>
                                     </div>
+                                    
                                 </form>
                             </div>
                         </div>

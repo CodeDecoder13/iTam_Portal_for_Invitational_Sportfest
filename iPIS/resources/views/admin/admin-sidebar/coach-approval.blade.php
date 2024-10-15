@@ -1,8 +1,8 @@
 <x-app-layout>
-    <div class="container mx-auto">
+    <div class="container mx-auto p-6">
         <h1 class="font-bold mb-2 text-3xl">Coaches Approval</h1>
         <p>Manage and organize coaches</p>
-    </div>
+    
     <li class="w-full flex justify-end items-end">
        
         <button class="btn btn-success h-2/3" data-bs-toggle="modal" data-bs-target="#addUserModal">
@@ -256,6 +256,8 @@
                 </div>
                 </div>
             </div>  
+
+        </div>
             
            <!-- Bootstrap Modal for Editing Users -->
             <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">

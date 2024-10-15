@@ -57,9 +57,13 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Player::class, 'user_id');
     }
     public function team()
-{
-    return $this->hasOne(Team::class, 'coach_id');
-}
+    {
+        return $this->hasOne(Team::class, 'coach_id');
+    }
+    public function games()
+    {
+        return $this->hasMany(Game::class);
+    }
 
    
 }

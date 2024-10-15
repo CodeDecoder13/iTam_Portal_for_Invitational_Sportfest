@@ -56,7 +56,9 @@
             <h2 class="text-lg">Girls Volleyball Competitive</h2>
             <p class="text-4xl">{{ $categories['Girls Volleyball Competitive'] }}</p>
         </div>
-    </div><div class="container mx-auto p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    </div>
+    
+    <div class="container mx-auto p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <!-- Additional dynamic sections (remaining slots, incomplete documents, etc.) -->
         <div class="col-span-1 lg:col-span-2 bg-gray-50 p-4 rounded-lg shadow hover:bg-green-700 hover:text-white">
             <h2 class="text-lg">Remaining Slots</h2>
@@ -73,19 +75,11 @@
     <section class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         <div class="rounded-lg shadow-md">
             <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
-                <h3 class="text-xl font-bold mb-2">Recent Douments Activities</h3>
+                <h3 class="text-xl font-bold mb-2">Recent Documents Activities</h3>
             </div>
             <div class="rounded-b-lg p-4 py-2">
                 <ul>
-               <!--      <li class="border text-xs p-2 flex">
-                        <div class="text-green-700 text-xl">
-                            <ion-icon name="document"></ion-icon>
-                        </div>
-                        <div>
-                            <span class="font-bold">Document Comment:</span> "Full name and address doesn’t match ID
-                            details” - RAC Representative"
-                        </div>
-                    </li> -->
+                 
                 </ul>
             </div>
         </div>
@@ -94,20 +88,14 @@
                 <h3 class="text-xl font-bold mb-2">Recent Activities</h3>
             </div>
             <div class="rounded-b-lg p-4 py-2">
-                <ul>
-                 <!--   <li class="border text-xs p-2 flex">
-                        <div class="w-8/12 border-e-2 flex-grow flex">
-                            <div><img width="15" class="img-fluid" src="/images/userlogo.png" /></div>
-                            <div class="text-center">
-                                <div><span>FITGC</span> VS <span>MPTGC</span></div>
-                                <div class="text-xs">Men’s Basketball (D)</div>
-                            </div>
-                            <div><img width="15" class="img-fluid" src="/images/userlogo.png" /></div>
-                        </div>
-                        <div class="w-4/12 text-end">
-                            <p class="font-bold">Sept. 11, 2024</p>
-                        </div>  
-                    </li> -->
+                <ul id="activity-list">
+                @foreach($activities as $activity)
+                    <li>
+                    <strong>{{ $activity->first_name }} {{ $activity->last_name }} ({{ $activity->role ?? 'No role' }} - {{ $activity->school_name ?? 'No school' }}):</strong>
+                             {{ $activity->description }}
+                        <small>({{ $activity->created_at->diffForHumans() }})</small>
+                    </li>
+                @endforeach
                 </ul>
             </div>
         </div>
@@ -138,8 +126,51 @@
                 </ol>
             </div>
         </div>
-        <div class="bg-green-800 text-white rounded-lg shadow-md px-4 py-2">
-            <h3 class="text-xl font-bold mb-2">Document Requirements</h3>
-        </div>
     </section>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    let lastActivityId = null; // Variable to keep track of the last activity ID
+
+    function fetchActivities() {
+        $.ajax({
+            url: '/activities',
+            method: 'GET',
+            success: function(data) {
+                // Check if there are new activities
+                if (data.length > 0) {
+                    // If this is the first fetch, initialize lastActivityId
+                    if (lastActivityId === null) {
+                        lastActivityId = data[0].id; // Set the lastActivityId to the first activity's ID
+                    }
+
+                    // Clear the existing list
+                    $('#activity-list').empty();
+
+                    // Loop through the activities and append them to the list
+                    data.forEach(function(activity) {
+                        $('#activity-list').append(
+                            '<li>' +
+                                '<strong>' + activity.first_name + ' ' + activity.last_name + ' (' + (activity.role || 'No role') + ' - ' + (activity.school_name || 'No school') + '):</strong> ' +
+                                activity.description + 
+                                ' <small>(' + activity.created_at + ')</small>' +
+                            '</li>'
+                        );
+
+                        // Update lastActivityId if the current activity ID is greater
+                        if (activity.id > lastActivityId) {
+                            lastActivityId = activity.id; // Update lastActivityId
+                        }
+                    });
+                }
+            },
+            error: function(xhr) {
+                console.error('Error fetching activities:', xhr);
+            }
+        });
+    }
+
+    // Fetch activities every 2 seconds
+    setInterval(fetchActivities, 2000);
+</script>
 </x-app-layout>

@@ -6,12 +6,14 @@ namespace App\Http\Controllers;
 use App\Models\Team;
 use App\Models\User;
 use App\Models\Player;
+use App\Models\Game;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Helpers\ActivityLogHelper;
 
 class UserController extends Controller
 {
@@ -349,6 +351,53 @@ class UserController extends Controller
     {
         return view('user-sidebar.my-calendar');
     }
+    public function getGamesUser(Request $request)
+    {
+        // Fetch games from the database
+        $games = Game::select('id', 'sport_category', 'team1_id', 'team2_id', 'game_date', 'start_time', 'end_time')
+            ->with(['team1', 'team2']) // Assuming you have relationships for team1 and team2 in Game model
+            ->get();
+
+        // Map the data to the format FullCalendar expects
+        $events = $games->map(function ($game) {
+            return [
+                'id' => $game->id,
+                'title' => $game->team1->name . ' - ' . $game->team2->name,  // Display teams names in the title
+                'start' => $game->game_date . 'T' . $game->start_time,  // Combine date and start time
+                'end' => $game->game_date . 'T' . $game->end_time,      // Combine date and end time
+                'extendedProps' => [
+                    'sport_category' => $game->sport_category,
+                    'team1_name' => $game->team1->name,
+                    'team2_name' => $game->team2->name,
+                ],
+            ];
+        });
+
+        return response()->json($events);
+    }
+    public function fetchEventsGamesUser($id)
+    {
+        // Fetch the game data by ID
+        $game = Game::with(['team1', 'team2', 'comments', 'team1.coach', 'team2.coach']) // Assuming you have relationships defined
+            ->findOrFail($id);
+
+        // Return the game data as JSON
+        return response()->json([
+            'team1' => [
+                'name' => $game->team1->name,
+                'score' => $game->team1_score,
+                'school' => $game->team1->coach ? $game->team1->coach->school_name : 'No School',  // Fetch school name from the user model
+            ],
+            'team2' => [
+                'name' => $game->team2->name,
+                'score' => $game->team2_score,
+                'school' => $game->team2->coach ? $game->team2->coach->school_name : 'No School',  // Fetch school name from the user model
+            ],
+            'game_date' => $game->game_date,
+            'sport_category' => $game->sport_category,
+            'comments' => $game->comments, 
+        ]);
+    }
 
     public function myPlayers()
     {
@@ -414,6 +463,17 @@ class UserController extends Controller
             // Create the folder
             Storage::makeDirectory($teamFolderPath);
         }
+        $user = Auth::user(); // Ensure this line is added
+          // Log the activity for team addition
+          ActivityLogHelper::logActivity(
+            $user->id,
+            'team_added',
+            sprintf(
+                'added a new team: %s (%s)',
+                $team->name,
+                $team->sport_category
+            )
+        );
 
         // Return a response
         return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
@@ -435,5 +495,193 @@ class UserController extends Controller
             return response()->json(['status' => 400, 'message' => 'Error: ' . $e->getMessage()]);
         }
     }
+    // added for sidebar my team
+    public function myTeam(Request $request)
+    {
+        $coachId = Auth::id();
+        
+        $query = Team::where('coach_id', $coachId);
 
+        // Handle search
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('sport_category', 'like', "%{$search}%");
+            });
+        }
+
+        // Handle filters
+        if ($request->has('sport') && $request->input('sport') !== '') {
+            $query->where('sport_category', $request->input('sport'));
+        }
+
+        if ($request->has('status') && $request->input('status') !== '') {
+            $query->where('is_active', $request->input('status') === 'active');
+        }
+
+        $teams = $query->paginate(10);
+
+        // Get unique sport categories for the filter dropdown
+        $sportCategories = Team::where('coach_id', $coachId)
+                               ->distinct()
+                               ->pluck('sport_category');
+
+        return view('user-sidebar.my-team', compact('teams', 'sportCategories'));
+    }
+    public function storeMyTeam(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'sport' => 'required|string',
+            'team_name' => 'required|string|max:255',
+            'team_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:25600',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $teamLogoPath = null;
+        if ($request->hasFile('team_logo')) {
+            $teamLogoPath = $request->file('team_logo')->store('team_logos', 'public');
+        }
+
+        $team = Team::create([
+            'name' => $request->team_name,
+            'sport_category' => $request->sport,
+            'coach_id' => Auth::id(),
+            'logo_path' => $teamLogoPath,
+            'is_active' => true,
+        ]);
+
+         // Define the user variable
+        $user = Auth::user(); // Ensure this line is added
+        // Log the activity for team addition
+        ActivityLogHelper::logActivity(
+            $user,
+            'team_added',
+            sprintf('added a new team: %s (%s)', $team->name, $team->sport_category)
+        );
+
+        return response()->json(['success' => true, 'team' => $team]);
+    }
+    //individual team management
+    public function teamManagement($id)
+    {
+        $team = Team::with(['players', 'coach'])->findOrFail($id);
+        $user = $team->coach; // This assumes the coach is stored in the 'coach' relationship
+
+        // Get the count of active and inactive players
+        $activePlayers = $team->players->where('is_active', true)->count();
+        $inactivePlayers = $team->players->where('is_active', false)->count();
+
+    
+
+        return view('user-sidebar.sub-team-management.team-management', compact('team', 'user', 'activePlayers', 'inactivePlayers'));
+    }
+    // added for sub player management
+    public function subPlayerManagement($id)
+    {
+        $user = Auth::user();
+        $team = Team::where('coach_id', $user->id)
+                    ->where('id', $id)
+                    ->firstOrFail();
+        
+        $players = $team->players; 
+
+        return view('user-sidebar.sub-team-management.sub-player-management', compact('team', 'players'));
+    }
+    
+    // added for sub documents management
+    public function subDocumentsManagement($id)
+{
+    $user = Auth::user();
+    $team = Team::where('coach_id', $user->id)
+                ->where('id', $id)
+                ->firstOrFail();
+    
+    $players = $team->players()->with('team')->get();
+
+    return view('user-sidebar.sub-team-management.sub-documents-management', compact('team', 'players'));
+}
+ // added for sub players management
+ public function storeSubPlayers(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'team_id' => 'required|integer|exists:teams,id',
+                'firstName' => 'required|string|max:255',
+                'middleName' => 'nullable|string|max:255',
+                'lastName' => 'required|string|max:255',
+                'birthday' => 'required|date',
+                'gender' => 'required|string|in:Male,Female',
+                'jersey_no' => 'required|integer|min:1|max:99',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $player = Player::create([
+                'team_id' => $request->input('team_id'),
+                'first_name' => $request->input('firstName'),
+                'middle_name' => $request->input('middleName'),
+                'last_name' => $request->input('lastName'),
+                'birthday' => $request->input('birthday'),
+                'gender' => $request->input('gender'),
+                'jersey_no' => $request->input('jersey_no'),
+                'coach_id' => Auth::user()->id
+            ]);
+
+            // Call the createPlayerFolder method to create the player's folder
+            $this->createPlayerFolder($player);
+
+            return response()->json(['success' => true, 'message' => 'Player added successfully!']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while saving player.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    // added for update player sub player management
+    public function updateSubPlayers(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'player_id' => 'required|integer|exists:players,id',
+                'team_id' => 'required|integer|exists:teams,id',
+                'firstName' => 'required|string|max:255',
+                'middleName' => 'nullable|string|max:255',
+                'lastName' => 'required|string|max:255',
+                'birthday' => 'required|date',
+                'gender' => 'required|string|in:Male,Female',
+                'jersey_no' => 'required|integer|min:1|max:99',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            }
+
+            $player = Player::findOrFail($request->input('player_id'));
+            $player->update([
+                'team_id' => $request->input('team_id'),
+                'first_name' => $request->input('firstName'),
+                'middle_name' => $request->input('middleName'),
+                'last_name' => $request->input('lastName'),
+                'birthday' => $request->input('birthday'),
+                'gender' => $request->input('gender'),
+                'jersey_no' => $request->input('jersey_no')
+            ]);
+
+            return response()->json(['success' => true, 'message' => 'Player updated successfully!']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while updating player.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
