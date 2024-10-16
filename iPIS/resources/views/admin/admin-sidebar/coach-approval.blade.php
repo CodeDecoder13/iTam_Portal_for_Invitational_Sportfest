@@ -6,10 +6,12 @@
     </div>
 
     <li class="w-full flex justify-end items-end">
-        <button class="btn btn-success h-2/3" data-bs-toggle="modal" data-bs-target="#addUserModal">
+        <button class="btn btn-success h-2/3" data-modal-toggle="addUserModal" data-modal-target="addUserModal">
             <sup>+</sup>Add New Coach
         </button>
     </li>
+
+    
    
     <div class="grid grid-cols-12 px-4 py-3 bg-grey-700 text-white rounded-lg border">
         @foreach ($data['users'] as $user) 
@@ -20,7 +22,7 @@
             @endphp
             <div class="col-span-4 p-4 relative">
                 <div class="bg-white text-black p-4 rounded-lg shadow cursor-pointer relative" 
-                onclick="openModal({{ $user->is_active ? 'true' : 'false' }}, '{{ $user->first_name }}', '{{ $user->last_name }}', '{{ $user->school_name ?? 'N/A' }}', '{{ $user->role ?? 'N/A' }}', '{{ $sports->isNotEmpty() ? $sports->implode(', ') : 'N/A' }}', '{{ $teams->isNotEmpty() ? $teams->implode(', ') : 'N/A' }}', '{{ $sports->isNotEmpty() ? $sports->implode(', ') : 'N/A' }}', '{{ $teams->isNotEmpty() ? $teams->implode(', ') : 'N/A' }}', '{{ $user->birth_date }}', '{{ $user->gender }}', {{ $user->id }})">
+                onclick="openViewModal({{ $user->is_active ? 'true' : 'false' }}, '{{ $user->first_name }}', '{{ $user->last_name }}', '{{ $user->school_name ?? 'N/A' }}', '{{ $user->role ?? 'N/A' }}', '{{ $sports->isNotEmpty() ? $sports->implode(', ') : 'N/A' }}', '{{ $teams->isNotEmpty() ? $teams->implode(', ') : 'N/A' }}', '{{ $sports->isNotEmpty() ? $sports->implode(', ') : 'N/A' }}', '{{ $teams->isNotEmpty() ? $teams->implode(', ') : 'N/A' }}', '{{ $user->birth_date }}', '{{ $user->gender }}', {{ $user->id }})">
                     
                     <!-- User Info -->
                     <h2 class="font-bold text-2xl mb-4 inline-flex items-center">
@@ -57,7 +59,6 @@
                 </button>
                         </li>
                         <li> <button type="button" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" data-id="{{ $user->id }}">Delete</button></li>
-                        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">More Info</a></li>
                     </ul>
                 </div>
             </div>
@@ -67,10 +68,7 @@
 <div id="userModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
     <div class="bg-black opacity-50 absolute inset-0"></div>
     <div class="bg-white rounded-lg p-6 z-10 w-11/12 md:w-1/3 relative">
-        <button class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-3xl p-2" onclick="closeModal()">&times;</button>
-
-      
-
+        <button class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-3xl p-2" onclick="closeViewModal()">&times;</button>
         <!-- Name and Role -->
         <h2 class="font-bold text-2xl mb-4 inline-flex items-center" id="modalUserName"></h2> 
         
@@ -97,6 +95,8 @@
                 <!-- Change here: Add userId to the buttons -->
                 <button class="bg-green-700 hover:bg-green-800 text-white px-2 py-1 rounded-lg mr-2" id="activateButton">Activate</button>
                 <button class="bg-red-700 hover:bg-red-800 text-white px-2 py-1 rounded-lg" id="deactivateButton">Deactivate</button>
+                
+                
             </div>
         </div>
         
@@ -104,164 +104,72 @@
 </div>
 
 
-<!-- Bootstrap Modal for Editing Users -->
-<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editUserModalLabel">Edit User Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editUserForm">
-                    @csrf
-                    <input type="hidden" id="edituserid" name="userid" value="">
-                    
-                    <!-- First Name -->
-                    <div class="mb-4">
-                        <label for="editFirstName" class="form-label">First Name</label>
-                        <input type="text" id="editFirstName" name="first_name" class="form-control">
-                    </div>
 
-                    <!-- Last Name -->
-                    <div class="mb-4">
-                        <label for="editLastName" class="form-label">Last Name</label>
-                        <input type="text" id="editLastName" name="last_name" class="form-control">
-                    </div>
 
-                    <!-- Email -->
-                    <div class="mb-4">
-                        <label for="editEmail" class="form-label">Email</label>
-                        <input type="text" id="editEmail" name="email" class="form-control">
-                    </div>
+  
+  <!-- Main modal -->
+  <div id="addUserModal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+      <div class="relative p-4 w-full max-w-md max-h-full">
+          <!-- Modal content -->
+          <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+              <!-- Modal header -->
+              <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                      Create New Product
+                  </h3>
+                  <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="crud-modal">
+                      <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                      </svg>
+                      <span class="sr-only">Close modal</span>
+                  </button>
+              </div>
+              <!-- Modal body -->
+              <form class="p-4 md:p-5">
+                  <div class="grid gap-4 mb-4 grid-cols-2">
+                      <div class="col-span-2">
+                          <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+                          <input type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Type product name" required="">
+                      </div>
+                      <div class="col-span-2 sm:col-span-1">
+                          <label for="price" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Price</label>
+                          <input type="number" name="price" id="price" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="$2999" required="">
+                      </div>
+                      <div class="col-span-2 sm:col-span-1">
+                          <label for="category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category</label>
+                          <select id="category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                              <option selected="">Select category</option>
+                              <option value="TV">TV/Monitors</option>
+                              <option value="PC">PC</option>
+                              <option value="GA">Gaming/Console</option>
+                              <option value="PH">Phones</option>
+                          </select>
+                      </div>
+                      <div class="col-span-2">
+                          <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Product Description</label>
+                          <textarea id="description" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write product description here"></textarea>                    
+                      </div>
+                  </div>
+                  <button type="submit" class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                      <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+                      Add new product
+                  </button>
+              </form>
+          </div>
+      </div>
+  </div> 
+  
 
-                    <!-- Role -->
-                    <div class="mb-4">
-                        <label for="editRole" class="form-label">Role</label>
-                        <select id="editRole" name="role" class="form-control" required>
-                            <option value="" disabled selected>Select Role</option>
-                                    <option value="Captain" {{ old('role') == 'Captain' ? 'selected' : '' }}> Captain</option>
-                                    <option value="Coach" {{ old('role') == 'Coach' ? 'selected' : '' }}>Coach</option>
-                                    <option value="School Representative" {{ old('role') == 'School Representative' ? 'selected' : '' }}> School Representative</option>
-                                    <option value="Guest Account" {{ old('role') == 'Guest Account' ? 'selected' : '' }}>Guest Account</option>
-                        </select>
-                    </div>
-
-                    <!-- School Name -->
-                    <div class="mb-4">
-                        <label for="editSchoolName" class="form-label">School Name</label>
-                        <select id="editSchoolName" name="school_name" class="form-control" required>
-                            <option value="" disabled selected>School Name</option>
-
-                                            <option value="Ilaya Barangka Elementary School" {{ old('school_name') == 'Ilaya Barangka Elementary School' ? 'selected' : '' }}>Ilaya Barangka Elementary School</option>
-                                            <option value="Aquinas School" {{ old('school_name') == 'Aquinas School' ? 'selected' : '' }}>Aquinas School</option>
-                                            <option value="Assemblywoman Felicita G. Berdino Memorial Trade School" {{ old('school_name') == 'Assemblywoman Felicita G. Berdino Memorial Trade School' ? 'selected' : '' }}>Assemblywoman Felicita G. Berdino Memorial Trade School</option>
-                                            <option value="Batasan National High School" {{ old('school_name') == 'Batasan National High School' ? 'selected' : '' }}>Batasan National High School</option>
-                                            <option value="Canossa Academy Lipa" {{ old('school_name') == 'Canossa Academy Lipa' ? 'selected' : '' }}>Canossa Academy Lipa</option>
-                                            <option value="Catmon Integrated School" {{ old('school_name') == 'Catmon Integrated School' ? 'selected' : '' }}>Catmon Integrated School</option>
-                                            <option value="Chiang Kai Shek College" {{ old('school_name') == 'Chiang Kai Shek College' ? 'selected' : '' }}>Chiang Kai Shek College</option>
-                                            <option value="College of St. Catherine, Quezon City" {{ old('school_name') == 'College of St. Catherine, Quezon City' ? 'selected' : '' }}>College of St. Catherine, Quezon City</option>
-                                            <option value="Community Learning Academy of San Jose" {{ old('school_name') == 'Community Learning Academy of San Jose' ? 'selected' : '' }}>Community Learning Academy of San Jose</option>
-                                            <option value="De La Salle Araneta University" {{ old('school_name') == 'De La Salle Araneta University' ? 'selected' : '' }}>De La Salle Araneta University</option>
-                                            <option value="Dominican School, Manila" {{ old('school_name') == 'Dominican School, Manila' ? 'selected' : '' }}>Dominican School, Manila</option>
-                                            <option value="Domuschola International School" {{ old('school_name') == 'Domuschola International School' ? 'selected' : '' }}>Domuschola International School</option>
-                                            <option value="Don Antonio De Zuzuarregui Sr Memorial Academy" {{ old('school_name') == 'Don Antonio De Zuzuarregui Sr Memorial Academy' ? 'selected' : '' }}>Don Antonio De Zuzuarregui Sr Memorial Academy</option>
-                                            <option value="Emilio Aguinaldo College, Manila" {{ old('school_name') == 'Emilio Aguinaldo College, Manila' ? 'selected' : '' }}>Emilio Aguinaldo College, Manila</option>
-                                            <option value="Ernesto Rondon High School" {{ old('school_name') == 'Ernesto Rondon High School' ? 'selected' : '' }}>Ernesto Rondon High School</option>
-                                            <option value="Escuela De Sophia School of Caloocan Inc." {{ old('school_name') == 'Escuela De Sophia School of Caloocan Inc.' ? 'selected' : '' }}>Escuela De Sophia School of Caloocan Inc.</option>
-                                            <option value="FEU Diliman" {{ old('school_name') == 'FEU Diliman' ? 'selected' : '' }}>FEU Diliman</option>
-                                            <option value="FEU Roosevelt Marikina" {{ old('school_name') == 'FEU Roosevelt Marikina' ? 'selected' : '' }}>FEU Roosevelt Marikina</option>
-                                            <option value="FEU Roosevelt Rodriguez" {{ old('school_name') == 'FEU Roosevelt Rodriguez' ? 'selected' : '' }}>FEU Roosevelt Rodriguez</option>
-                                            <option value="Gracel Christian College Foundation" {{ old('school_name') == 'Gracel Christian College Foundation' ? 'selected' : '' }}>Gracel Christian College Foundation</option>
-                                            <option value="Grant Cecilia Integrated School" {{ old('school_name') == 'Grant Cecilia Integrated School' ? 'selected' : '' }}>Grant Cecilia Integrated School</option>
-                                            <option value="Holy Angel School of Caloocan Inc." {{ old('school_name') == 'Holy Angel School of Caloocan Inc.' ? 'selected' : '' }}>Holy Angel School of Caloocan Inc.</option>
-                                            <option value="Holy Infant Montessori Center" {{ old('school_name') == 'Holy Infant Montessori Center' ? 'selected' : '' }}>Holy Infant Montessori Center</option>
-                                            <option value="Holy Trinity Academy" {{ old('school_name') == 'Holy Trinity Academy' ? 'selected' : '' }}>Holy Trinity Academy</option>
-                                            <option value="HSL-Braille College Inc." {{ old('school_name') == 'HSL-Braille College Inc.' ? 'selected' : '' }}>HSL-Braille College Inc.</option>
-                                            <option value="Integrated School of Science/AIMS" {{ old('school_name') == 'Integrated School of Science/AIMS' ? 'selected' : '' }}>Integrated School of Science/AIMS</option>
-                                            <option value="Jaime Cardinal Sin Learning Center" {{ old('school_name') == 'Jaime Cardinal Sin Learning Center' ? 'selected' : '' }}>Jaime Cardinal Sin Learning Center</option>
-                                            <option value="Jesus Christ Saves Global Outreach Christian Academy" {{ old('school_name') == 'Jesus Christ Saves Global Outreach Christian Academy' ? 'selected' : '' }}>Jesus Christ Saves Global Outreach Christian Academy</option>
-                                            <option value="Jesus is Lord College Foundation" {{ old('school_name') == 'Jesus is Lord College Foundation' ? 'selected' : '' }}>Jesus is Lord College Foundation</option>
-                                            <option value="Jesus Reigns Christian Academy" {{ old('school_name') == 'Jesus Reigns Christian Academy' ? 'selected' : '' }}>Jesus Reigns Christian Academy</option>
-                                            <option value="Juan R. Liwag Memorial High School" {{ old('school_name') == 'Juan R. Liwag Memorial High School' ? 'selected' : '' }}>Juan R. Liwag Memorial High School</option>
-                                            <option value="Justice Cecilia Munoz Palma High School" {{ old('school_name') == 'Justice Cecilia Munoz Palma High School' ? 'selected' : '' }}>Justice Cecilia Munoz Palma High School</option>
-                                            <option value="Kings Montessori School" {{ old('school_name') == 'Kings Montessori School' ? 'selected' : '' }}>Kings Montessori School</option>
-                                            <option value="Lakandula High School" {{ old('school_name') == 'Lakandula High School' ? 'selected' : '' }}>Lakandula High School</option>
-                                            <option value="Leandro Locsin Integrated School" {{ old('school_name') == 'Leandro Locsin Integrated School' ? 'selected' : '' }}>Leandro Locsin Integrated School</option>
-                                            <option value="Malabon National High School" {{ old('school_name') == 'Malabon National High School' ? 'selected' : '' }}>Malabon National High School</option>
-                                            <option value="Manggahan High School" {{ old('school_name') == 'Manggahan High School' ? 'selected' : '' }}>Manggahan High School</option>
-                                            <option value="Manila Cathedral School" {{ old('school_name') == 'Manila Cathedral School' ? 'selected' : '' }}>Manila Cathedral School</option>
-                                            <option value="Manuel G. Araullo High School" {{ old('school_name') == 'Manuel G. Araullo High School' ? 'selected' : '' }}>Manuel G. Araullo High School</option>
-                                            <option value="Milestone Innovative Academy" {{ old('school_name') == 'Milestone Innovative Academy' ? 'selected' : '' }}>Milestone Innovative Academy</option>
-                                            <option value="Moreh Academy Inc." {{ old('school_name') == 'Moreh Academy Inc.' ? 'selected' : '' }}>Moreh Academy Inc.</option>
-                                            <option value="Mother of Perpetual Help School, Inc." {{ old('school_name') == 'Mother of Perpetual Help School, Inc.' ? 'selected' : '' }}>Mother of Perpetual Help School, Inc.</option>
-                                            <option value="Mystical Rose School of Bulacan, Inc." {{ old('school_name') == 'Mystical Rose School of Bulacan, Inc.' ? 'selected' : '' }}>Mystical Rose School of Bulacan, Inc.</option>                                                
-                                            <option value="Mystical Rose School of Caloocan, Inc." {{ old('school_name') == 'Mystical Rose School of Caloocan, Inc.' ? 'selected' : '' }}>Mystical Rose School of Caloocan, Inc.</option>
-                                            <option value="Nazarene Catholic School" {{ old('school_name') == 'Nazarene Catholic School' ? 'selected' : '' }}>Nazarene Catholic School</option>
-                                            <option value="New Era High School" {{ old('school_name') == 'New Era High School' ? 'selected' : '' }}>New Era High School</option>
-                                            <option value="New Prodon Academy of Valenzuela" {{ old('school_name') == 'New Prodon Academy of Valenzuela' ? 'selected' : '' }}>New Prodon Academy of Valenzuela</option>
-                                            <option value="Northern Rizal Yorklin School" {{ old('school_name') == 'Northern Rizal Yorklin School' ? 'selected' : '' }}>Northern Rizal Yorklin School</option>
-                                            <option value="Nuestra Senora De Guia Academy" {{ old('school_name') == 'Nuestra Senora De Guia Academy' ? 'selected' : '' }}>Nuestra Senora De Guia Academy</option>
-                                            <option value="Nuestra Senora Del Carmen Institute" {{ old('school_name') == 'Nuestra Senora Del Carmen Institute' ? 'selected' : '' }}>Nuestra Senora Del Carmen Institute</option>
-                                            <option value="Our Lady of Fatima Catholic School, Bacood" {{ old('school_name') == 'Our Lady of Fatima Catholic School, Bacood' ? 'selected' : '' }}>Our Lady of Fatima Catholic School, Bacood</option>
-                                            <option value="Our Lady of Fatima University Quezon City" {{ old('school_name') == 'Our Lady of Fatima University Quezon City' ? 'selected' : '' }}>Our Lady of Fatima University Quezon City</option>
-                                            <option value="Our Lady of Fatima University Valenzuela" {{ old('school_name') == 'Our Lady of Fatima University Valenzuela' ? 'selected' : '' }}>Our Lady of Fatima University Valenzuela</option>
-                                            <option value="Our Lady of Peace School" {{ old('school_name') == 'Our Lady of Peace School' ? 'selected' : '' }}>Our Lady of Peace School</option>
-                                            <option value="PAREF Rosehill" {{ old('school_name') == 'PAREF Rosehill' ? 'selected' : '' }}>PAREF Rosehill</option>
-                                            <option value="Philippine Academy of Sakya" {{ old('school_name') == 'Philippine Academy of Sakya' ? 'selected' : '' }}>Philippine Academy of Sakya</option>
-                                            <option value="Riveridge School Inc." {{ old('school_name') == 'Riveridge School Inc.' ? 'selected' : '' }}>Riveridge School Inc.</option>
-                                            <option value="Rizal High School" {{ old('school_name') == 'Rizal High School' ? 'selected' : '' }}>Rizal High School</option>
-                                            <option value="Sacred Heart Academy of Novaliches" {{ old('school_name') == 'Sacred Heart Academy of Novaliches' ? 'selected' : '' }}>Sacred Heart Academy of Novaliches</option>
-                                            <option value="Sacred Heart of Jesus Catholic School" {{ old('school_name') == 'Sacred Heart of Jesus Catholic School' ? 'selected' : '' }}>Sacred Heart of Jesus Catholic School</option>
-                                            <option value="Sampaguita High School" {{ old('school_name') == 'Sampaguita High School' ? 'selected' : '' }}>Sampaguita High School</option>
-                                            <option value="San Felipe Neri Catholic School" {{ old('school_name') == 'San Felipe Neri Catholic School' ? 'selected' : '' }}>San Felipe Neri Catholic School</option>
-                                            <option value="St. Benedict School of Novaliches" {{ old('school_name') == 'St. Benedict School of Novaliches' ? 'selected' : '' }}>St. Benedict School of Novaliches</option>
-                                            <option value="St. John's Wort Montessori School" {{ old('school_name') == 'St. John Wort Montessori School' ? 'selected' : '' }}>St. John's Wort Montessori School</option>
-                                            <option value="St. Louis College Valenzuela" {{ old('school_name') == 'St. Louis College Valenzuela' ? 'selected' : '' }}>St. Louis College Valenzuela</option>
-                                            <option value="St. Mary's Angel College - Valenzuela" {{ old('school_name') == 'St. Marys Angel College - Valenzuela' ? 'selected' : '' }}>St. Mary's Angel College - Valenzuela</option>
-                                            <option value="St. Patrick School of Quezon City" {{ old('school_name') == 'St. Patrick School of Quezon City' ? 'selected' : '' }}>St. Patrick School of Quezon City</option>
-                                            <option value="St. Stephen High School" {{ old('school_name') == 'St. Stephen High School' ? 'selected' : '' }}>St. Stephen High School</option>
-                                            <option value="St. Theresa's College, Quezon City" {{ old('school_name') == 'St. Theresas College, Quezon City' ? 'selected' : '' }}>St. Theresa's College, Quezon City</option>
-                                            <option value="System Plus Computer College - Caloocan Campus" {{ old('school_name') == 'System Plus Computer College - Caloocan Campus' ? 'selected' : '' }}>System Plus Computer College - Caloocan Campus</option>
-                                            <option value="The Cardinal Academy Inc." {{ old('school_name') == 'The Cardinal Academy Inc.' ? 'selected' : '' }}>The Cardinal Academy Inc.</option>
-                                            <option value="Trinitas College" {{ old('school_name') == 'Trinitas College' ? 'selected' : '' }}>Trinitas College</option>
-                                            <option value="Trinitas School of Sta Maria" {{ old('school_name') == 'Trinitas School of Sta Maria' ? 'selected' : '' }}>Trinitas School of Sta Maria</option>
-                                            <option value="UST Angelicum College" {{ old('school_name') == 'UST Angelicum College' ? 'selected' : '' }}>UST Angelicum College</option>
-                                            <option value="Villagers Montessori College" {{ old('school_name') == 'Villagers Montessori College' ? 'selected' : '' }}>Villagers Montessori College</option>
-                                            <option value="Young Achievers School of Caloocan Inc." {{ old('school_name') == 'Young Achievers School of Caloocan Inc.' ? 'selected' : '' }}>Young Achievers School of Caloocan Inc.</option>
-                                            
-                                        </select>
-                            </div>
-
-                                <!-- Password -->
-                            <div class="mb-4">
-                                <label for="editPassword" class="form-label">Password</label>
-                                <input type="password" id="editPassword" name="password" class="form-control">
-                            </div>
-
-                            <!-- Confirm Password -->
-                            <div class="mb-4">
-                                <label for="editConfirmPassword" class="form-label">Confirm Password</label>
-                                <input type="password" id="editConfirmPassword" name="password_confirmation" class="form-control">
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" id="EditCoach" class="btn btn-primary">Save User</button>
-                        <button type="button" class="btn btn-danger delete-btn" data-id="{{ $user->id }}">Delete User</button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
 
 
 
         
 
-
-<script type="module" src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons/ionicons.esm.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   
+    
+        <script type="module" src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons/ionicons.esm.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     
    function updateStatus(userId, action) {
@@ -298,11 +206,11 @@
 <script>
     
 
-    function closeModal() {
+    function closeViewModal() {
         document.getElementById('userModal').classList.add('hidden');
     }
 
-    function openModal(is_active, firstName, lastName, schoolName, role, sports, teams, sport_category, name, birth_date, gender, userId) {
+    function openViewModal(is_active, firstName, lastName, schoolName, role, sports, teams, sport_category, name, birth_date, gender, userId) {
     // Update Name with Role
     document.getElementById('modalUserName').innerText = `${firstName} ${lastName} (${role})`;
     
