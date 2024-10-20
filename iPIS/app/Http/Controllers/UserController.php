@@ -377,6 +377,7 @@ class UserController extends Controller
     }
     public function fetchEventsGamesUser($id)
     {
+       
         // Fetch the game data by ID
         $game = Game::with(['team1', 'team2', 'comments', 'team1.coach', 'team2.coach']) // Assuming you have relationships defined
             ->findOrFail($id);
@@ -395,7 +396,13 @@ class UserController extends Controller
             ],
             'game_date' => $game->game_date,
             'sport_category' => $game->sport_category,
-            'comments' => $game->comments, 
+            'comments' => $game->comments->map(function ($comment) {
+                return [
+                    'content' => $comment->content,
+                    'admin_name' => $comment->admin ? $comment->admin->name : 'Unknown Admin',
+                ];
+            }),
+
         ]);
     }
 
@@ -682,6 +689,22 @@ class UserController extends Controller
                 'message' => 'An error occurred while updating player.',
                 'error' => $e->getMessage()
             ], 500);
+        }
+    }
+    public function deleteTeam(Request $request)
+    {
+        try {
+            // Find the player by ID
+            $team = Team::findOrFail($request->id);
+
+            // Delete the player
+            if ($team->delete()) {
+                return response()->json(['status' => 200, 'message' => 'Team deleted successfully.']);
+            } else {
+                return response()->json(['status' => 400, 'message' => 'Failed to delete Team.']);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 400, 'message' => 'Error: ' . $e->getMessage()]);
         }
     }
 }

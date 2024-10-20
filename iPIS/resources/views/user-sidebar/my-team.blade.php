@@ -25,7 +25,10 @@
                 </div>
                 <div class="col-span-3">
                     <a href="{{ route('team-management', $team->id) }}" class="btn btn-primary">View</a>
+                    <a href="javascript:void(0);" class="btn btn-danger" onclick="deleteTeam({{ $team->id }})">Delete</a>
+
                 </div>
+                
             </div>
         @endforeach
     </section>
@@ -140,4 +143,33 @@
         });
 
     </script>
+
+<script>
+    function deleteTeam(teamId) {
+        if (confirm("Are you sure you want to delete this team?")) {
+            $.ajax({
+                url: "{{ route('delete.team') }}",  // URL of the delete route
+                type: "DELETE",                   // Method for the request
+                data: {
+                    id: teamId,                   // Pass the team ID
+                    _token: "{{ csrf_token() }}"  // Include CSRF token for security
+                },
+                success: function(response) {
+                    if (response.status === 200) {
+                        alert(response.message);
+                        // Optionally, you can remove the deleted team from the UI
+                        location.reload(); // Refresh the page to update the team list
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function(xhr) {
+                    console.error(xhr.responseText);
+                    alert('An error occurred while deleting the team.');
+                }
+            });
+        }
+    }
+</script>
+
 </x-app-layout>

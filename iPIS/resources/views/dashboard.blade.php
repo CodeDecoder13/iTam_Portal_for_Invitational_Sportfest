@@ -54,7 +54,7 @@
                         <h3 class="text-xl font-bold mb-2">Standing</h3>
                     </div>
                     <div class="rounded-b-lg p-4 py-2">
-                        <ol type="1">
+                        <ul type="1">
                             <!--<li type="1" class="border text-xs flex w-full">
                                 <div class="bg-yellow-100 p-2 w-1/12">1</div>
                                 <div class="my-2 ps-2 w-6/12 border-e-2">FTICGC</div>
@@ -73,7 +73,7 @@
                                 <div class="p-2 w-3/12">Wins</div>
                                 <div class="p-2 w-2/12 font-bold">06</div>
                             </li> -->
-                        </ol>
+                        </ul>
                     </div>
                 </div>
 

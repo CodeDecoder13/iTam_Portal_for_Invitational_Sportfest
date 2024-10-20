@@ -9,18 +9,19 @@
                             <p class="mb-6">Manage and schedule games</p>
                             
                             <div class="flex justify-between items-center mb-6">
-                                <div class="relative">
+                              <!--  <div class="relative">
                                     <input type="text" placeholder="Search..." class="border rounded-md py-2 px-4 pr-10">
                                     <svg class="w-5 h-5 text-gray-500 absolute right-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                     </svg>
-                                </div>
+                                </div> 
                                 <div class="flex items-center">
                                     <span class="mr-2">View Filter</span>
                                     <select class="border rounded-md py-2 px-4">
                                         <option>Monthly</option>
                                     </select>
                                 </div>
+                                -->
                             </div>
 
                             <div id="calendar"></div>
@@ -185,9 +186,11 @@
 
                // Populate comments section
                $('#commentsSection').empty(); // Clear previous comments
-               data.comments.forEach(function(comment) {
-                   $('#commentsSection').append(`<p class="text-sm"><span class="font-semibold">${comment.user}:</span> ${comment.text}</p>`);
-               });
+                    data.comments.forEach(function(comment) {
+                        $('#commentsSection').append(
+                            `<p class="text-sm"><span class="font-semibold">${comment.admin_name}:</span> ${comment.content}</p>`
+                        );
+                    });
 
                // Show the modal
                $('#viewGameModal').removeClass('hidden');
