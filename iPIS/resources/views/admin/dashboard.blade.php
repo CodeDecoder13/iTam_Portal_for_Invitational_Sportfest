@@ -72,14 +72,15 @@
     </div>
     
     
-    <section class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <section class="container mx-auto p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Recent Documents Activities -->
         <div class="rounded-lg shadow-md">
             <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
                 <h3 class="text-xl font-bold mb-2">Recent Documents Activities</h3>
             </div>
-            <div class="rounded-b-lg p-4 py-2">
+            <div class="rounded-b-lg p-4 py-2 h-72 overflow-y-auto bg-white border border-gray-300">
                 <ul>
-                 
+                    <!-- Document activities go here -->
                 </ul>
             </div>
         </div>
@@ -87,7 +88,7 @@
             <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
                 <h3 class="text-xl font-bold mb-2">Recent Activities</h3>
             </div>
-            <div class="rounded-b-lg p-4 py-2">
+            <div class="rounded-b-lg p-4 py-2 h-72 overflow-y-auto bg-white border border-gray-300">
                 <ul id="activity-list">
                 @foreach($activities as $activity)
                     <li>
@@ -103,7 +104,7 @@
             <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
                 <h3 class="text-xl font-bold mb-2">Standing</h3>
             </div>
-            <div class="rounded-b-lg p-4 py-2">
+            <div class="rounded-b-lg p-4 py-2 h-72 overflow-y-auto bg-white border border-gray-300">
                 <ol type="1">
                  <!--    <li type="1" class="border text-xs flex w-full">
                         <div class="bg-yellow-100 p-2 w-1/12">1</div>

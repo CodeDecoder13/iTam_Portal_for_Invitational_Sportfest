@@ -1,7 +1,8 @@
 <x-app-layout>
-    <div class="container mx-auto p-6">
-        <h1 class="font-bold mb-2 text-3xl">Coaches Approval</h1>
-        <p>Manage and organize coaches</p>
+    <div class="grid grid-cols-1">
+        <h1 class="font-bold mb-2 text-3xl">Coach Approval</h1>
+        <h3>Manage and Organize Coach/Captain/School Representative</h3>
+    </div>
     
     <li class="w-full flex justify-end items-end">
        
