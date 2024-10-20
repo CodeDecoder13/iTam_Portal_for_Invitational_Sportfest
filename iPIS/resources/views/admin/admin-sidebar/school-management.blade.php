@@ -56,6 +56,7 @@
                 </div>
                 <div class="col-span-3">
                     <a href="{{ route('admin.card-school-management', $user->id) }}" class="btn btn-primary">View</a>
+                    
                 </div>
             </div>
         @endforeach

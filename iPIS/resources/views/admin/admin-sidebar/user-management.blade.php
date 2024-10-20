@@ -3,7 +3,7 @@
     <!-- User and Admin Management Section -->
     <div class="grid grid-cols-1">
         <h1 class="font-bold mb-2 text-3xl">User Management</h1>
-        <h3>Manage and Organize Users/Admins</h3>
+        <h3>Manage and Organize Admins Access</h3>
     </div>
 
 

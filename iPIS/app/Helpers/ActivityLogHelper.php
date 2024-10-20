@@ -20,4 +20,5 @@ class ActivityLogHelper
             'description' => $description,
         ]);
     }
+
 }

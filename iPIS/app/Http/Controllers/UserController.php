@@ -291,6 +291,25 @@ class UserController extends Controller
             // Call the createPlayerFolder method to create the player's folder
             $this->createPlayerFolder($player);
 
+            $user = Auth::user(); // Ensure this line is added
+
+            // Log the activity for player addition
+            ActivityLogHelper::logActivity(
+                $user->id,
+                'player_added',
+                sprintf(
+                    'Added a new player: %s %s (Jersey No: %s) to team: %s (%s)',
+                    $player->first_name,
+                    $player->last_name,
+                    $player->jersey_no,
+                    $player->team->name,
+                    $player->team->sport_category
+                )
+            );
+
+            
+
+
             return response()->json(['message' => 'Players saved successfully!']);
         } catch (\Exception $e) {
             return response()->json([

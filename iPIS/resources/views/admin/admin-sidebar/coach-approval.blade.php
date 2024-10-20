@@ -43,7 +43,7 @@
                         <!-- Conditional Activation Badge -->
                         <span class="inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full ml-2 {{ $user->is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' }}">
                             <span class="w-2 h-2 me-1 rounded-full {{ $user->is_active ? 'bg-green-500' : 'bg-red-500' }}"></span>
-                            {{ $user->is_active ? 'Activate' : 'Deactivate' }}
+                            {{ $user->is_active ? 'Active' : 'Inactive' }}
                         </span>
                     </h2>
                     <p>{{ $user->role }}</p>
@@ -522,11 +522,11 @@
             if (is_active) {
                 activationBadge.classList.add('bg-green-100', 'text-green-800', 'dark:bg-green-900', 'dark:text-green-300');
                 activationBadge.classList.remove('bg-red-100', 'text-red-800', 'dark:bg-red-900', 'dark:text-red-300');
-                activationBadge.innerHTML = `<span class="w-2 h-2 me-1 bg-green-500 rounded-full"></span> Activate`;
+                activationBadge.innerHTML = `<span class="w-2 h-2 me-1 bg-green-500 rounded-full"></span> Active`;
             } else {
                 activationBadge.classList.add('bg-red-100', 'text-red-800', 'dark:bg-red-900', 'dark:text-red-300');
                 activationBadge.classList.remove('bg-green-100', 'text-green-800', 'dark:bg-green-900', 'dark:text-green-300');
-                activationBadge.innerHTML = `<span class="w-2 h-2 me-1 bg-red-500 rounded-full"></span> Deactivate`;
+                activationBadge.innerHTML = `<span class="w-2 h-2 me-1 bg-red-500 rounded-full"></span> Unactivate`;
             }
 
             // Set button actions with the correct user ID
