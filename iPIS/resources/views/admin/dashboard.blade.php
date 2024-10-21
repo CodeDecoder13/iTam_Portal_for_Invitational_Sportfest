@@ -106,7 +106,7 @@
             </div>
             <div class="rounded-b-lg p-4 py-2 h-72 overflow-y-auto bg-white border border-gray-300">
                 <ol type="1">
-                 <!--    <li type="1" class="border text-xs flex w-full">
+                    <li type="1" class="border text-xs flex w-full">
                         <div class="bg-yellow-100 p-2 w-1/12">1</div>
                         <div class="my-2 ps-2 w-6/12 border-e-2">FTICGC</div>
                         <div class="p-2 w-3/12">Wins</div>
@@ -123,19 +123,23 @@
                         <div class="my-2 ps-2 w-6/12 border-e-2">FTICGC</div>
                         <div class="p-2 w-3/12">Wins</div>
                         <div class="p-2 w-2/12 font-bold">06</div>
-                    </li> -->
+                    </li> 
                 </ol>
             </div>
         </div>
     </section>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/relativeTime.js"></script>
 <script>
+    dayjs.extend(dayjs_plugin_relativeTime); // Enable the relative time plugin
+
     let lastActivityId = null; // Variable to keep track of the last activity ID
 
     function fetchActivities() {
         $.ajax({
-            url: '/activities',
+            url: '/admin/activities',
             method: 'GET',
             success: function(data) {
                 // Check if there are new activities
@@ -150,11 +154,14 @@
 
                     // Loop through the activities and append them to the list
                     data.forEach(function(activity) {
+                        // Convert created_at to relative time using Day.js
+                        var timeAgo = dayjs(activity.created_at).fromNow();
+
                         $('#activity-list').append(
                             '<li>' +
                                 '<strong>' + activity.first_name + ' ' + activity.last_name + ' (' + (activity.role || 'No role') + ' - ' + (activity.school_name || 'No school') + '):</strong> ' +
                                 activity.description + 
-                                ' <small>(' + activity.created_at + ')</small>' +
+                                ' <small>(' + timeAgo + ')</small>' + // Use relative time
                             '</li>'
                         );
 
@@ -174,4 +181,5 @@
     // Fetch activities every 2 seconds
     setInterval(fetchActivities, 2000);
 </script>
+
 </x-app-layout>
