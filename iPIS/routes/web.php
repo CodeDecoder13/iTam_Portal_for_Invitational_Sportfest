@@ -71,6 +71,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/school-management', [AdminController::class, 'schoolManagement'])->name('admin.school-management');
     Route::get('/user-management', [AdminController::class, 'usersManagement'])->name('admin.user-management');
     Route::get('/coach-approval', [AdminController::class, 'coachApproval'])->name('admin.coach-approval');
+    Route::get('/logs-system', [AdminController::class, 'logSystem'])->name('admin.logs-system');
     Route::post('/update-status/{id}', [AdminController::class, 'updateStatus'])->name('admin.update-status');
     Route::get('/teams/{id}', [AdminController::class, 'showteam'])->name('admin.showteams');
     Route::get('/players-team-documents', [AdminController::class, 'teamdocuments'])->name('admin.playersTeamDocuments');
@@ -118,6 +119,10 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/player-document/{playerId}/{documentType}', [PlayerDocumentController::class, 'getDocument']);
     Route::get('/player-comments/{playerId}/{documentType}', [PlayerDocumentController::class, 'getComments']);
     Route::post('/player-comments', [PlayerDocumentController::class, 'addComment']);
+});
+// added for Logs Management Module
+Route::prefix('admin')->middleware(['auth:admin'])->group(function () { 
+
 });
 //added for document checker
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {

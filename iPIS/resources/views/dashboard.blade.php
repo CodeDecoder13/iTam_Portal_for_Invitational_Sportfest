@@ -33,7 +33,7 @@
                     </div>
                     <div class="rounded-b-lg p-4 py-2">
                         <ul>
-                          <!--   <li class="border text-xs p-2 flex">
+                            <li class="border text-xs p-2 flex">
                                 <div class="w-8/12 border-e-2 flex-grow flex">
                                     <div><img width="15" class="img-fluid" src="/images/userlogo.png" /></div>
                                     <div class="text-center">
@@ -45,7 +45,7 @@
                                 <div class="w-4/12 text-end">
                                     <p class="font-bold">Sept. 11, 2024</p>
                                 </div>
-                            </li> -->
+                            </li> 
                         </ul>
                     </div>
                 </div>
