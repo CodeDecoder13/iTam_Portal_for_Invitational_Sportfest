@@ -295,15 +295,13 @@ class UserController extends Controller
 
             // Log the activity for player addition
             ActivityLogHelper::logActivity(
-                $user->id,
+                $user,  // Pass the authenticated user object
                 'player_added',
                 sprintf(
-                    'Added a new player: %s %s (Jersey No: %s) to team: %s (%s)',
+                    'added a new player: %s %s, Jersey No: %s',
                     $player->first_name,
                     $player->last_name,
-                    $player->jersey_no,
-                    $player->team->name,
-                    $player->team->sport_category
+                    $player->jersey_no
                 )
             );
 
@@ -505,14 +503,30 @@ class UserController extends Controller
         return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
     }
    
+
     public function deletePlayer(Request $request)
     {
         try {
             // Find the player by ID
             $player = Player::findOrFail($request->id);
 
+            // Get the current authenticated user (coach)
+            $user = Auth::user();
+
             // Delete the player
             if ($player->delete()) {
+                // Log the activity for player deletion
+                ActivityLogHelper::logActivity(
+                    $user,  // Pass the authenticated coach user object
+                    'player_deleted',
+                    sprintf(
+                        'deleted player: %s %s, Jersey No: %s',
+                        $player->first_name,
+                        $player->last_name,
+                        $player->jersey_no
+                    )
+                );
+
                 return response()->json(['status' => 200, 'message' => 'Player deleted successfully.']);
             } else {
                 return response()->json(['status' => 400, 'message' => 'Failed to delete player.']);
@@ -662,6 +676,20 @@ class UserController extends Controller
             // Call the createPlayerFolder method to create the player's folder
             $this->createPlayerFolder($player);
 
+            $user = Auth::user(); // Ensure this line is added
+
+            // Log the activity for player addition
+            ActivityLogHelper::logActivity(
+                $user,  // Pass the authenticated user object
+                'player_added',
+                sprintf(
+                    'added a new player: %s %s, Jersey No: %s',
+                    $player->first_name,
+                    $player->last_name,
+                    $player->jersey_no
+                )
+            );
+
             return response()->json(['success' => true, 'message' => 'Player added successfully!']);
         } catch (\Exception $e) {
             return response()->json([
@@ -713,11 +741,25 @@ class UserController extends Controller
     public function deleteTeam(Request $request)
     {
         try {
-            // Find the player by ID
+            // Find the team by ID
             $team = Team::findOrFail($request->id);
 
-            // Delete the player
+            // Get the current authenticated coach or user
+            $user = Auth::user();
+
+            // Delete the team
             if ($team->delete()) {
+                // Log the activity for team deletion
+                ActivityLogHelper::logActivity(
+                    $user,  // Pass the authenticated user (coach or admin)
+                    'team_deleted',
+                    sprintf(
+                        'deleted team: %s (%s)',
+                        $team->name,
+                        $team->sport_category
+                    )
+                );
+
                 return response()->json(['status' => 200, 'message' => 'Team deleted successfully.']);
             } else {
                 return response()->json(['status' => 400, 'message' => 'Failed to delete Team.']);
