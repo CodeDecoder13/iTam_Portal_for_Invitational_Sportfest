@@ -330,34 +330,40 @@ class AdminController extends Controller
     //   return view('admin.admin-sidebar.coach-approval');
     // }
     public function coachApproval(Request $request)
-    {
-        try {
-            // Select all users with their corresponding team info
-            $users = User::select('users.id', 'users.first_name', 'users.last_name', 'users.email', 'users.school_name', 'users.role','users.gender','users.birth_date', 'users.is_active', 'users.created_at')
-                ->leftJoin('teams', 'teams.coach_id', '=', 'users.id') // Joining teams table on coach_id
-                ->groupBy('users.id', 'users.first_name', 'users.last_name', 'users.email', 'users.school_name', 'users.role','users.gender','users.birth_date', 'users.is_active', 'users.created_at')
-                ->get();
+{
+    try {
+        $query = User::select('users.id', 'users.first_name', 'users.last_name', 'users.email', 'users.school_name', 'users.role', 'users.gender', 'users.birth_date', 'users.is_active', 'users.created_at')
+            ->leftJoin('teams', 'teams.coach_id', '=', 'users.id') // Joining teams table on coach_id
+            ->groupBy('users.id', 'users.first_name', 'users.last_name', 'users.email', 'users.school_name', 'users.role', 'users.gender', 'users.birth_date', 'users.is_active', 'users.created_at');
 
-
-            // Fetch all teams
-            $teams = Team::select('teams.id', 'teams.name', 'teams.sport_category', 'teams.created_at', 'teams.coach_id')
-                ->get();
-
-            // Logging data to ensure it's being fetched correctly
-            Log::info('Fetched users: ', $users->toArray());
-            Log::info('Fetched teams: ', $teams->toArray());
-
-            $data = [
-                'users' => $users,
-                'teams' => $teams
-            ];
-
-            return view('admin.admin-sidebar.coach-approval', compact('data'));
-        } catch (\Exception $e) {
-            Log::error('Error fetching coach approval data: ' . $e->getMessage());
-            return response()->json(['message' => $e->getMessage(), 'code' => $e->getCode()], 500);
+        // Check if there is a search term
+        if ($request->has('term') && $request->term !== '') {
+            $searchTerm = $request->term;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('users.first_name', 'LIKE', '%' . $searchTerm . '%')
+                  ->orWhere('users.last_name', 'LIKE', '%' . $searchTerm . '%')
+                  ->orWhereRaw("CONCAT(users.first_name, ' ', users.last_name) LIKE ?", '%' . $searchTerm . '%');
+            });
         }
+
+        $users = $query->get();
+
+        // Fetch all teams
+        $teams = Team::select('teams.id', 'teams.name', 'teams.sport_category', 'teams.created_at', 'teams.coach_id')->get();
+
+        $data = [
+            'users' => $users,
+            'teams' => $teams
+        ];
+
+        return view('admin.admin-sidebar.coach-approval', compact('data')); // Render the view with the data
+    } catch (\Exception $e) {
+        return response()->json(['message' => $e->getMessage(), 'code' => $e->getCode()], 500);
     }
+}
+
+
+
 
 
 

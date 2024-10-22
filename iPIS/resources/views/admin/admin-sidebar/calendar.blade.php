@@ -1,9 +1,15 @@
 <x-app-layout>
+    <div class="grid grid-cols-1">
+        <h1 class="font-bold mb-2 text-3xl">Coach Approval</h1>
+        <h3>Manage and Organize Coach/Captain/School Representative</h3>
+    </div>
     <div class="container mx-auto p-6">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="font-bold mb-2 text-3xl">Calendar</h1>
             <div>
-                <button id="openAddGameModal" class="bg-green-700 text-white px-4 py-2 rounded-md mr-2">
+                <!-- You can add content for the left side here if needed -->
+            </div>
+            <div>
+                <button id="openAddGameModal" class="bg-green-700 text-white px-4 py-2 rounded-md">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20"
                         fill="currentColor">
                         <path fill-rule="evenodd"
@@ -12,10 +18,9 @@
                     </svg>
                     Add Game
                 </button>
-
             </div>
         </div>
-        <p class="mb-6">Manage and schedule games</p>
+        
 
         <!--
         <div class="flex justify-between items-center mb-6">

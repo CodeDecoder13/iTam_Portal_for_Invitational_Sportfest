@@ -6,17 +6,19 @@
 
     <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
         <!-- Search bar -->
-        <div class="relative w-full sm:w-64">
-            <input 
-                type="text" 
-                class="pl-10 pr-4 py-2 w-full bg-white rounded-full shadow-sm focus:ring-2 focus:ring-green-300" 
-                placeholder="Search coaches..."
-                id="searchTerm"
-            />
-            <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16l-3-3m0 0l3-3m-3 3h12M13 16l-3-3m0 0l3-3m-3 3h12"></path>
-            </svg>
-        </div>
+    <div class="relative w-full sm:w-64">
+        <input 
+            type="text" 
+            class="pl-10 pr-4 py-2 w-full bg-white rounded-full shadow-sm focus:ring-2 focus:ring-green-300" 
+            placeholder="Search coaches..."
+            id="searchTerm"
+        />
+        <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16l-3-3m0 0l3-3m-3 3h12M13 16l-3-3m0 0l3-3m-3 3h12"></path>
+        </svg>
+    </div>
+    <!-- Results container -->
+    <div id="searchResults" class="mt-4"></div>
     
         <!-- Add New Coach button -->
         <li class="w-full sm:w-auto flex justify-end items-end">
@@ -712,6 +714,42 @@ $(document).ready(function() {
             }
         });
         });
+        </script>
+        <script>
+            $(document).ready(function() {
+                $('#searchTerm').on('input', function() {
+                    var searchTerm = $(this).val();
+                    if (searchTerm.length > 0) {
+                        $.ajax({
+                            url: '{{ route('search.coaches') }}', // Define your route for searching
+                            type: 'GET',
+                            data: { term: searchTerm },
+                            success: function(response) {
+                                // Clear previous results
+                                $('#searchResults').empty();
+        
+                                // Check if there are results
+                                if (response.length > 0) {
+                                    response.forEach(function(user) {
+                                        $('#searchResults').append(`
+                                            <div class="p-2 border-b border-gray-300">
+                                                ${user.first_name} ${user.last_name} - ${user.email}
+                                            </div>
+                                        `);
+                                    });
+                                } else {
+                                    $('#searchResults').append('<div class="p-2">No results found</div>');
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Search error:', xhr.responseText);
+                            }
+                        });
+                    } else {
+                        $('#searchResults').empty(); // Clear results when input is empty
+                    }
+                });
+            });
         </script>
 
 </x-app-layout>
