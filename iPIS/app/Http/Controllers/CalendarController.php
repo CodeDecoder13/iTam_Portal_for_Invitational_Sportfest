@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Team;
-use App\Models\Comment;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Http\Request;
 use App\Models\Game;
+use App\Models\Team;
+use App\Models\User;
+use App\Models\Comment;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -14,8 +15,13 @@ class CalendarController extends Controller
 {
     public function calendar()
     {
-        return view('admin.admin-sidebar.calendar');
+        // Fetch all games
+        $games = Game::all();
+
+        // Pass the games to the Blade view
+        return view('admin.admin-sidebar.calendar', compact('games'));
     }
+
 
 
     public function getSchool(Request $request)
@@ -148,4 +154,23 @@ class CalendarController extends Controller
 
         return response()->json(['message' => 'Comment added successfully!', 'comment' => $comment], 201);
     }
+    public function deleteGame(Request $request)
+    {
+        
+
+        try {
+            // Fetch the game by ID
+            $game = Game::findOrFail($request->id);
+            
+            // Delete the game
+            $game->delete();
+            
+            return response()->json(['status' => 200, 'message' => 'Game deleted successfully!']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 404, 'message' => 'Game not found or could not be deleted.'], 404);
+        }
+    }
+
+
+
 }
