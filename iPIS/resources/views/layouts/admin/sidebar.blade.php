@@ -158,6 +158,14 @@
             Coach Approval
         </a>
     </li>
+    @if (Auth::guard('admin')->check() && (Auth::guard('admin')->user()->role === 'SysAdmin'))
+    <li class="nav-item">
+        <a href="{{ route('admin.logs-system') }}" class="nav-link {{ request()->is('admin/logs-system*') ? 'active' : '' }}">
+            <ion-icon name="cloud"></ion-icon>
+            Logs Management
+        </a>
+    </li>
+    @endif
 </ul>
         
     </ul>
