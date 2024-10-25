@@ -1,9 +1,15 @@
 <x-app-layout>
+    <div class="grid grid-cols-1">
+        <h1 class="font-bold mb-2 text-3xl">Coach Approval</h1>
+        <h3>Manage and Organize Coach/Captain/School Representative</h3>
+    </div>
     <div class="container mx-auto p-6">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="font-bold mb-2 text-3xl">Calendar</h1>
             <div>
-                <button id="openAddGameModal" class="bg-green-700 text-white px-4 py-2 rounded-md mr-2">
+                <!-- You can add content for the left side here if needed -->
+            </div>
+            <div>
+                <button id="openAddGameModal" class="bg-green-700 text-white px-4 py-2 rounded-md">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20"
                         fill="currentColor">
                         <path fill-rule="evenodd"
@@ -12,10 +18,9 @@
                     </svg>
                     Add Game
                 </button>
-
             </div>
         </div>
-        <p class="mb-6">Manage and schedule games</p>
+        
 
         <!--
         <div class="flex justify-between items-center mb-6">
@@ -150,8 +155,12 @@
                         Scores</button>
                     <button id="setDefaultBtn" class="bg-yellow-500 text-white px-3 py-1 rounded-md text-sm mr-2">Set
                         Default</button>
-                    <button id="deleteMatchBtn" class="bg-red-500 text-white px-3 py-1 rounded-md text-sm">Delete
-                        Match</button>
+                        @foreach($games as $game)
+                            <button id="deleteMatchBtn" data-id="{{ $game->id }}" class="bg-red-500 text-white px-3 py-1 rounded-md text-sm delete-btn">
+                                Delete Match </button>
+
+                                
+                        @endforeach
                 </div>
             </div>
 
@@ -533,4 +542,31 @@
             });
         });
     </script>
+    <script>
+        $(document).on('click', '.delete-btn', function() {
+    var gameId = $(this).data('id'); // Get the player ID from the button
+    if (confirm('Are you sure you want to delete this Game Match?')) {
+        $.ajax({
+            url: '{{ route('admin.delete.game') }}', // Route for deleting player
+            type: 'DELETE',
+            data: { id: gameId }, // Player ID being sent to the server
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // CSRF token for security
+            },
+            success: function(response) {
+                if (response.status === 200) {
+                    alert(response.message); // Show success message
+                    location.reload(); // Reload the page to reflect changes
+                } else {
+                    alert(response.message); // Show error message if any
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Error: ' + error); // Show generic error message
+            }
+        });
+    }
+});
+    </script>
+    
 </x-app-layout>

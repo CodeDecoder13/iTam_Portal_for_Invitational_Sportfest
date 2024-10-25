@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Helpers;
+namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Models\ActivityLog;
 
-class ActivityLogHelper
+class UserActivityLogHelper extends Controller
 {
-    public static function logActivity($user, $activityType, $details)
+    public static function userLogActivity($user, $activityType, $details)
     {
         $description = $details;
 
@@ -20,5 +21,4 @@ class ActivityLogHelper
             'description' => $description,
         ]);
     }
-
 }

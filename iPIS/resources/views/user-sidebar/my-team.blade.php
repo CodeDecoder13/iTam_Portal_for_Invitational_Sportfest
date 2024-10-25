@@ -25,7 +25,10 @@
                 </div>
                 <div class="col-span-3">
                     <a href="{{ route('team-management', $team->id) }}" class="btn btn-primary">View</a>
+                    <button type="button" id="deleteTeam" class="btn btn-danger btn-sm delete-btn" data-id="{{ $team->id }}"><i class="fas fa-trash-alt"></i> Delete</button>
+
                 </div>
+                
             </div>
         @endforeach
     </section>
@@ -140,4 +143,33 @@
         });
 
     </script>
+
+<script>
+     // for delete player
+     $(document).on('click', '.delete-btn', function() {
+    var teamId = $(this).data('id'); // Get the player ID from the button
+    if (confirm('Are you sure you want to delete this team?')) {
+        $.ajax({
+            url: '{{ route('delete.team') }}', // Route for deleting player
+            type: 'DELETE',
+            data: { id: teamId }, // Player ID being sent to the server
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // CSRF token for security
+            },
+            success: function(response) {
+                if (response.status === 200) {
+                    alert(response.message); // Show success message
+                    location.reload(); // Reload the page to reflect changes
+                } else {
+                    alert(response.message); // Show error message if any
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Error: ' + error); // Show generic error message
+            }
+        });
+    }
+});
+</script>
+
 </x-app-layout>

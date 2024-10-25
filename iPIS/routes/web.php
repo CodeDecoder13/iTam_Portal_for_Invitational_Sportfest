@@ -36,6 +36,7 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/my-players', [UserController::class, 'myPlayers'])->name('my-players');
     Route::get('/add-teams', [UserController::class, 'addTeams'])->name('add-teams');
     Route::post('/store/team', [UserController::class, 'storeTeam'])->name('store.team');
+    Route::delete('/delete-team', [UserController::class, 'deleteTeam'])->name('delete.team');
     Route::get('/add-players', [UserController::class, 'addPlayers'])->name('add-players');
     Route::post('/store-players', [UserController::class, 'storePlayers'])->name('store.players');
     Route::post('/update-players', [UserController::class, 'updatePlayers'])->name('update.players');
@@ -70,6 +71,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/school-management', [AdminController::class, 'schoolManagement'])->name('admin.school-management');
     Route::get('/user-management', [AdminController::class, 'usersManagement'])->name('admin.user-management');
     Route::get('/coach-approval', [AdminController::class, 'coachApproval'])->name('admin.coach-approval');
+    Route::get('/logs-system', [AdminController::class, 'logSystem'])->name('admin.logs-system');
     Route::post('/update-status/{id}', [AdminController::class, 'updateStatus'])->name('admin.update-status');
     Route::get('/teams/{id}', [AdminController::class, 'showteam'])->name('admin.showteams');
     Route::get('/players-team-documents', [AdminController::class, 'teamdocuments'])->name('admin.playersTeamDocuments');
@@ -84,6 +86,8 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/get-games', [CalendarController::class, 'getGames'])->name('admin.get.games');
     Route::get('/official-game/{id}', [CalendarController::class, 'fetchEventsGames'])->name('admin.official-game');
     Route::post('/admin/comments', [CalendarController::class, 'addComment'])->name('admin.add.comment');
+    Route::delete('/delete-game', [CalendarController::class, 'deleteGame'])->name('admin.delete.game');
+
     
 
 });
@@ -111,12 +115,18 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::post('/admin/coach/update', [AdminController::class, 'updateUser'])->name('admin.users.update');
     Route::delete('/admin/delete-coach', [AdminController::class, 'deleteCoach'])->name('delete.coach');
     Route::post('/store-user-accounts', [AdminController::class, 'storeUser'])->name('admin.store-user');
+    Route::get('/search-coaches', [AdminController::class, 'coachApproval'])->name('search.coaches');
+
 });
 // added for Document Module
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {     
     Route::get('/player-document/{playerId}/{documentType}', [PlayerDocumentController::class, 'getDocument']);
     Route::get('/player-comments/{playerId}/{documentType}', [PlayerDocumentController::class, 'getComments']);
     Route::post('/player-comments', [PlayerDocumentController::class, 'addComment']);
+});
+// added for Logs Management Module
+Route::prefix('admin')->middleware(['auth:admin'])->group(function () { 
+
 });
 //added for document checker
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
