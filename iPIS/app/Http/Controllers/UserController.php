@@ -441,67 +441,61 @@ class UserController extends Controller
         return view('user-sidebar.add-teams');
     }
     public function storeTeam(Request $request)
-    {
-        // Validate the incoming request
-        $validator = Validator::make($request->all(), [
-            'sport' => 'required|string',
-            'team_name' => 'required|string|max:255',
-            'team_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:25600',
-        ]);
+{
+    // Validate the incoming request
+    $validator = Validator::make($request->all(), [
+        'sport' => 'required|string',
+        'team_name' => 'required|string|max:255',
+        'team_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:25600',
+    ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-        // Handle the team logo upload
-        if ($request->hasFile('team_logo')) {
-            $teamLogoPath = $request->file('team_logo')->store('public/team_logos');
-            $teamLogoPath = str_replace('public/', '', $teamLogoPath);
-        } else {
-            $teamLogoPath = null;
-        }
-
-        // Get the currently signed-in user's ID
-        $coachId = auth()->user()->id;
-
-        // Create or update the team
-        $team = Team::updateOrCreate(
-            ['name' => $request->input('team_name')],
-            [
-                'sport_category' => $request->input('sport'),
-                'coach_id' => $coachId,
-                'logo_path' => $teamLogoPath,
-            ]
-        );
-
-        // Fetch the school name and sport category from the team model
-        $coach = $team->coach;
-        $schoolName = $coach->school_name;
-        $sportCategory = $team->sport_category;
-
-        // Define the path for the sport category folder
-        $teamFolderPath = "public/{$schoolName}/{$sportCategory}";
-
-        // Check if the folder already exists
-        if (!Storage::exists($teamFolderPath)) {
-            // Create the folder
-            Storage::makeDirectory($teamFolderPath);
-        }
-        $user = Auth::user(); // Ensure this line is added
-          // Log the activity for team addition
-          ActivityLogHelper::logActivity(
-            $user->id,
-            'team_added',
-            sprintf(
-                'added a new team: %s (%s)',
-                $team->name,
-                $team->sport_category
-            )
-        );
-
-        // Return a response
-        return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
     }
+
+    // Get the currently signed-in user's ID
+    $coachId = auth()->user()->id;
+
+    // Fetch the coach's school name
+    $coach = User::find($coachId); // Assuming you have a Coach model related to the User
+    $schoolName = $coach ? $coach->school_name : 'default';
+
+    // Sanitize the school name to remove special characters for the folder name
+    $sanitizedSchoolName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $schoolName);
+
+    // Define the path for storing the team logo
+    $teamFolderPath = "public/{$sanitizedSchoolName}";
+
+    // Check if the folder exists, and if not, create it
+    if (!Storage::exists($teamFolderPath)) {
+        Storage::makeDirectory($teamFolderPath);
+    }
+
+    // Handle the team logo upload
+    if ($request->hasFile('team_logo')) {
+        $teamLogoPath = $request->file('team_logo')->store("{$teamFolderPath}/team_logos");
+        $teamLogoPath = str_replace('public/', '', $teamLogoPath);
+    } else {
+        $teamLogoPath = null;
+    }
+
+    // Create or update the team
+    $team = Team::updateOrCreate(
+        ['name' => $request->input('team_name')],
+        [
+            'sport_category' => $request->input('sport'),
+            'coach_id' => $coachId,
+            'logo_path' => $teamLogoPath,
+        ]
+    );
+
+    // Return a response
+    return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
+}
+
+
+    
+
    
 
     public function deletePlayer(Request $request)
