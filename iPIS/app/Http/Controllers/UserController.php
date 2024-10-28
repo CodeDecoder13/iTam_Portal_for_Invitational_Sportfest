@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Helpers\ActivityLogHelper;
 
+
 class UserController extends Controller
 {
     public function dashboard()
@@ -441,67 +442,70 @@ class UserController extends Controller
         return view('user-sidebar.add-teams');
     }
     public function storeTeam(Request $request)
-{
+    {
+        // Validate the incoming request
+        $validator = Validator::make($request->all(), [
+            'sport' => 'required|string',
+            'team_name' => 'required|string|max:255',
+            'team_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:25600',
+        ]);
     
-
-    // Validate the incoming request
-    $validator = Validator::make($request->all(), [
-        'sport' => 'required|string',
-        'team_name' => 'required|string|max:255',
-        'team_logo' => 'required|image|mimes:jpeg,png,jpg,gif|max:25600',
-    ]);
-
-    if ($validator->fails()) {
-        return response()->json(['errors' => $validator->errors()], 422);
-    }
-
-    // Check if the file is uploaded correctly
-    if (!$request->hasFile('team_logo') || !$request->file('team_logo')->isValid()) {
-        \Log::warning('No valid file uploaded for team_logo.');
-        return response()->json(['message' => 'Logo upload failed, file not found!'], 400);
-    }
-
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
     
+        // Get the currently signed-in user's ID
+        $coachId = auth()->user()->id;
+    
+        // Fetch the school name from the authenticated user
+        $coach = Auth::user();
+        $schoolName = $coach->school_name;
+        $sportCategory = $request->input('sport');
+    
+        // Define the path for the sport category folder
+        $teamFolderPath = "public/{$schoolName}/{$sportCategory}";
+    
+        // Check if the folder already exists; if not, create it
+        if (!Storage::exists($teamFolderPath)) {
+            Storage::makeDirectory($teamFolderPath);
+        }
+    
+        // Handle the team logo upload
+        if ($request->hasFile('team_logo')) {
+            // Store the logo in the defined folder path
+            $teamLogoPath = $request->file('team_logo')->store("{$teamFolderPath}/team_logos");
+            $teamLogoPath = str_replace('public/', '', $teamLogoPath); // Remove 'public/' from the path for easy retrieval
+        } else {
+            $teamLogoPath = null;
+        }
+    
+        // Create or update the team
+        $team = Team::updateOrCreate(
+            ['name' => $request->input('team_name')],
+            [
+                'sport_category' => $sportCategory,
+                'coach_id' => $coachId,
+                'logo_path' => $teamLogoPath,
+            ]
+        );
 
-    // Get the currently signed-in user's ID
-    $coachId = auth()->user()->id;
-    $coach = User::find($coachId);
-    $schoolName = $coach ? $coach->school_name : 'default';
-    $sanitizedSchoolName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $schoolName);
-    $teamFolderPath = "public/{$sanitizedSchoolName}";
-
-    // Create directory if it doesn't exist
-    if (!Storage::exists($teamFolderPath)) {
-        Storage::makeDirectory($teamFolderPath);
+        ActivityLogHelper::logActivity(
+            Auth::id(),
+            'team_added',
+            sprintf(
+                'added a new team: %s (%s)',
+                $team->name,
+                $team->sport_category
+            )
+        );
+    
+       
+    
+    
+        // Return a response
+        return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
     }
 
-    // Store the logo with a specific name
-    $extension = $request->file('team_logo')->getClientOriginalExtension();
-    $logoFileName = 'logo.' . $extension;
-    $logoPath = $request->file('team_logo')->storeAs("{$teamFolderPath}/team_logos", $logoFileName);
-    $logoPath = str_replace('public/', '', $logoPath);
-
-   
-    // Create or update the team
-    $team = Team::updateOrCreate(
-        ['name' => $request->input('team_name')],
-        [
-            'sport_category' => $request->input('sport'),
-            'coach_id' => $coachId,
-            'logo_path' => $logoPath,
-        ]
-    );
-    // Define the user variable
-    $user = Auth::user(); // Ensure this line is added
-    // Log the activity for team addition
-    ActivityLogHelper::logActivity(
-        $user,
-        'team_added',
-        sprintf('added a new team: %s (%s)', $team->name, $team->sport_category)
-    );
-
-    return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
-}
 
 
 
