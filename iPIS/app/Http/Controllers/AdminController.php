@@ -454,6 +454,10 @@ class AdminController extends Controller
 
         return view('admin.admin-sidebar.sub-school-management.card-school-management', compact('user', 'team', 'players'));
     }
+
+
+
+
     // added player management 
     public function playerManagement($id)
     {

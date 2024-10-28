@@ -442,42 +442,44 @@ class UserController extends Controller
     }
     public function storeTeam(Request $request)
 {
+    
+
     // Validate the incoming request
     $validator = Validator::make($request->all(), [
         'sport' => 'required|string',
         'team_name' => 'required|string|max:255',
-        'team_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:25600',
+        'team_logo' => 'required|image|mimes:jpeg,png,jpg,gif|max:25600',
     ]);
 
     if ($validator->fails()) {
         return response()->json(['errors' => $validator->errors()], 422);
     }
 
+    // Check if the file is uploaded correctly
+    if (!$request->hasFile('team_logo') || !$request->file('team_logo')->isValid()) {
+        \Log::warning('No valid file uploaded for team_logo.');
+        return response()->json(['message' => 'Logo upload failed, file not found!'], 400);
+    }
+
+    
+
     // Get the currently signed-in user's ID
     $coachId = auth()->user()->id;
-
-    // Fetch the coach's school name
-    $coach = User::find($coachId); // Assuming you have a Coach model related to the User
+    $coach = User::find($coachId);
     $schoolName = $coach ? $coach->school_name : 'default';
-
-    // Sanitize the school name to remove special characters for the folder name
     $sanitizedSchoolName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $schoolName);
-
-    // Define the path for storing the team logo
     $teamFolderPath = "public/{$sanitizedSchoolName}";
 
-    // Check if the folder exists, and if not, create it
+    // Create directory if it doesn't exist
     if (!Storage::exists($teamFolderPath)) {
         Storage::makeDirectory($teamFolderPath);
     }
 
-    // Handle the team logo upload
-    if ($request->hasFile('team_logo')) {
-        $teamLogoPath = $request->file('team_logo')->store("{$teamFolderPath}/team_logos");
-        $teamLogoPath = str_replace('public/', '', $teamLogoPath);
-    } else {
-        $teamLogoPath = null;
-    }
+    // Store the logo with a specific name
+    $extension = $request->file('team_logo')->getClientOriginalExtension();
+    $logoFileName = 'logo.' . $extension;
+    $logoPath = $request->file('team_logo')->storeAs("{$teamFolderPath}/team_logos", $logoFileName);
+    $logoPath = str_replace('public/', '', $logoPath);
 
     // Create or update the team
     $team = Team::updateOrCreate(
@@ -485,13 +487,14 @@ class UserController extends Controller
         [
             'sport_category' => $request->input('sport'),
             'coach_id' => $coachId,
-            'logo_path' => $teamLogoPath,
+            'logo_path' => $logoPath,
         ]
     );
 
-    // Return a response
     return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
 }
+
+
 
 
     

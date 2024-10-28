@@ -635,9 +635,9 @@ $(document).ready(function() {
         var id = $(this).data('id'); // Get the game ID from the button's data-id attribute
         console.log('Attempting to delete game with ID:', id);
 
-        if (confirm('Are you sure you want to delete this match?')) {
+        if (confirm('Are you sure you want to delete this user?')) {
             $.ajax({
-                url: '{{ route('admin.delete.game') }}', // Use the correct named route for game deletion
+                url: '{{ route('admin.delete.coach') }}', // Use the correct named route for game deletion
                 type: 'DELETE', // Use DELETE request
                 data: { id: id }, // Pass the game ID
                 headers: {

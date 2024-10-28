@@ -113,7 +113,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/admin/users/{id}/edit', [AdminController::class, 'edit'])->name('admin.users.edit');
     Route::post('/admin/coach/update', [AdminController::class, 'updateUser'])->name('admin.users.update');
-    Route::delete('/admin/delete-coach', [AdminController::class, 'deleteCoach'])->name('delete.coach');
+    Route::delete('/admin/delete-coach', [AdminController::class, 'deleteCoach'])->name('admin.delete.coach');
     Route::post('/store-user-accounts', [AdminController::class, 'storeUser'])->name('admin.store-user');
     Route::get('/search-coaches', [AdminController::class, 'coachApproval'])->name('search.coaches');
 
