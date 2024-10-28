@@ -481,6 +481,7 @@ class UserController extends Controller
     $logoPath = $request->file('team_logo')->storeAs("{$teamFolderPath}/team_logos", $logoFileName);
     $logoPath = str_replace('public/', '', $logoPath);
 
+   
     // Create or update the team
     $team = Team::updateOrCreate(
         ['name' => $request->input('team_name')],
@@ -489,6 +490,14 @@ class UserController extends Controller
             'coach_id' => $coachId,
             'logo_path' => $logoPath,
         ]
+    );
+    // Define the user variable
+    $user = Auth::user(); // Ensure this line is added
+    // Log the activity for team addition
+    ActivityLogHelper::logActivity(
+        $user,
+        'team_added',
+        sprintf('added a new team: %s (%s)', $team->name, $team->sport_category)
     );
 
     return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
@@ -571,23 +580,19 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'sport' => 'required|string',
             'team_name' => 'required|string|max:255',
-            'team_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:25600',
+            
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $teamLogoPath = null;
-        if ($request->hasFile('team_logo')) {
-            $teamLogoPath = $request->file('team_logo')->store('team_logos', 'public');
-        }
+      
 
         $team = Team::create([
             'name' => $request->team_name,
             'sport_category' => $request->sport,
             'coach_id' => Auth::id(),
-            'logo_path' => $teamLogoPath,
             'is_active' => true,
         ]);
 

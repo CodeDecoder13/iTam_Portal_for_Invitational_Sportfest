@@ -1,11 +1,10 @@
 <x-app-layout>
-    <section class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-    </section>
     <section class="grid grid-cols-1">
         <h1 class="font-bold mb-2 text-3xl">School Management</h1>
         <h3>Manage and Organize School Players</h3>
+
         <div class="w-full flex justify-end items-end mb-4">
-            <button class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded" data-bs-toggle="modal" data-bs-target="#addUserModal">
+            <button class="bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 rounded" data-bs-toggle="modal" data-bs-target="#addUserModal">
                 <span class="text-lg mr-1">+</span>Add New Coach
             </button>
         </div>
@@ -17,22 +16,19 @@
                 </div>
                 <div class="col-span-1 flex items-center">Filtered By:</div>
                 <div class="col-span-2">
-                    <select name="sport"
-                        class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select name="sport" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="">Sports</option>
                         <!-- Add options dynamically or statically here -->
                     </select>
                 </div>
                 <div class="col-span-2">
-                    <select name="team"
-                        class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select name="team" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="">Team</option>
                         <!-- Add options dynamically or statically here -->
                     </select>
                 </div>
                 <div class="col-span-2">
-                    <select name="status"
-                        class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select name="status" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <option value="">Status</option>
                         <!-- Add options dynamically or statically here -->
                     </select>
@@ -40,13 +36,14 @@
             </div>
             <button type="submit" class="hidden"></button>
         </form>
-        
+
         <div class="grid grid-cols-12 px-4 py-3 bg-green-700 text-white rounded-lg border">
             <div class="col-span-3">School Name</div>
             <div class="col-span-3">Coach Name</div>
             <div class="col-span-3">Status</div>
             <div class="col-span-3">Action</div>
         </div>
+
         @foreach ($users as $user)
             <div class="grid grid-cols-12 px-4 py-3 rounded-lg border mt-2">
                 <div class="col-span-3">{{ $user->school_name ?? 'N/A' }}</div>
@@ -55,8 +52,7 @@
                     {{ $user->is_active ? 'Active' : 'Inactive' }}
                 </div>
                 <div class="col-span-3">
-                    <a href="{{ route('admin.card-school-management', $user->id) }}" class="btn btn-primary">View</a>
-                    
+                    <a href="{{ route('admin.card-school-management', $user->id) }}" class="btn btn-primary bg-green-700 hover:bg-green-600">View</a>
                 </div>
             </div>
         @endforeach

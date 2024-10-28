@@ -13,7 +13,7 @@
         <!-- Right-Aligned Update Patch Button -->
         <div class="flex justify-end">
             <button
-                class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
+                class="bg-green-700 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
                 onclick="toggleModal(true)"
             >
                 Update Patch
