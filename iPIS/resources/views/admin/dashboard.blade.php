@@ -1,13 +1,25 @@
 <x-app-layout>
 
-    <h1 class="text-2xl font-bold">Admin Dashboard</h1>
-
-    <!-- Fetch Current User Login -->
-    @if (Auth::guard('admin')->check())
-        <h3 class="text-lg mb-8">
-            Welcome, <span class="underline">({{ Auth::guard('admin')->user()->role }}) {{ Auth::guard('admin')->user()->name }}</span>
-        </h3>
-    @endif
+   
+        <h1 class="text-2xl font-bold">Admin Dashboard</h1>
+    
+        <!-- Fetch Current User Login -->
+        @if (Auth::guard('admin')->check())
+            <h3 class="text-lg mb-8">
+                Welcome, <span class="underline">({{ Auth::guard('admin')->user()->role }}) {{ Auth::guard('admin')->user()->name }}</span>
+            </h3>
+        @endif
+    
+        <!-- Right-Aligned Update Patch Button -->
+        <div class="flex justify-end">
+            <button
+                class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
+                onclick="toggleModal(true)"
+            >
+                Update Patch
+            </button>
+        </div>
+   
 
     <div class="container mx-auto p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <!-- Total Registrations -->
@@ -128,10 +140,47 @@
             </div>
         </div>
     </section>
+    <!-- Modal -->
+    <div id="updatePatchModal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden" onclick="toggleModal(false)">
+        <div class="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 relative" onclick="event.stopPropagation()">
+            <!-- Close Button -->
+            <button
+                class="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                style="font-size: 1.5rem; padding: 0.5rem;"
+                onclick="toggleModal(false)"
+            >
+                &times;
+            </button>
+
+            <!-- Modal Content -->
+            <h2 class="text-xl font-bold mb-4">System Update Information</h2>
+            <p class="text-gray-600">
+                Here you will find the latest updates made in the system. This may include changes to functionality, design adjustments, and other relevant information to keep you informed.
+            </p>
+
+            <ul class="mt-4 text-gray-600 list-disc pl-5">
+                <li>Update 1: Improved user interface for better accessibility.</li>
+                <li>Update 2: Added new reporting features to the admin dashboard.</li>
+                <li>Update 3: Performance enhancements for faster loading times.</li>
+            </ul>
+        </div>
+    </div>
+</div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/relativeTime.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/relativeTime.js"></script>\
+<script>
+    // Function to toggle the modal visibility
+    function toggleModal(show) {
+        const modal = document.getElementById("updatePatchModal");
+        if (show) {
+            modal.classList.remove("hidden");
+        } else {
+            modal.classList.add("hidden");
+        }
+    }
+</script>
 <script>
     dayjs.extend(dayjs_plugin_relativeTime); // Enable the relative time plugin
 
