@@ -1,7 +1,7 @@
 <x-app-layout>
 
    
-        <h1 class="text-2xl font-bold">Admin Dashboard</h1>
+        <h1 class="text-3xl font-bold">Admin Dashboard</h1>
     
         <!-- Fetch Current User Login -->
         @if (Auth::guard('admin')->check())
