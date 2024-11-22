@@ -442,69 +442,48 @@ class UserController extends Controller
         return view('user-sidebar.add-teams');
     }
     public function storeTeam(Request $request)
-    {
-        // Validate the incoming request
-        $validator = Validator::make($request->all(), [
-            'sport' => 'required|string',
-            'team_name' => 'required|string|max:255',
-            'team_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:25600',
-        ]);
+{
     
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-    
-        // Get the currently signed-in user's ID
-        $coachId = auth()->user()->id;
-    
-        // Fetch the school name from the authenticated user
-        $coach = Auth::user();
-        $schoolName = $coach->school_name;
-        $sportCategory = $request->input('sport');
-    
-        // Define the path for the sport category folder
-        $teamFolderPath = "public/{$schoolName}/{$sportCategory}";
-    
-        // Check if the folder already exists; if not, create it
-        if (!Storage::exists($teamFolderPath)) {
-            Storage::makeDirectory($teamFolderPath);
-        }
-    
-        // Handle the team logo upload
-        if ($request->hasFile('team_logo')) {
-            // Store the logo in the defined folder path
-            $teamLogoPath = $request->file('team_logo')->store("{$teamFolderPath}/team_logos");
-            $teamLogoPath = str_replace('public/', '', $teamLogoPath); // Remove 'public/' from the path for easy retrieval
-        } else {
-            $teamLogoPath = null;
-        }
-    
-        // Create or update the team
-        $team = Team::updateOrCreate(
-            ['name' => $request->input('team_name')],
-            [
-                'sport_category' => $sportCategory,
-                'coach_id' => $coachId,
-                'logo_path' => $teamLogoPath,
-            ]
-        );
 
-        ActivityLogHelper::logActivity(
-            Auth::id(),
-            'team_added',
-            sprintf(
-                'added a new team: %s (%s)',
-                $team->name,
-                $team->sport_category
-            )
-        );
-    
-       
-    
-    
-        // Return a response
-        return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
+    $validator = Validator::make($request->all(), [
+        'sport' => 'required|string',
+        'team_name' => 'required|string|max:255',
+        'team_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:25600',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
     }
+
+    $coachId = auth()->user()->id;
+    $schoolName = auth()->user()->school_name;
+    $sportCategory = $request->input('sport');
+
+    $teamFolderPath = "public/{$schoolName}/{$sportCategory}";
+
+    if (!Storage::exists($teamFolderPath)) {
+        Storage::makeDirectory($teamFolderPath);
+    }
+
+    $teamLogoPath = null;
+
+    if ($request->hasFile('team_logo')) {
+        $teamLogoPath = $request->file('team_logo')->store("{$teamFolderPath}/team_logos");
+        $teamLogoPath = str_replace('public/', '', $teamLogoPath);
+    }
+
+    $team = Team::updateOrCreate(
+        ['name' => $request->input('team_name')],
+        [
+            'sport_category' => $sportCategory,
+            'coach_id' => $coachId,
+            'logo_path' => $teamLogoPath,
+        ]
+    );
+
+    return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
+}
+
 
 
 
