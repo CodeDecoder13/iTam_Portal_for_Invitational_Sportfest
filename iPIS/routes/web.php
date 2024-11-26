@@ -7,9 +7,10 @@ use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TestingController;
 use App\Http\Controllers\CalendarController;
-use App\Http\Controllers\DocumentCheckerController;
-use App\Http\Controllers\PlayerDocumentController;
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\UserActivityController;
+use App\Http\Controllers\PlayerDocumentController;
+use App\Http\Controllers\DocumentCheckerController;
 Route::get('/', function () {
     return view('auth.login');
 });
@@ -49,7 +50,8 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::delete('/delete/player/birth_certificate/{id}', [UserController::class, 'deleteBirthCertificate'])->name('delete.player.birth_certificate');
     Route::delete('/delete/player/parental_consent/{id}', [UserController::class, 'deleteParentalConsent'])->name('delete.player.parental_consent');
     Route::get('/player/{playerId}/download-document', [UserController::class, 'downloadDocument'])->name('download.player.document');
-   
+    
+    
 });
 // added for myteam page
 Route::middleware(['auth','verified'])->group(function () { 
@@ -61,6 +63,7 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::post('/update-sub-players', [UserController::class, 'updateSubPlayers'])->name('update.sub-players');
     Route::get('/my-team/team-management/sub-documents-management/{id}', [UserController::class, 'subDocumentsManagement'])->name('sub-documents-management');
 
+    
 });
 
 // added for admin sidebar

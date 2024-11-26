@@ -3,17 +3,18 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\Game;
 use App\Models\Team;
 use App\Models\User;
 use App\Models\Player;
-use App\Models\Game;
+use App\Models\ActivityLog;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Helpers\ActivityLogHelper;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use App\Helpers\ActivityLogHelper;
 
 
 class UserController extends Controller
@@ -21,10 +22,20 @@ class UserController extends Controller
     public function dashboard()
     {
         $coachId = Auth::user()->id;
+
+        // Fetch teams associated with the coach
         $teams = Team::where('coach_id', $coachId)->get();
-        return view('dashboard', compact('teams'));
-       // return view('dashboard');
+
+        // Fetch recent activities for the logged-in coach, limit to 5 activities per page
+        $activities = ActivityLog::where('user_id', $coachId)
+            ->orderBy('created_at', 'desc')
+            ->paginate(5); // Paginate the results, 5 activities per page
+
+        // Pass both `teams` and `activities` to the view
+        return view('dashboard', compact('teams', 'activities'));
     }
+
+
 
     public function myDocuments()
 {
@@ -137,6 +148,13 @@ class UserController extends Controller
             $player->birth_certificate = $birthCertificateName;
             $player->birth_certificate_status = 1; // Set status to "For Review"
             $documentUploaded = true;
+
+            // Log the activity for birth certificate upload
+            ActivityLogHelper::logActivity(
+                auth()->user(),
+                'Uploaded a document',
+                "Uploaded birth certificate for player {$player->first_name} {$player->last_name} in team {$team->name}."
+            );
         }
 
         // Handle the upload of the parental consent
@@ -147,15 +165,22 @@ class UserController extends Controller
             $player->parental_consent = $parentalConsentName;
             $player->parental_consent_status = 1; // Set status to "For Review"
             $documentUploaded = true;
-        }
 
-        // If any document has been uploaded, update the status to "For Review"
+            // Log the activity for parental consent upload
+            ActivityLogHelper::logActivity(
+                auth()->user(),
+                'Uploaded a document',
+                "Uploaded parental consent for player {$player->first_name} {$player->last_name} in team {$team->name}."
+            );
+        }
 
         // Save the player's updated information
         $player->save();
 
+        // Return with a success message
         return redirect()->back()->with('success', 'Documents uploaded successfully and status updated to "For Review".');
     }
+
 
 
     // Method to view and download PSA Birth Certificate
@@ -442,56 +467,57 @@ class UserController extends Controller
         return view('user-sidebar.add-teams');
     }
     public function storeTeam(Request $request)
-{
-    
+    {
+        
 
-    $validator = Validator::make($request->all(), [
-        'sport' => 'required|string',
-        'team_name' => 'required|string|max:255',
-        'team_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:25600',
-    ]);
+        $validator = Validator::make($request->all(), [
+            'sport' => 'required|string',
+            'team_name' => 'required|string|max:255',
+            'team_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:25600',
+        ]);
 
-    if ($validator->fails()) {
-        return response()->json(['errors' => $validator->errors()], 422);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $coachId = auth()->user()->id;
+        $schoolName = auth()->user()->school_name;
+        $sportCategory = $request->input('sport');
+
+        $teamFolderPath = "public/{$schoolName}/{$sportCategory}";
+
+        if (!Storage::exists($teamFolderPath)) {
+            Storage::makeDirectory($teamFolderPath);
+        }
+
+        $teamLogoPath = null;
+
+        if ($request->hasFile('team_logo')) {
+            $teamLogoPath = $request->file('team_logo')->store("{$teamFolderPath}/team_logos");
+            $teamLogoPath = str_replace('public/', '', $teamLogoPath);
+        }
+
+        $team = Team::updateOrCreate(
+            ['name' => $request->input('team_name')],
+            [
+                'sport_category' => $sportCategory,
+                'coach_id' => $coachId,
+                'logo_path' => $teamLogoPath,
+            ]
+        );
+
+         // Define the user variable
+         $user = Auth::user(); // Ensure this line is added
+         // Log the activity for team addition
+         ActivityLogHelper::logActivity(
+             $user,
+             'team_added',
+             sprintf('added a new team: %s (%s)', $team->name, $team->sport_category)
+         );
+
+        return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
     }
 
-    $coachId = auth()->user()->id;
-    $schoolName = auth()->user()->school_name;
-    $sportCategory = $request->input('sport');
-
-    $teamFolderPath = "public/{$schoolName}/{$sportCategory}";
-
-    if (!Storage::exists($teamFolderPath)) {
-        Storage::makeDirectory($teamFolderPath);
-    }
-
-    $teamLogoPath = null;
-
-    if ($request->hasFile('team_logo')) {
-        $teamLogoPath = $request->file('team_logo')->store("{$teamFolderPath}/team_logos");
-        $teamLogoPath = str_replace('public/', '', $teamLogoPath);
-    }
-
-    $team = Team::updateOrCreate(
-        ['name' => $request->input('team_name')],
-        [
-            'sport_category' => $sportCategory,
-            'coach_id' => $coachId,
-            'logo_path' => $teamLogoPath,
-        ]
-    );
-
-    return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
-}
-
-
-
-
-
-
-    
-
-   
 
     public function deletePlayer(Request $request)
     {

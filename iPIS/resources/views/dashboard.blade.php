@@ -15,18 +15,30 @@
                     </div>
                     <div class="rounded-b-lg p-4 py-2">
                         <ul>
-                            <!-- <li class="border text-xs p-2 flex">
-                                <div class="text-green-700 text-xl">
-                                    <ion-icon name="document"></ion-icon>
-                                </div>
-                                <div>
-                                    <span class="font-bold">Document Comment:</span> "Full name and address doesn’t match ID
-                                    details” - RAC Representative"
-                                </div>
-                            </li> -->
+                            @foreach($activities as $activity)
+                                <li class="border text-xs p-2 flex">
+                                    <div class="text-green-700 text-xl">
+                                        <ion-icon name="document"></ion-icon>
+                                    </div>
+                                    <div>
+                                        <span class="font-bold">{{ $activity->activity_type }}:</span> 
+                                        @if($activity->first_name && $activity->last_name)
+                                            {{ $activity->first_name }} {{ $activity->last_name }} - {{ $activity->description }}
+                                        @else
+                                            You - {{ $activity->description }}
+                                        @endif
+                                    </div>
+                                </li>
+                            @endforeach
                         </ul>
+                
+                        <!-- Pagination links -->
+                        <div class="mt-4">
+                            {{ $activities->links() }}
+                        </div>
                     </div>
                 </div>
+                
                 <div class="rounded-lg shadow-md">
                     <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
                         <h3 class="text-xl font-bold mb-2">Upcoming Games</h3>
