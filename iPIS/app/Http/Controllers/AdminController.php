@@ -18,8 +18,11 @@ use App\Models\ActivityLog;
 
 class AdminController extends Controller
 {
+       
+      
     public function dashboard()
     {
+    
         // Fetch the total number of teams and players grouped by sport category
         $registrations = Team::withCount('players')->get();
 

@@ -20,20 +20,40 @@ use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
 {
     public function dashboard()
-    {
-        $coachId = Auth::user()->id;
+{
+    $coachId = Auth::user()->id;
 
-        // Fetch teams associated with the coach
-        $teams = Team::where('coach_id', $coachId)->get();
+    // Fetch teams associated with the coach
+    $teams = Team::where('coach_id', $coachId)->get();
 
-        // Fetch recent activities for the logged-in coach, limit to 5 activities per page
-        $activities = ActivityLog::where('user_id', $coachId)
-            ->orderBy('created_at', 'desc')
-            ->paginate(5); // Paginate the results, 5 activities per page
+    // Fetch recent activities for the logged-in coach, limit to 5 activities per page
+    $activities = ActivityLog::where('user_id', $coachId)
+        ->orderBy('created_at', 'desc')
+        ->paginate(5);
 
-        // Pass both `teams` and `activities` to the view
-        return view('dashboard', compact('teams', 'activities'));
-    }
+    // Fetch upcoming games related to the teams of the logged-in coach
+    $teamIds = $teams->pluck('id'); // Get team IDs associated with the coach
+
+    $upcomingGames = Game::with(['team1.coach', 'team2.coach']) // Load coach relationship
+    ->whereIn('team1_id', $teamIds)
+    ->orWhereIn('team2_id', $teamIds)
+    ->orderBy('game_date', 'asc')
+    ->paginate(5); // Paginate the results (5 per page)
+
+// Apply transformation to add school names
+$upcomingGames->getCollection()->transform(function ($game) {
+    // Fetch school names from the coach (User model)
+    $game->team1_school_name = $game->team1 && $game->team1->coach ? $game->team1->coach->school_name : 'N/A';
+    $game->team2_school_name = $game->team2 && $game->team2->coach ? $game->team2->coach->school_name : 'N/A';
+    return $game;
+}); 
+
+
+    // Pass all data to the dashboard view
+    return view('dashboard', compact('teams', 'activities', 'upcomingGames'));
+}
+
+
 
 
 

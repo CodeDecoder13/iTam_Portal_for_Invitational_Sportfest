@@ -39,28 +39,37 @@
                     </div>
                 </div>
                 
-                <div class="rounded-lg shadow-md">
+                <div class="rounded-lg shadow-md mb-4">
                     <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
-                        <h3 class="text-xl font-bold mb-2">Upcoming Games</h3>
+                        <h3 class="text-xl font-bold">Upcoming Games</h3>
                     </div>
-                    <div class="rounded-b-lg p-4 py-2">
-                        <ul>
-                            <li class="border text-xs p-2 flex">
-                                <div class="w-8/12 border-e-2 flex-grow flex">
-                                    <div><img width="15" class="img-fluid" src="/images/userlogo.png" /></div>
-                                    <div class="text-center">
-                                        <div><span>FITGC</span> VS <span>MPTGC</span></div>
-                                        <div class="text-xs">Men’s Basketball (D)</div>
+                    <div class="rounded-b-lg p-4">
+                        @if($upcomingGames->isEmpty())
+                            <p class="text-center text-gray-500">No upcoming games scheduled.</p>
+                        @else
+                            <ul>
+                            @foreach($upcomingGames as $game)
+                                <li class="border-b py-2 flex justify-between items-center">
+                                    <div>
+                                        <strong class="text-sm">{{ $game->team1_school_name }}</strong>
+                                        vs
+                                        <strong class="text-sm">{{ $game->team2_school_name }}</strong>
+                                        <div class="text-gray-600">{{ $game->sport_category }}</div>
                                     </div>
-                                    <div><img width="15" class="img-fluid" src="/images/userlogo.png" /></div>
-                                </div>
-                                <div class="w-4/12 text-end">
-                                    <p class="font-bold">Sept. 11, 2024</p>
-                                </div>
-                            </li> 
-                        </ul>
+                                    <div>
+                                        <span class="text-gray-700">{{ \Carbon\Carbon::parse($game->game_date)->format('M d, Y') }}</span>
+                                    </div>
+                                </li>
+                            @endforeach
+                            </ul>
+                            <!-- Pagination links -->
+                            <div class="mt-4">
+                                {{ $upcomingGames->links() }}
+                            </div>
+                        @endif
                     </div>
                 </div>
+
                 <div class="rounded-lg shadow-md">
                     <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
                         <h3 class="text-xl font-bold mb-2">Standing</h3>
