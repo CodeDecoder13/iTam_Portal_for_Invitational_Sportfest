@@ -3,27 +3,59 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\Game;
 use App\Models\Team;
 use App\Models\User;
 use App\Models\Player;
-use App\Models\Game;
+use App\Models\ActivityLog;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Helpers\ActivityLogHelper;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use App\Helpers\ActivityLogHelper;
+
 
 class UserController extends Controller
 {
     public function dashboard()
-    {
-        $coachId = Auth::user()->id;
-        $teams = Team::where('coach_id', $coachId)->get();
-        return view('dashboard', compact('teams'));
-       // return view('dashboard');
-    }
+{
+    $coachId = Auth::user()->id;
+
+    // Fetch teams associated with the coach
+    $teams = Team::where('coach_id', $coachId)->get();
+
+    // Fetch recent activities for the logged-in coach, limit to 5 activities per page
+    $activities = ActivityLog::where('user_id', $coachId)
+        ->orderBy('created_at', 'desc')
+        ->paginate(5);
+
+    // Fetch upcoming games related to the teams of the logged-in coach
+    $teamIds = $teams->pluck('id'); // Get team IDs associated with the coach
+
+    $upcomingGames = Game::with(['team1.coach', 'team2.coach']) // Load coach relationship
+    ->whereIn('team1_id', $teamIds)
+    ->orWhereIn('team2_id', $teamIds)
+    ->orderBy('game_date', 'asc')
+    ->paginate(5); // Paginate the results (5 per page)
+
+// Apply transformation to add school names
+$upcomingGames->getCollection()->transform(function ($game) {
+    // Fetch school names from the coach (User model)
+    $game->team1_school_name = $game->team1 && $game->team1->coach ? $game->team1->coach->school_name : 'N/A';
+    $game->team2_school_name = $game->team2 && $game->team2->coach ? $game->team2->coach->school_name : 'N/A';
+    return $game;
+}); 
+
+
+    // Pass all data to the dashboard view
+    return view('dashboard', compact('teams', 'activities', 'upcomingGames'));
+}
+
+
+
+
 
     public function myDocuments()
 {
@@ -136,6 +168,13 @@ class UserController extends Controller
             $player->birth_certificate = $birthCertificateName;
             $player->birth_certificate_status = 1; // Set status to "For Review"
             $documentUploaded = true;
+
+            // Log the activity for birth certificate upload
+            ActivityLogHelper::logActivity(
+                auth()->user(),
+                'Uploaded a document',
+                "Uploaded birth certificate for player {$player->first_name} {$player->last_name} in team {$team->name}."
+            );
         }
 
         // Handle the upload of the parental consent
@@ -146,15 +185,22 @@ class UserController extends Controller
             $player->parental_consent = $parentalConsentName;
             $player->parental_consent_status = 1; // Set status to "For Review"
             $documentUploaded = true;
-        }
 
-        // If any document has been uploaded, update the status to "For Review"
+            // Log the activity for parental consent upload
+            ActivityLogHelper::logActivity(
+                auth()->user(),
+                'Uploaded a document',
+                "Uploaded parental consent for player {$player->first_name} {$player->last_name} in team {$team->name}."
+            );
+        }
 
         // Save the player's updated information
         $player->save();
 
+        // Return with a success message
         return redirect()->back()->with('success', 'Documents uploaded successfully and status updated to "For Review".');
     }
+
 
 
     // Method to view and download PSA Birth Certificate
@@ -442,7 +488,8 @@ class UserController extends Controller
     }
     public function storeTeam(Request $request)
     {
-        // Validate the incoming request
+        
+
         $validator = Validator::make($request->all(), [
             'sport' => 'required|string',
             'team_name' => 'required|string|max:255',
@@ -453,56 +500,44 @@ class UserController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Handle the team logo upload
-        if ($request->hasFile('team_logo')) {
-            $teamLogoPath = $request->file('team_logo')->store('public/team_logos');
-            $teamLogoPath = str_replace('public/', '', $teamLogoPath);
-        } else {
-            $teamLogoPath = null;
+        $coachId = auth()->user()->id;
+        $schoolName = auth()->user()->school_name;
+        $sportCategory = $request->input('sport');
+
+        $teamFolderPath = "public/{$schoolName}/{$sportCategory}";
+
+        if (!Storage::exists($teamFolderPath)) {
+            Storage::makeDirectory($teamFolderPath);
         }
 
-        // Get the currently signed-in user's ID
-        $coachId = auth()->user()->id;
+        $teamLogoPath = null;
 
-        // Create or update the team
+        if ($request->hasFile('team_logo')) {
+            $teamLogoPath = $request->file('team_logo')->store("{$teamFolderPath}/team_logos");
+            $teamLogoPath = str_replace('public/', '', $teamLogoPath);
+        }
+
         $team = Team::updateOrCreate(
             ['name' => $request->input('team_name')],
             [
-                'sport_category' => $request->input('sport'),
+                'sport_category' => $sportCategory,
                 'coach_id' => $coachId,
                 'logo_path' => $teamLogoPath,
             ]
         );
 
-        // Fetch the school name and sport category from the team model
-        $coach = $team->coach;
-        $schoolName = $coach->school_name;
-        $sportCategory = $team->sport_category;
+         // Define the user variable
+         $user = Auth::user(); // Ensure this line is added
+         // Log the activity for team addition
+         ActivityLogHelper::logActivity(
+             $user,
+             'team_added',
+             sprintf('added a new team: %s (%s)', $team->name, $team->sport_category)
+         );
 
-        // Define the path for the sport category folder
-        $teamFolderPath = "public/{$schoolName}/{$sportCategory}";
-
-        // Check if the folder already exists
-        if (!Storage::exists($teamFolderPath)) {
-            // Create the folder
-            Storage::makeDirectory($teamFolderPath);
-        }
-        $user = Auth::user(); // Ensure this line is added
-          // Log the activity for team addition
-          ActivityLogHelper::logActivity(
-            $user->id,
-            'team_added',
-            sprintf(
-                'added a new team: %s (%s)',
-                $team->name,
-                $team->sport_category
-            )
-        );
-
-        // Return a response
         return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
     }
-   
+
 
     public function deletePlayer(Request $request)
     {
@@ -574,23 +609,19 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'sport' => 'required|string',
             'team_name' => 'required|string|max:255',
-            'team_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:25600',
+            
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $teamLogoPath = null;
-        if ($request->hasFile('team_logo')) {
-            $teamLogoPath = $request->file('team_logo')->store('team_logos', 'public');
-        }
+      
 
         $team = Team::create([
             'name' => $request->team_name,
             'sport_category' => $request->sport,
             'coach_id' => Auth::id(),
-            'logo_path' => $teamLogoPath,
             'is_active' => true,
         ]);
 

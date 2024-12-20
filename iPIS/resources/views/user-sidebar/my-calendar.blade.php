@@ -1,13 +1,9 @@
 <x-app-layout>
-
-               
+    <div class="grid grid-cols-1">
+        <h1 class="font-bold mb-2 text-3xl">Calendar</h1>
+        <h3>Manage and Organize Games and Match</h3>
+    </div>
                         <div class="container mx-auto p-6">
-                            <div class="flex justify-between items-center mb-6">
-                                <h1 class="text-2xl font-bold">Calendar</h1>
-                
-                            </div>
-                            <p class="mb-6">Manage and schedule games</p>
-                            
                             <div class="flex justify-between items-center mb-6">
                               <!--  <div class="relative">
                                     <input type="text" placeholder="Search..." class="border rounded-md py-2 px-4 pr-10">

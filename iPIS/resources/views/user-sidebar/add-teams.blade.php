@@ -48,7 +48,7 @@
         document.getElementById('team-create-form').addEventListener('submit', function(e) {
     e.preventDefault();
     var players = new FormData(this);
-
+    
     fetch("{{ route('store.team') }}", {
         method: 'POST',
         body: players,

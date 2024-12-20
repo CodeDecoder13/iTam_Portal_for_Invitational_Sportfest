@@ -633,13 +633,13 @@ $(document).ready(function() {
         //delete ajax
         $(document).on('click', '.delete-btn', function() {
         var id = $(this).data('id'); // Get the game ID from the button's data-id attribute
-        console.log('Attempting to delete game with ID:', id);
+        console.log('Attempting to delete user with ID:', id);
 
-        if (confirm('Are you sure you want to delete this match?')) {
+        if (confirm('Are you sure you want to delete this user?')) {
             $.ajax({
-                url: '{{ route('admin.delete.game') }}', // Use the correct named route for game deletion
+                url: '{{ route('admin.delete.coach') }}', // Use the correct named route for user deletion
                 type: 'DELETE', // Use DELETE request
-                data: { id: id }, // Pass the game ID
+                data: { id: id }, // Pass the user ID
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Include CSRF token
                 },
@@ -647,8 +647,8 @@ $(document).ready(function() {
                     console.log('Delete response:', response);
                     if (response.status === 200) {
                         alert(response.message);
-                        // Remove the game element from the DOM
-                        $('div[data-game-id="' + id + '"]').remove();
+                        // Remove the user element from the DOM
+                        $('div[data-user-id="' + id + '"]').remove();
                         // Optionally reload the page to reflect changes
                         window.location.reload(); // Reload the page after success
                     } else {

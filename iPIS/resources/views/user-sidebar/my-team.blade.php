@@ -68,17 +68,7 @@
                             </select>
                         </div>
 
-                        <!-- Team Logo Upload -->
-                        <div class="mb-4">
-                            <label for="team-logo" class="block text-sm font-medium text-gray-700">School Logo (max 25MB)</label>
-                            <input type="file" id="team-logo" name="team_logo" class="mt-1 block w-full text-sm text-gray-500
-                                file:mr-4 file:py-2 file:px-4
-                                file:rounded-full file:border-0
-                                file:text-sm file:font-semibold
-                                file:bg-violet-50 file:text-violet-700
-                                hover:file:bg-violet-100
-                            ">
-                        </div>
+                      
 
                         <!-- Buttons -->
                         <div class="flex justify-end mt-4">
