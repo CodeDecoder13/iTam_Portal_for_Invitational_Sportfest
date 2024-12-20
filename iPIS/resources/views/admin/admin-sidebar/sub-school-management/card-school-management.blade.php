@@ -1,88 +1,95 @@
 <x-app-layout>
-    <div class="container mx-auto px-4 py-8">
-    <div class="flex justify-between items-center mb-4">
-
-
-            <a href="{{ route('admin.school-management', ['id' => $user->id]) }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                    </svg>
-                    Go Back
-                </a>
-    </div>
-        
-        <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-            <h2 class="text-3xl font-semibold mb-2">{{ $user->school_name ?? 'N/A' }}</h2>
-            
-            <div class="mb-4">
-                <p><strong>Name:</strong> {{ $user->first_name . ' ' . $user->last_name }}</p>
-                <p><strong>Email:</strong> {{ $user->email }}</p>
-                <p><strong>Role:</strong> {{ $user->role ?? 'N/A' }}</p>
-                <p><strong>Status:</strong> <span id="userStatus">{{ $user->is_active ? 'Active' : 'Inactive' }}</span></p>
-                
-                
+    <div class="min-h-screen bg-gray-100 p-8">
+        <!-- Header section with Back button and School name -->
+        <div class="flex justify-between items-center mb-8">
+            <div class="flex items-center space-x-4">
+                <div class="relative h-16 w-16 overflow-hidden rounded-full">
+                    <img
+                    src="/placeholder.svg?height=64&width=64"
+                    alt="{{ $user->school_name ?? 'School Logo' }}"
+                    class="object-cover"
+                />
                 
                
-            </div>
-            
-            <div class="flex flex-col">
-                
-                <div class="self-end">
-                    <button class="bg-green-700 hover:bg-green-800 text-white px-2 py-1 rounded-lg mr-2" onclick="updateStatus({{ $user->id }}, 'activate')">Activate</button>
-                    <button class="bg-red-700 hover:bg-red-800 text-white px-2 py-1 rounded-lg" onclick="updateStatus({{ $user->id }}, 'deactivate')">Deactivate</button>
                 </div>
+                
+                
+                
+                
+                <h1 class="text-2xl font-bold text-gray-900">{{ $user->school_name ?? 'N/A' }}</h1>
+            </div>
+            <a href="{{ route('admin.school-management', ['id' => $user->id]) }}" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-gray-800 font-semibold tracking-wide hover:bg-gray-200">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Go Back
+            </a>
+        </div>
+
+        <!-- School information card -->
+        <div class="bg-white shadow-md rounded-md p-8 mb-8">
+            <h2 class="text-3xl font-semibold mb-4">School Management Dashboard</h2>
+            <p class="text-gray-600 mb-4">Manage school information and access school-related operations.</p>
+            <div class="grid gap-4 md:grid-cols-2">
+                <div>
+                    <p class="font-semibold">Name:</p>
+                    <p>{{ $user->first_name . ' ' . $user->last_name }}</p>
+                </div>
+                <div>
+                    <p class="font-semibold">Email:</p>
+                    <p>{{ $user->email }}</p>
+                </div>
+                <div>
+                    <p class="font-semibold">Role:</p>
+                    <p>{{ $user->role ?? 'N/A' }}</p>
+                </div>
+                <div>
+                    <p class="font-semibold">Status:</p>
+                    <p class="inline-flex items-center rounded-full {{ $user->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }} px-2.5 py-0.5 text-sm font-medium">
+                        {{ $user->is_active ? 'Active' : 'Inactive' }}
+                    </p>
+                </div>
+            </div>
+            <div class="flex justify-end mt-4">
+                <button class="bg-green-700 hover:bg-green-800 text-white px-3 py-1 rounded-lg mr-2" onclick="updateStatus({{ $user->id }}, 'activate')">Activate</button>
+                <button class="bg-red-700 hover:bg-red-800 text-white px-3 py-1 rounded-lg" onclick="updateStatus({{ $user->id }}, 'deactivate')">Deactivate</button>
             </div>
         </div>
-        
 
-        <!-- debug this drei nasisisra ui pag naa alis ko to sa side bar -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-            
-        
+        <!-- Management cards -->
+<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <!-- Player Management Card -->
+    <div class="bg-orange-300 rounded-lg shadow-lg overflow-hidden">
+        <div class="p-5">
+            <div class="text-gray-800 text-4xl mb-2">Player Management</div>
+            <p class="text-gray-700 text-sm mb-4">Manage player information with Create, Read, Update, and Delete operations</p>
+            <button class="bg-white text-orange-500 font-bold py-2 px-4 rounded w-full">
+                <a href="{{ route('admin.player-management', ['id' => $user->id]) }}">Player Management</a>
+            </button>
+        </div>
     </div>
 
-        <!-- New cards section -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-            <!-- Player Management card -->
-            <div class="bg-orange-500 rounded-lg overflow-hidden shadow-lg">
-                <div class="flex flex-col h-full">
-    
-                    <div class="p-5">
-                    <div class="text-white text-4xl mb-2">Player Management</div>
-                        <!--<h3 class="text-white font-bold mb-2">Player Management</h3> -->
-                        <p class="text-white text-sm mb-4">Manage player information with Create, Read, Update, and Delete operations</p>
-                        <button class="bg-white text-orange-500 font-bold py-2 px-4 rounded">
-                        <a href="{{ route('admin.player-management', ['id' => $user->id]) }}">Player Management</a>
-                        </button>
-                    </div>
-                </div>
-            </div>
+    <!-- Team Management Card -->
+    <div class="bg-purple-300 rounded-lg shadow-lg overflow-hidden">
+        <div class="p-5">
+            <div class="text-gray-800 text-4xl mb-2">Team Management</div>
+            <p class="text-gray-700 text-sm mb-4">Manage teams and oversee team-related operations efficiently.</p>
+            <button class="bg-white text-purple-500 font-bold py-2 px-4 rounded w-full">
+                <a href="{{ route('admin.team-management', ['id' => $user->id]) }}">View Team</a>
+            </button>
+        </div>
+    </div>
 
-            <!-- Team Management card -->
-            <div class="bg-purple-500 rounded-lg overflow-hidden shadow-lg">
-                <div class="p-5">
-                    <div class="text-white text-4xl mb-2">Team Management</div>
-                   <!-- <h3 class="text-white font-bold mb-2">Team Management</h3> -->
-                    <p class="text-white text-sm mb-4">Manage teams and oversee team-related operations efficiently.</p>
-                    <button class="bg-white text-purple-500 font-bold py-2 px-4 rounded">
-                        <a href="{{ route('admin.team-management', ['id' => $user->id]) }}">View Team</a>
-                    </button>
-                </div>
-            </div>
-                
-            <!-- Document Management card -->
-            <!--
-            <div class="bg-blue-500 rounded-lg overflow-hidden shadow-lg">
-                <div class="p-5">
-                    <div class="text-white text-4xl mb-2">HTML5</div>
-                    <h3 class="text-white font-bold mb-2">Document Management</h3>
-                    <p class="text-white text-sm mb-4">Manage and organize documents, including player Birth certificate, Parental Consent, and team records.</p>
-                    <button class="bg-white text-blue-500 font-bold py-2 px-4 rounded">
-                        <a href="{{ route('admin.document-management', ['id' => $user->id]) }}">View Document</a>
-                    </button>
-                </div>
-            </div>
-            -->
+    <!-- Document Management Card 
+    <div class="bg-blue-300 rounded-lg shadow-lg overflow-hidden">
+        <div class="p-5">
+            <div class="text-gray-800 text-4xl mb-2">Document Management</div>
+            <p class="text-gray-700 text-sm mb-4">Manage and organize documents, including player Birth certificate, Parental Consent, and team records.</p>
+            <button class="bg-white text-blue-500 font-bold py-2 px-4 rounded w-full">
+                <a href="{{ route('admin.document-management', ['id' => $user->id]) }}">View Document</a>
+            </button>
+        </div>
+    </div> -->
 
             <!-- Logs card -->
              <!--

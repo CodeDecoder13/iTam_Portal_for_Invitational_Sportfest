@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="grid grid-cols-1">
-        <h1 class="font-bold mb-2 text-3xl">Coach Approval</h1>
-        <h3>Manage and Organize Coach/Captain/School Representative</h3>
+        <h1 class="font-bold mb-2 text-3xl">Calendar</h1>
+        <h3>Manage and Organize Games and Match</h3>
     </div>
     <div class="container mx-auto p-6">
         <div class="flex justify-between items-center mb-6">

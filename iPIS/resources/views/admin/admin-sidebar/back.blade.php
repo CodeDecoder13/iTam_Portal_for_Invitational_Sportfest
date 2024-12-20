@@ -1,100 +1,68 @@
 <x-app-layout>
-    <section class="p-6 space-y-6">
-        <!-- Header -->
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="font-bold mb-2 text-3xl">School Management</h1>
-                <p class="text-sm text-gray-600">Manage and Organize School Players</p>
-            </div>
-            <button 
-                class="flex items-center gap-2 bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
-                data-bs-toggle="modal" 
-                data-bs-target="#addUserModal"
-            >
+    <section class="grid grid-cols-1">
+        <h1 class="font-bold mb-2 text-3xl">School Management</h1>
+        <h3>Manage and Organize School Players</h3>
+
+        <div class="grid grid-cols-1">
+            <h1 class="font-bold mb-2 text-3xl">Summary Of Players</h1>
+            <h3>Fill in player's summary to complete your requirements.</h3>
+        </div>
+
+        <div class="w-full flex justify-end items-end mb-4">
+            <button class="bg-green-700 hover:bg-green-600 text-white font-bold py-2 px-4 rounded" data-bs-toggle="modal" data-bs-target="#addUserModal">
                 <span class="text-lg mr-1">+</span>Add New Coach
             </button>
         </div>
-
-        <!-- Filters -->
-        <form method="GET" action="{{ route('admin.school-management') }}" class="flex flex-col sm:flex-row gap-4">
-            <input 
-                type="text" 
-                name="search" 
-                placeholder="Search schools..." 
-                value="{{ request('search') }}"
-                class="sm:max-w-[300px] p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <div class="flex flex-1 gap-4">
-                <select 
-                    name="sport" 
-                    class="w-full sm:w-[150px] p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                    <option value="">Sports</option>
-                    <!-- Dynamically populate sports -->
-                </select>
-                <select 
-                    name="team" 
-                    class="w-full sm:w-[150px] p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                    <option value="">Team</option>
-                    <!-- Dynamically populate teams -->
-                </select>
-                <select 
-                    name="status" 
-                    class="w-full sm:w-[150px] p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                    <option value="">Status</option>
-                    <!-- Dynamically populate statuses -->
-                </select>
+        <form method="GET" action="{{ route('admin.school-management') }}" class="grid grid-cols-1 mt-5">
+            <div class="grid grid-cols-12 gap-4 px-4 py-3 rounded-lg bg-gray-100">
+                <div class="col-span-5">
+                    <input type="text" name="search" placeholder="Search" value="{{ request('search') }}"
+                        class="w-8/12 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="col-span-1 flex items-center">Filtered By:</div>
+                <div class="col-span-2">
+                    <select name="sport" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Sports</option>
+                        <!-- Add options dynamically or statically here -->
+                    </select>
+                </div>
+                <div class="col-span-2">
+                    <select name="team" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Team</option>
+                        <!-- Add options dynamically or statically here -->
+                    </select>
+                </div>
+                <div class="col-span-2">
+                    <select name="status" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Status</option>
+                        <!-- Add options dynamically or statically here -->
+                    </select>
+                </div>
             </div>
+            <button type="submit" class="hidden"></button>
         </form>
 
-        <!-- Cards Section -->
-        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            @foreach ($users as $user)
-                <div class="border rounded-lg shadow-lg bg-white p-4">
-                    <div class="flex items-center gap-4">
-                        <div class="w-16 h-16 relative rounded-full overflow-hidden bg-gray-200">
-                            <!-- Add dynamic image if available -->
-                            <img 
-                                src="{{ $user->school_logo ?? '/placeholder.svg' }}" 
-                                alt="School logo" 
-                                class="w-full h-full object-cover"
-                            />
-                        </div>
-                        <h2 class="text-lg font-semibold">{{ $user->school_name ?? 'N/A' }}</h2>
-                    </div>
-                    <div class="space-y-2 mt-4">
-                        <div class="flex items-center gap-2 text-sm text-gray-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                            </svg>
-                            <span><strong>Coach:</strong> {{ $user->first_name . ' ' . $user->last_name }}</span>
-                        </div>
-                        <div class="flex items-center gap-2 text-sm text-gray-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm2-8h-4V7h4v2z" />
-                            </svg>
-                            <span><strong>Status:</strong> 
-                                <span class="px-2 py-1 rounded-full text-xs font-semibold {{ $user->is_active ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600' }}">
-                                    {{ $user->is_active ? 'Active' : 'Inactive' }}
-                                </span>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <a 
-                            href="{{ route('admin.card-school-management', $user->id) }}" 
-                            class="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded-lg font-semibold"
-                        >
-                            View Details
-                        </a>
-                    </div>
-                </div>
-            @endforeach
+        <div class="grid grid-cols-12 px-4 py-3 bg-green-700 text-white rounded-lg border">
+            <div class="col-span-3">School Name</div>
+            <div class="col-span-3">Coach Name</div>
+            <div class="col-span-3">Status</div>
+            <div class="col-span-3">Action</div>
         </div>
 
-        <!-- Pagination -->
+        @foreach ($users as $user)
+            <div class="grid grid-cols-12 px-4 py-3 rounded-lg border mt-2">
+                <div class="col-span-3">{{ $user->school_name ?? 'N/A' }}</div>
+                <div class="col-span-3">{{ $user->first_name . ' ' . $user->last_name }}</div>
+                <div class="col-span-3">
+                    {{ $user->is_active ? 'Active' : 'Inactive' }}
+                </div>
+                <div class="col-span-3">
+                    <a href="{{ route('admin.card-school-management', $user->id) }}" class="btn btn-primary bg-green-700 hover:bg-green-600">View</a>
+                </div>
+            </div>
+        @endforeach
+        
+        <!-- Pagination links -->
         <div class="mt-4">
             {{ $users->links() }}
         </div>

@@ -101,7 +101,7 @@ class DocumentCheckerController extends Controller
                     return Storage::download($filePath);
                 }
                 return back()->with('error', 'File not found.');
-                break;
+                
         }
 
         $player->update([
