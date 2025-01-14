@@ -135,6 +135,11 @@
                 Calendar
             </a>
         </li>
+        <li class="nav-item">
+            <a href="{{ route('admin.standing') }}" class="nav-link {{ request()->is('admin/standing*') ? 'active' : '' }}">
+                <ion-icon name="basketball"></ion-icon>
+                Game Standing
+            </a>
         
         @if (Auth::guard('admin')->check() && (Auth::guard('admin')->user()->role === 'SysAdmin' || Auth::guard('admin')->user()->role === 'SADO'))
         <li class="nav-item">

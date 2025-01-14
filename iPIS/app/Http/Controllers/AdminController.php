@@ -83,6 +83,10 @@ class AdminController extends Controller
         // Pass this data to the view
         return view('admin.dashboard', compact('totalRegistrations', 'categories', 'incompleteDocuments', 'activities','recentDocuments'));
     }
+    public function standing()
+    {
+        return view('admin.admin-sidebar.standing');
+    }
     public function logSystem()
     {
         return view ('admin.admin-sidebar.logs-system');
