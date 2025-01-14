@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-
+use Carbon\Carbon;
 use App\Models\Game;
 use App\Models\Team;
 use App\Models\User;
@@ -26,27 +26,54 @@ class UserController extends Controller
     // Fetch teams associated with the coach
     $teams = Team::where('coach_id', $coachId)->get();
 
-    // Fetch recent activities for the logged-in coach, limit to 5 activities per page
-    $activities = ActivityLog::where('user_id', $coachId)
-        ->orderBy('created_at', 'desc')
-        ->paginate(5);
+    // Fetch recent activities for the logged-in coach with user details
+    $activities = ActivityLog::select([
+        'activity_logs.*',
+        'users.first_name',
+        'users.last_name',
+        'users.school_name',
+        'users.role'
+    ])
+    ->join('users', 'activity_logs.user_id', '=', 'users.id')
+    ->where('activity_logs.user_id', $coachId)
+    ->orderBy('activity_logs.created_at', 'desc')
+    ->limit(5)
+    ->get();
 
-    // Fetch upcoming games related to the teams of the logged-in coach
-    $teamIds = $teams->pluck('id'); // Get team IDs associated with the coach
+    // Fetch upcoming games
+        $teamIds = $teams->pluck('id');
 
-    $upcomingGames = Game::with(['team1.coach', 'team2.coach']) // Load coach relationship
-    ->whereIn('team1_id', $teamIds)
-    ->orWhereIn('team2_id', $teamIds)
-    ->orderBy('game_date', 'asc')
-    ->paginate(5); // Paginate the results (5 per page)
+        $upcomingGames = Game::with([
+            'team1.coach',
+            'team2.coach'
+        ])
+        ->where(function($query) use ($teamIds) {
+            $query->whereIn('team1_id', $teamIds)
+                ->orWhereIn('team2_id', $teamIds);
+        })
+        ->where('game_date', '>=', now())
+        ->orderBy('game_date', 'asc')
+        ->limit(5)
+        ->get();
 
-// Apply transformation to add school names
-$upcomingGames->getCollection()->transform(function ($game) {
-    // Fetch school names from the coach (User model)
-    $game->team1_school_name = $game->team1 && $game->team1->coach ? $game->team1->coach->school_name : 'N/A';
-    $game->team2_school_name = $game->team2 && $game->team2->coach ? $game->team2->coach->school_name : 'N/A';
-    return $game;
-}); 
+        // Transform games data with error handling
+        $upcomingGames->transform(function ($game) {
+            try {
+                return [
+                    'id' => $game->id,
+                    'team1_school_name' => $game->team1->coach->school_name ?? 'N/A',
+                    'team2_school_name' => $game->team2->coach->school_name ?? 'N/A',
+                    'sport_category' => $game->sport_category ?? 'N/A', // Use direct column
+                    'game_date' => Carbon::parse($game->game_date)->format('M d, Y, D '),
+                    'start_time' => Carbon::parse($game->start_time)->format('h:i A'),
+                    'team1_score' => $game->team1_score ?? 0,
+                    'team2_score' => $game->team2_score ?? 0
+                ];
+            } catch (\Exception $e) {
+                \Log::error('Game transformation error: ' . $e->getMessage());
+                return null;
+            }
+        })->filter();
 
 
     // Pass all data to the dashboard view
