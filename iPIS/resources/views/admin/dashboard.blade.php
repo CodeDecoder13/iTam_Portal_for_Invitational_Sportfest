@@ -85,30 +85,101 @@
     
     
     <section class="container mx-auto p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- Recent Documents Activities -->
-        <div class="rounded-lg shadow-md">
-            <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
-                <h3 class="text-xl font-bold mb-2">Recent Documents Activities</h3>
-            </div>
-            <div class="rounded-b-lg p-4 py-2 h-72 overflow-y-auto bg-white border border-gray-300">
-                <ul>
-                    <!-- Document activities go here -->
-                </ul>
-            </div>
+       <!-- Recent Documents Activities -->
+    <div class="rounded-lg shadow-md">
+        <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
+            <h3 class="text-xl font-bold mb-2">Recent Documents Activities</h3>
         </div>
+        <div class="rounded-b-lg p-4 py-2 h-72 overflow-y-auto bg-white border border-gray-300">
+            <ul>
+                @forelse($recentDocuments as $document)
+            <li class="mb-4 border-b border-gray-200 pb-2">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-900">
+                            {{ $document->first_name }} {{ $document->last_name }}
+                        </p>
+                        <p class="text-sm text-gray-600">
+                            {{ $document->school_name }} - {{ $document->role }}
+                        </p>
+                        <p class="text-sm text-gray-500">
+                            Team: {{ $document->team_name }}
+                        </p>
+                        <p class="text-sm text-gray-500">
+                            {{ $document->description }}
+                        </p>
+                        <p class="text-xs text-gray-400 mt-1">
+                            {{ $document->created_at->diffForHumans() }}
+                        </p>
+                    </div>
+                </div>
+            </li>
+        @empty
+            <li class="text-gray-500 text-center py-4">
+                No recent document uploads
+            </li>
+        @endforelse
+            </ul>
+        </div>
+    </div>
         <div class="rounded-lg shadow-md">
             <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
                 <h3 class="text-xl font-bold mb-2">Recent Activities</h3>
             </div>
             <div class="rounded-b-lg p-4 py-2 h-72 overflow-y-auto bg-white border border-gray-300">
                 <ul id="activity-list">
-                @foreach($activities as $activity)
-                    <li>
-                    <strong>{{ $activity->first_name }} {{ $activity->last_name }} ({{ $activity->role ?? 'No role' }} - {{ $activity->school_name ?? 'No school' }}):</strong>
-                             {{ $activity->description }}
-                        <small>({{ $activity->created_at->diffForHumans() }})</small>
+                    @forelse($activities as $activity)
+                    <li class="mb-4 border-b border-gray-200 pb-2">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                @switch($activity->activity_type)
+                                    @case('Login')
+                                        <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                                        </svg>
+                                        @break
+                                    @case('Logout')
+                                        <svg class="h-5 w-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                        </svg>
+                                        @break
+                                    @case('Uploaded a document')
+                                        <svg class="h-5 w-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                        @break
+                                    @default
+                                        <svg class="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                @endswitch
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-gray-900">
+                                    {{ $activity->first_name }} {{ $activity->last_name }}
+                                </p>
+                                <p class="text-sm text-gray-600">
+                                    {{ $activity->school_name }} - {{ $activity->role }}
+                                </p>
+                                <p class="text-sm text-gray-500">
+                                    {{ $activity->description }}
+                                </p>
+                                <p class="text-xs text-gray-400 mt-1">
+                                    {{ $activity->created_at->diffForHumans() }}
+                                </p>
+                            </div>
+                        </div>
                     </li>
-                @endforeach
+                @empty
+                    <li class="text-gray-500 text-center py-4">
+                        No recent activities
+                    </li>
+                @endforelse
                 </ul>
             </div>
         </div>
@@ -182,43 +253,77 @@
     }
 </script>
 <script>
-    dayjs.extend(dayjs_plugin_relativeTime); // Enable the relative time plugin
+    dayjs.extend(dayjs_plugin_relativeTime);
+    
+    let lastActivityId = null;
 
-    let lastActivityId = null; // Variable to keep track of the last activity ID
+    function getActivityIcon(type) {
+        switch(type) {
+            case 'Login':
+                return `<svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                </svg>`;
+            case 'Logout':
+                return `<svg class="h-5 w-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>`;
+            
+            default:
+                return `<svg class="h-5 w-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>`;
+        }
+    }
 
     function fetchActivities() {
         $.ajax({
             url: '/admin/activities',
             method: 'GET',
             success: function(data) {
-                // Check if there are new activities
                 if (data.length > 0) {
-                    // If this is the first fetch, initialize lastActivityId
                     if (lastActivityId === null) {
-                        lastActivityId = data[0].id; // Set the lastActivityId to the first activity's ID
+                        lastActivityId = data[0].id;
                     }
 
-                    // Clear the existing list
                     $('#activity-list').empty();
 
-                    // Loop through the activities and append them to the list
-                    data.forEach(function(activity) {
-                        // Convert created_at to relative time using Day.js
-                        var timeAgo = dayjs(activity.created_at).fromNow();
+            data.forEach(function(activity) {
+                // Skip document upload activities
+                if (activity.activity_type === 'Uploaded a document') {
+                    return;
+                }
 
-                        $('#activity-list').append(
-                            '<li>' +
-                                '<strong>' + activity.first_name + ' ' + activity.last_name + ' (' + (activity.role || 'No role') + ' - ' + (activity.school_name || 'No school') + '):</strong> ' +
-                                activity.description + 
-                                ' <small>(' + timeAgo + ')</small>' + // Use relative time
-                            '</li>'
-                        );
+                var timeAgo = dayjs(activity.created_at).fromNow();
+                var icon = getActivityIcon(activity.activity_type);
 
-                        // Update lastActivityId if the current activity ID is greater
-                        if (activity.id > lastActivityId) {
-                            lastActivityId = activity.id; // Update lastActivityId
-                        }
-                    });
+                $('#activity-list').append(`
+                    <li class="mb-4 border-b border-gray-200 pb-2">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                ${icon}
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-gray-900">
+                                    ${activity.first_name} ${activity.last_name}
+                                </p>
+                                <p class="text-sm text-gray-600">
+                                    ${activity.school_name || 'No school'} - ${activity.role || 'No role'}
+                                </p>
+                                <p class="text-sm text-gray-500">
+                                    ${activity.description}
+                                </p>
+                                <p class="text-xs text-gray-400 mt-1">
+                                    ${timeAgo}
+                                </p>
+                            </div>
+                        </div>
+                    </li>
+                `);
+
+                if (activity.id > lastActivityId) {
+                    lastActivityId = activity.id;
+                }
+            });
                 }
             },
             error: function(xhr) {
@@ -227,8 +332,9 @@
         });
     }
 
-    // Fetch activities every 2 seconds
-    setInterval(fetchActivities, 2000);
+    // Initial fetch and set interval
+    fetchActivities();
+    setInterval(fetchActivities, 5000);
 </script>
 
 </x-app-layout>

@@ -22,6 +22,7 @@ class AdminController extends Controller
       
     public function dashboard()
     {
+        $coachId = Auth::user()->id;
     
         // Fetch the total number of teams and players grouped by sport category
         $registrations = Team::withCount('players')->get();
@@ -50,10 +51,37 @@ class AdminController extends Controller
             ->orWhere('parental_consent_status', '!=', 2)
             ->count();
 
-            $activities = ActivityLog::orderBy('created_at', 'desc')->get();
+            $activities = ActivityLog::select([
+                'activity_logs.*',
+                'users.first_name',
+                'users.last_name',
+                'users.school_name', 
+                'users.role'
+            ])
+            ->join('users', 'activity_logs.user_id', '=', 'users.id')
+            ->where('activity_type', '!=', 'Uploaded a document')
+            ->orderBy('activity_logs.created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        // Fetch recent document uploads with relationships
+        $recentDocuments = ActivityLog::select([
+            'activity_logs.*',
+            'users.first_name',
+            'users.last_name',
+            'users.school_name', 
+            'users.role',
+            'teams.name as team_name'
+        ])
+        ->join('users', 'activity_logs.user_id', '=', 'users.id')
+        ->join('teams', 'users.id', '=', 'teams.coach_id')  // Join using coach_id
+        ->where('activity_type', 'Uploaded a document')
+        ->orderBy('activity_logs.created_at', 'desc')
+        ->limit(5)
+        ->get();
 
         // Pass this data to the view
-        return view('admin.dashboard', compact('totalRegistrations', 'categories', 'incompleteDocuments', 'activities'));
+        return view('admin.dashboard', compact('totalRegistrations', 'categories', 'incompleteDocuments', 'activities','recentDocuments'));
     }
     public function logSystem()
     {
