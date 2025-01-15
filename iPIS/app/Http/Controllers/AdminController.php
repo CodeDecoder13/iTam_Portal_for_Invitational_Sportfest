@@ -6,15 +6,16 @@ use App\Models\Team;
 use App\Models\User;
 use App\Models\Admin;
 use App\Models\Player;
+use App\Models\Standing;
+use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Helpers\ActivityLogHelper;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use App\Helpers\ActivityLogHelper;
-use App\Models\ActivityLog;
 
 class AdminController extends Controller
 {
@@ -80,12 +81,28 @@ class AdminController extends Controller
         ->limit(5)
         ->get();
 
+        // Fetch standings data grouped by sport category, limit to top 3 per category
+        $standings = Standing::with(['team.coach'])
+        ->select('standings.*')
+        ->orderBy('wins', 'desc')
+        ->get()
+        ->groupBy('sport_category')
+        ->map(function ($categoryStandings) {
+            return $categoryStandings->take(3);
+        });
+
         // Pass this data to the view
-        return view('admin.dashboard', compact('totalRegistrations', 'categories', 'incompleteDocuments', 'activities','recentDocuments'));
+        return view('admin.dashboard', compact('totalRegistrations', 'categories', 'incompleteDocuments', 'activities','recentDocuments','standings'));
     }
-    public function standing()
+    public function standing(Request $request)
     {
-        return view('admin.admin-sidebar.standing');
+        $sportCategories = Team::select('sport_category')
+            ->distinct()
+            ->pluck('sport_category');
+        
+        $standings = Standing::with(['team.coach'])->get();
+
+        return view('admin.admin-sidebar.standing', compact('sportCategories', 'standings'));
     }
     public function logSystem()
     {

@@ -7,6 +7,7 @@ use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TestingController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\StandingController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\UserActivityController;
 use App\Http\Controllers\PlayerDocumentController;
@@ -96,6 +97,17 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     
 
 });
+
+//game standing
+Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
+    Route::get('/standings', [AdminController::class, 'standing'])->name('admin.standing');
+    Route::post('/standings', [StandingController::class, 'store'])->name('admin.standings.store');
+    Route::get('/standings/{id}/edit', [StandingController::class, 'edit'])->name('admin.standings.edit');
+    Route::put('/standings/{id}', [StandingController::class, 'update'])->name('admin.standings.update');
+    Route::delete('/standings/{id}', [StandingController::class, 'destroy'])->name('admin.standings.destroy');
+    Route::get('/standings/schools-by-category', [StandingController::class, 'getSchoolsByCategory'])
+    ->name('admin.standings.schools-by-category');
+}); 
 
 // added for school management
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
