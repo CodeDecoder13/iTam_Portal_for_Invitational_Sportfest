@@ -405,6 +405,60 @@ class AdminController extends Controller
             return response()->json(['message' => $e->getMessage(), 'code' => $e->getCode()], 500);
         }
     }
+    public function searchCoaches(Request $request)
+{
+    try {
+        $searchTerm = $request->input('term');
+        
+        // Search without role restriction first to debug
+        $users = User::where(function($query) use ($searchTerm) {
+            $query->whereRaw('LOWER(first_name) LIKE ?', ['%' . strtolower($searchTerm) . '%'])
+                  ->orWhereRaw('LOWER(last_name) LIKE ?', ['%' . strtolower($searchTerm) . '%'])
+                  ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($searchTerm) . '%'])
+                  ->orWhereRaw('LOWER(school_name) LIKE ?', ['%' . strtolower($searchTerm) . '%']);
+        });
+
+        // Log query for debugging
+        \Log::info('Search Query:', [
+            'sql' => $users->toSql(),
+            'bindings' => $users->getBindings(),
+            'searchTerm' => $searchTerm,
+            'results_count' => $users->count()
+        ]);
+
+        $results = $users->get();
+
+        return response()->json([
+            'status' => 200,
+            'data' => $results,
+            'count' => $results->count()
+        ]);
+        
+    } catch (\Exception $e) {
+        \Log::error('Search error: ' . $e->getMessage());
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+
+public function Searchmodule(Request $request)
+
+    {
+        return view('admin.admin-sidebar.searchmodule');
+    }
+
+public function search(Request $request)
+    {
+        $searchTerm = $request->input('searchTerm');
+        $results = User::where('first_name', 'LIKE', '%' . $searchTerm . '%')
+            ->orWhere('last_name', 'LIKE', '%' . $searchTerm . '%')
+            ->orWhere('email', 'LIKE', '%' . $searchTerm . '%')
+            ->orWhere('school_name', 'LIKE', '%' . $searchTerm . '%')
+            ->get();
+
+        return response()->json($results);
+    }
+
+
 
 
 
@@ -609,4 +663,27 @@ class AdminController extends Controller
          return view('admin.admin-sidebar.sub-school-management.document-management');
      }
       
+    public function searchUsers(Request $request)
+    {
+        try {
+            $searchTerm = $request->input('term');
+            
+            $users = User::where(function($query) use ($searchTerm) {
+                $query->whereRaw('LOWER(first_name) LIKE ?', ['%' . strtolower($searchTerm) . '%'])
+                      ->orWhereRaw('LOWER(last_name) LIKE ?', ['%' . strtolower($searchTerm) . '%'])
+                      ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($searchTerm) . '%'])
+                      ->orWhereRaw('LOWER(school_name) LIKE ?', ['%' . strtolower($searchTerm) . '%']);
+            })->get();
+
+            return response()->json([
+                'status' => 200,
+                'data' => $users,
+                'count' => $users->count()
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Search error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }

@@ -134,8 +134,9 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::post('/admin/coach/update', [AdminController::class, 'updateUser'])->name('admin.users.update');
     Route::delete('/admin/delete-coach', [AdminController::class, 'deleteCoach'])->name('admin.delete.coach');
     Route::post('/store-user-accounts', [AdminController::class, 'storeUser'])->name('admin.store-user');
-    Route::get('/search-coaches', [AdminController::class, 'coachApproval'])->name('search.coaches');
-
+    Route::get('/search-coaches', [AdminController::class, 'searchCoaches'])->name('admin.search.coaches');
+    Route::get('/search-modules', [AdminController::class, 'Searchmodule'])->name('admin.search.module'); 
+    Route::get('/search-users', [AdminController::class, 'searchUsers'])->name('admin.search.users');
 });
 // added for Document Module
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {     

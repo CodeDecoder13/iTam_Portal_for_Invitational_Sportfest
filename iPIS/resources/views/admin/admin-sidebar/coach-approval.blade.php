@@ -1,86 +1,93 @@
 <x-app-layout>
-    <div class="grid grid-cols-1">
-        <h1 class="font-bold mb-2 text-3xl">Coach Approval</h1>
-        <h3>Manage and Organize Coach/Captain/School Representative</h3>
-    </div>
+    <div class="p-6">
+        <div class="grid grid-cols-1">
+            <h1 class="font-bold mb-2 text-3xl">Coach Approval</h1>
+            <h3>Search for Users, Coaches, and School Representatives</h3>
+        </div>
 
-    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-        <!-- Search bar -->
-    <div class="relative w-full sm:w-64">
-        <input 
-            type="text" 
-            class="pl-10 pr-4 py-2 w-full bg-white rounded-full shadow-sm focus:ring-2 focus:ring-green-300" 
-            placeholder="Search coaches..."
-            id="searchTerm"
-        />
-        <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16l-3-3m0 0l3-3m-3 3h12M13 16l-3-3m0 0l3-3m-3 3h12"></path>
-        </svg>
-    </div>
-    <!-- Results container -->
-    <div id="searchResults" class="mt-4"></div>
-    
-        <!-- Add New Coach button -->
-        <li class="w-full sm:w-auto flex justify-end items-end">
-            <button class="btn btn-success h-2/3" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                <sup>+</sup>Add New Coach
-            </button>
-        </li>
-    </div>
+        <div class="mt-6">
+            <!-- Search bar -->
+            <div class="relative w-full sm:w-96">
+                <input 
+                    type="text" 
+                    class="pl-10 pr-4 py-2 w-full bg-white rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-300 focus:border-green-300" 
+                    placeholder="Search by name, email, or school..."
+                    id="searchTerm"
+                />
+                <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <div id="searchStatus" class="mt-2 text-sm text-gray-500"></div>
+            </div>
+        
+            <!-- Results container -->
+            <div id="searchResults" class="mt-4 space-y-2">
+        
+                <!-- Add New Coach button -->
+                <li class="w-full sm:w-auto flex justify-end items-end">
+                    <button class="btn btn-success h-2/3" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                        <sup>+</sup>Add New Coach
+                    </button>
+                </li>
+            </div>
+        </div>
 
-    <div class="grid grid-cols-12 px-4 py-3 bg-grey-700 text-white rounded-lg border">
-        @foreach ($data['users'] as $user) 
-            @php
-                $userTeams = $data['teams']->where('coach_id', $user->id);
-                $sports = $userTeams->pluck('sport_category')->unique();
-                $teams = $userTeams->pluck('name')->unique();
-            @endphp
-            <div class="col-span-4 p-4 relative">
-                <div class="bg-white text-black p-4 rounded-lg shadow cursor-pointer relative" 
-                onclick="openModal({{ $user->is_active ? 'true' : 'false' }}, '{{ $user->first_name }}', '{{ $user->last_name }}', '{{ $user->school_name ?? 'N/A' }}', '{{ $user->role ?? 'N/A' }}', '{{ $sports->isNotEmpty() ? $sports->implode(', ') : 'N/A' }}', '{{ $teams->isNotEmpty() ? $teams->implode(', ') : 'N/A' }}', '{{ $sports->isNotEmpty() ? $sports->implode(', ') : 'N/A' }}', '{{ $teams->isNotEmpty() ? $teams->implode(', ') : 'N/A' }}', '{{ $user->birth_date }}', '{{ $user->gender }}', {{ $user->id }})">
-                    
-                    <!-- User Info -->
-                    <h2 class="font-bold text-2xl mb-4 inline-flex items-center">
-                        {{ $user->first_name }} {{ $user->last_name }} 
-                        <!-- Conditional Activation Badge -->
-                        <span class="inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full ml-2 {{ $user->is_active ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' }}">
-                            <span class="w-2 h-2 me-1 rounded-full {{ $user->is_active ? 'bg-green-500' : 'bg-red-500' }}"></span>
-                            {{ $user->is_active ? 'Active' : 'Inactive' }}
-                        </span>
-                    </h2>
-                    <p>{{ $user->role }}</p>
-                    <p>{{ $user->school_name }}</p>
-                    <p>Email: {{ $user->email }}</p>
-    
-                    <!-- Kebab Menu Button (moved inside the container) -->
-                    <button class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-2xl p-2 kebab-menu" id="kebabMenuButton-{{ $user->id }}">&#x22EE;</button>
-                    
-                </div>
-
-                
-    
-                <!-- Kebab Menu Dropdown (still inside the relative container) -->
-                <div id="kebabMenuDropdown-{{ $user->id }}" class="hidden absolute right-4 top-12 bg-white rounded-md shadow-lg z-20 w-40">
-                    <ul class="py-1">
-                        <li>
-                            <!-- Edit Button -->
-                        <button class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" 
-                                data-bs-toggle="modal" 
-                                data-bs-target="#editUserModal" 
-                                data-user-id="{{ $user->id }}" 
-                                data-user-firstname="{{ $user->first_name }}" 
-                                data-user-lastname="{{ $user->last_name }}" 
-                                data-user-email="{{ $user->email }}" 
-                                data-user-role="{{ $user->role }}" 
-                                data-user-schoolname="{{ $user->school_name }}">
+      <!-- Users table -->
+      <div id="usersTable" class="mt-6">
+        <div class="space-y-4">
+            @foreach ($data['users'] as $user) 
+                @php
+                    $userTeams = $data['teams']->where('coach_id', $user->id);
+                    $sports = $userTeams->pluck('sport_category')->unique();
+                    $teams = $userTeams->pluck('name')->unique();
+                @endphp
+                <div class="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-semibold text-lg">{{ $user->first_name }} {{ $user->last_name }}</h3>
+                            <p class="text-gray-600">{{ $user->email }}</p>
+                            <p class="text-gray-500 text-sm">School: {{ $user->school_name ?? 'N/A' }}</p>
+                        </div>
+                        <div class="flex flex-col items-end gap-2">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full {{ ($user->role === 'coach') ? 'bg-blue-100 text-blue-800' : ($user->role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800') }}">
+                                {{ $user->role ?? 'user' }}
+                            </span>
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $user->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                {{ $user->is_active ? 'Active' : 'Inactive' }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mt-2 flex justify-end gap-2">
+                        <button class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+                            onclick="openModal({{ $user->is_active ? 'true' : 'false' }}, 
+                                '{{ $user->first_name }}', 
+                                '{{ $user->last_name }}', 
+                                '{{ $user->school_name ?? 'N/A' }}', 
+                                '{{ $user->role ?? 'N/A' }}', 
+                                '{{ $sports->isNotEmpty() ? $sports->implode(', ') : 'N/A' }}', 
+                                '{{ $teams->isNotEmpty() ? $teams->implode(', ') : 'N/A' }}', 
+                                '{{ $sports->isNotEmpty() ? $sports->implode(', ') : 'N/A' }}', 
+                                '{{ $teams->isNotEmpty() ? $teams->implode(', ') : 'N/A' }}', 
+                                '{{ $user->birth_date }}', 
+                                '{{ $user->gender }}', 
+                                {{ $user->id }})">
+                            View Details
+                        </button>
+                        <button class="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
+                            data-bs-toggle="modal" 
+                            data-bs-target="#editUserModal" 
+                            data-user-id="{{ $user->id }}" 
+                            data-user-firstname="{{ $user->first_name }}" 
+                            data-user-lastname="{{ $user->last_name }}" 
+                            data-user-email="{{ $user->email }}" 
+                            data-user-role="{{ $user->role }}" 
+                            data-user-schoolname="{{ $user->school_name }}">
                             Edit
                         </button>
-                        </li>
-                        
-                    </ul>
+                    </div>
                 </div>
-            </div>  
-        @endforeach
+            @endforeach
+        </div>
     </div>
 
     <!-- modals area-->
@@ -501,11 +508,12 @@
     </script>
 
     <script>
-          function closeModal() {
-                document.getElementById('userModal').classList.add('hidden');
-            }
+        // Modal handling functions
+        function closeModal() {
+            document.getElementById('userModal').classList.add('hidden');
+        }
 
-            function openModal(is_active, firstName, lastName, schoolName, role, sports, teams, sport_category, name, birth_date, gender, userId) {
+        function openModal(is_active, firstName, lastName, schoolName, role, sports, teams, sport_category, name, birth_date, gender, userId) {
             // Update Name with Role
             document.getElementById('modalUserName').innerText = `${firstName} ${lastName} (${role})`;
             
@@ -515,9 +523,8 @@
             document.getElementById('modalUserTeamName').innerText = name;
             
             // Birth Date and Gender
-            document.getElementById('modalUserBirthDate').innerText = new Date(birth_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-            console.log('Birth date:', birth_date);
-            document.getElementById('modalUserGender').innerText = `${gender}`;
+            document.getElementById('modalUserBirthDate').innerText = birth_date;
+            document.getElementById('modalUserGender').innerText = gender;
 
             // Activation Badge Logic
             let activationBadge = document.getElementById('activationBadge');
@@ -537,56 +544,213 @@
 
             // Show the modal
             document.getElementById('userModal').classList.remove('hidden');
-
         }
-     </script>
 
-     <script>
+        // Edit User modal
+        document.addEventListener('DOMContentLoaded', function() {
+            const editModal = document.getElementById('editUserModal');
+            
+            if (editModal) {
+                editModal.addEventListener('show.bs.modal', function(event) {
+                    const button = event.relatedTarget;
+                    if (button) {
+                        const userId = button.getAttribute('data-user-id');
+                        const userFirstName = button.getAttribute('data-user-firstname');
+                        const userLastName = button.getAttribute('data-user-lastname');
+                        const userEmail = button.getAttribute('data-user-email');
+                        const userRole = button.getAttribute('data-user-role');
+                        const userSchoolName = button.getAttribute('data-user-schoolname');
 
-$(document).ready(function() {
-        // Toggle Kebab Menu Dropdown
-        $('[id^=kebabMenuButton]').click(function(event) {
-            event.stopPropagation(); // Prevent triggering modal when clicking the kebab
-            const id = $(this).attr('id').split('-')[1];
-            $(`#kebabMenuDropdown-${id}`).toggleClass('hidden');
-        });
+                        // Populate the modal form
+                        document.getElementById('edituserid').value = userId;
+                        document.getElementById('editFirstName').value = userFirstName;
+                        document.getElementById('editLastName').value = userLastName;
+                        document.getElementById('editEmail').value = userEmail;
+                        document.getElementById('editRole').value = userRole;
+                        document.getElementById('editSchoolName').value = userSchoolName;
 
-        // Close dropdown when clicked outside
-        $(document).click(function(e) {
-            if (!$(e.target).closest('.kebab-menu').length && !$(e.target).closest('[id^=kebabMenuDropdown]').length) {
-                $('[id^=kebabMenuDropdown]').addClass('hidden');
+                        // Set the delete button's data-id attribute
+                        const deleteBtn = editModal.querySelector('.delete-btn');
+                        if (deleteBtn) {
+                            deleteBtn.setAttribute('data-id', userId);
+                        }
+                    }
+                });
             }
         });
-    });
 
-    // Edit User modal
-    document.querySelectorAll('[data-bs-target="#editUserModal"]').forEach(button => {
-    button.addEventListener('click', function () {
-        const userId = this.getAttribute('data-user-id');
-        const userFirstName = this.getAttribute('data-user-firstname');
-        const userLastName = this.getAttribute('data-user-lastname');
-        const userEmail = this.getAttribute('data-user-email');
-        const userRole = this.getAttribute('data-user-role');
-        const userSchoolName = this.getAttribute('data-user-schoolname');
-        
-        // Populate the modal form
-        document.getElementById('edituserid').value = userId;
-        document.getElementById('editFirstName').value = userFirstName;
-        document.getElementById('editLastName').value = userLastName;
-        document.getElementById('editEmail').value = userEmail;
-        document.getElementById('editRole').value = userRole;
-        document.getElementById('editSchoolName').value = userSchoolName;
+        // Search functionality
+        const searchInput = document.getElementById('searchTerm');
+        const resultsContainer = document.getElementById('searchResults');
+        const searchStatus = document.getElementById('searchStatus');
+        const usersTable = document.getElementById('usersTable');
+        let searchTimeout;
 
-        // Set the delete button's data-id attribute
-        document.querySelector('#editUserModal .delete-btn').setAttribute('data-id', userId);
+        // Add New Coach button HTML
+        const addNewCoachButton = `
+            <li class="w-full sm:w-auto flex justify-end items-end mb-4">
+                <button class="btn btn-success h-2/3" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                    <sup>+</sup>Add New Coach
+                </button>
+            </li>
+        `;
 
-        // Clear password fields
-        document.getElementById('editPassword').value = '';
-        document.getElementById('editConfirmPassword').value = '';
-    });
-});
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const searchTerm = this.value.trim();
+            
+            if (searchTerm === '') {
+                resultsContainer.innerHTML = addNewCoachButton;
+                searchStatus.textContent = '';
+                usersTable.style.display = 'block';
+                return;
+            }
 
-        // Update user
+            usersTable.style.display = 'none';
+            searchStatus.textContent = 'Searching...';
+            
+            searchTimeout = setTimeout(() => {
+                fetch(`/admin/search-users?term=${encodeURIComponent(searchTerm)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(response => {
+                        const data = response.data || [];
+                        searchStatus.textContent = `Found ${data.length} results`;
+                        resultsContainer.innerHTML = addNewCoachButton;
+
+                        if (data.length === 0) {
+                            resultsContainer.innerHTML += `
+                                <div class="p-4 bg-gray-50 rounded-lg">
+                                    <p class="text-gray-500">No results found</p>
+                                </div>
+                            `;
+                            return;
+                        }
+
+                        data.forEach(user => {
+                            const resultCard = document.createElement('div');
+                            resultCard.className = 'p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow';
+                            resultCard.innerHTML = `
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="font-semibold text-lg">${user.first_name} ${user.last_name}</h3>
+                                        <p class="text-gray-600">${user.email}</p>
+                                        <p class="text-gray-500 text-sm">School: ${user.school_name || 'N/A'}</p>
+                                    </div>
+                                    <div class="flex flex-col items-end gap-2">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full ${
+                                            user.role === 'coach' ? 'bg-blue-100 text-blue-800' :
+                                            user.role === 'admin' ? 'bg-red-100 text-red-800' :
+                                            'bg-gray-100 text-gray-800'
+                                        }">${user.role || 'user'}</span>
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full ${
+                                            user.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                        }">${user.is_active ? 'Active' : 'Inactive'}</span>
+                                    </div>
+                                </div>
+                                <div class="mt-2 flex justify-end gap-2">
+                                    <button class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+                                        onclick="openModal(${user.is_active}, 
+                                            '${user.first_name}', 
+                                            '${user.last_name}', 
+                                            '${user.school_name || 'N/A'}', 
+                                            '${user.role || 'N/A'}', 
+                                            '${user.teams ? user.teams.map(t => t.sport_category).join(', ') : 'N/A'}', 
+                                            '${user.teams ? user.teams.map(t => t.name).join(', ') : 'N/A'}', 
+                                            '${user.teams ? user.teams.map(t => t.sport_category).join(', ') : 'N/A'}', 
+                                            '${user.teams ? user.teams.map(t => t.name).join(', ') : 'N/A'}', 
+                                            '${user.birth_date || 'N/A'}', 
+                                            '${user.gender || 'N/A'}', 
+                                            ${user.id})">
+                                        View Details
+                                    </button>
+                                    <button class="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#editUserModal" 
+                                        data-user-id="${user.id}" 
+                                        data-user-firstname="${user.first_name}" 
+                                        data-user-lastname="${user.last_name}" 
+                                        data-user-email="${user.email}" 
+                                        data-user-role="${user.role}" 
+                                        data-user-schoolname="${user.school_name || ''}">
+                                        Edit
+                                    </button>
+                                </div>
+                            `;
+                            resultsContainer.appendChild(resultCard);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        searchStatus.textContent = 'Error occurred while searching';
+                        resultsContainer.innerHTML = addNewCoachButton + `
+                            <div class="p-4 bg-red-50 rounded-lg">
+                                <p class="text-red-500">An error occurred while searching. Please try again.</p>
+                            </div>
+                        `;
+                    });
+            }, 300);
+        });
+    </script>
+
+    <script>
+        //added for storing user
+        document.getElementById('saveUser').addEventListener('click', function() {
+            var userForm = document.getElementById('addUserForm');
+            var formData = new FormData(userForm);
+
+            var userData = {
+                first_name: formData.get('first_name'),
+                last_name: formData.get('last_name'),
+                email: formData.get('email'),
+                password: formData.get('password'),
+                password_confirmation: formData.get('password_confirmation'),
+                birth_date: formData.get('birth_date'),
+                gender: formData.get('gender'),
+                school_name: formData.get('school_name'),
+                role: formData.get('role'),
+                is_active: formData.get('is_active')
+            };
+
+            $.ajaxSetup({
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+
+            $.ajax({
+                url: '/admin/store-user-accounts',
+                type: 'POST',
+                data: JSON.stringify(userData),
+                success: function(response) {
+                    alert(response.message);
+                    window.location.href = "{{ route('admin.coach-approval') }}";
+                },
+                error: function(xhr) {
+                    if (xhr.status === 422) {
+                        var errors = xhr.responseJSON.errors;
+                        var errorMessage = 'Validation Error:\n';
+                        for (var field in errors) {
+                            if (errors.hasOwnProperty(field)) {
+                                errorMessage += errors[field].join('\n') + '\n';
+                            }
+                        }
+                        alert(errorMessage);
+                    } else {
+                        alert('Error saving user data');
+                    }
+                }
+            });
+        });
+    </script>
+
+    <!-- Update user functionality -->
+    <script>
         document.getElementById('EditCoach').addEventListener('click', function () {
             var formData = new FormData(document.getElementById('editUserForm')); // Collect form data
 
@@ -632,124 +796,36 @@ $(document).ready(function() {
 
         //delete ajax
         $(document).on('click', '.delete-btn', function() {
-        var id = $(this).data('id'); // Get the game ID from the button's data-id attribute
-        console.log('Attempting to delete user with ID:', id);
+            var id = $(this).data('id'); // Get the game ID from the button's data-id attribute
+            console.log('Attempting to delete user with ID:', id);
 
-        if (confirm('Are you sure you want to delete this user?')) {
-            $.ajax({
-                url: '{{ route('admin.delete.coach') }}', // Use the correct named route for user deletion
-                type: 'DELETE', // Use DELETE request
-                data: { id: id }, // Pass the user ID
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Include CSRF token
-                },
-                success: function(response) {
-                    console.log('Delete response:', response);
-                    if (response.status === 200) {
-                        alert(response.message);
-                        // Remove the user element from the DOM
-                        $('div[data-user-id="' + id + '"]').remove();
-                        // Optionally reload the page to reflect changes
-                        window.location.reload(); // Reload the page after success
-                    } else {
-                        alert(response.message);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error('Delete error:', xhr.responseText);
-                    alert('Error: ' + error);
-                }
-            });
-        }
-    });
-    </script>
-
-    <script>
-        //added for storing user
-        document.getElementById('saveUser').addEventListener('click', function() {
-        var userForm = document.getElementById('addUserForm');
-        var formData = new FormData(userForm);
-
-        var userData = {
-            first_name: formData.get('first_name'),
-            last_name: formData.get('last_name'),
-            email: formData.get('email'),
-            password: formData.get('password'),
-            password_confirmation: formData.get('password_confirmation'),
-            birth_date: formData.get('birth_date'),
-            gender: formData.get('gender'),
-            school_name: formData.get('school_name'),
-            role: formData.get('role'),
-            is_active: formData.get('is_active')
-        };
-
-        $.ajaxSetup({
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-
-        $.ajax({
-            url: '/admin/store-user-accounts',
-            type: 'POST',
-            data: JSON.stringify(userData),
-            success: function(response) {
-                alert(response.message);
-                window.location.href = "{{ route('admin.coach-approval') }}";
-            },
-            error: function(xhr) {
-                if (xhr.status === 422) {
-                    var errors = xhr.responseJSON.errors;
-                    var errorMessage = 'Validation Error:\n';
-                    for (var field in errors) {
-                        if (errors.hasOwnProperty(field)) {
-                            errorMessage += errors[field].join('\n') + '\n';
+            if (confirm('Are you sure you want to delete this user?')) {
+                $.ajax({
+                    url: '{{ route('admin.delete.coach') }}', // Use the correct named route for user deletion
+                    type: 'DELETE', // Use DELETE request
+                    data: { id: id }, // Pass the user ID
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Include CSRF token
+                    },
+                    success: function(response) {
+                        console.log('Delete response:', response);
+                        if (response.status === 200) {
+                            alert(response.message);
+                            // Remove the user element from the DOM
+                            $('div[data-user-id="' + id + '"]').remove();
+                            // Optionally reload the page to reflect changes
+                            window.location.reload(); // Reload the page after success
+                        } else {
+                            alert(response.message);
                         }
-                    }
-                    alert(errorMessage);
-                } else {
-                    alert('Error saving user data');
-                }
-            }
-        });
-        });
-        </script>
-        <script>
-            $(document).ready(function() {
-                $('#searchTerm').on('input', function() {
-                    var searchTerm = $(this).val();
-                    if (searchTerm.length > 0) {
-                        $.ajax({
-                            url: '{{ route('search.coaches') }}', // Define your route for searching
-                            type: 'GET',
-                            data: { term: searchTerm },
-                            success: function(response) {
-                                // Clear previous results
-                                $('#searchResults').empty();
-        
-                                // Check if there are results
-                                if (response.length > 0) {
-                                    response.forEach(function(user) {
-                                        $('#searchResults').append(`
-                                            <div class="p-2 border-b border-gray-300">
-                                                ${user.first_name} ${user.last_name} - ${user.email}
-                                            </div>
-                                        `);
-                                    });
-                                } else {
-                                    $('#searchResults').append('<div class="p-2">No results found</div>');
-                                }
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('Search error:', xhr.responseText);
-                            }
-                        });
-                    } else {
-                        $('#searchResults').empty(); // Clear results when input is empty
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Delete error:', xhr.responseText);
+                        alert('Error: ' + error);
                     }
                 });
-            });
-        </script>
+            }
+        });
+    </script>
 
 </x-app-layout>
