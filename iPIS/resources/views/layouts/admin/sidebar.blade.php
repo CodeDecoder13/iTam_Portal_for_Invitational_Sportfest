@@ -177,7 +177,7 @@
     <div class="m">
         <ul class="nav nav-pills flex-column">
             <li>
-                <a href="#" class="nav-link text-white">
+                <a href="{{ route('admin.settings') }}" class="nav-link text-white">
                     <ion-icon name="settings"></ion-icon>
                     Settings
                 </a>

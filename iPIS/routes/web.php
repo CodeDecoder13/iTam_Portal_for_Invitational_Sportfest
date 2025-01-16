@@ -148,6 +148,14 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () { 
 
 });
+
+// added for setting page
+Route::prefix('admin')->middleware(['auth:admin'])->group(function () { 
+    Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
+    Route::post('/settings/update', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
+    Route::post('/settings/update-password', [AdminController::class, 'updatePassword'])->name('admin.settings.update-password');
+    Route::get('/settings/get-current-password', [AdminController::class, 'getCurrentPassword'])->name('admin.settings.get-current-password');
+});
 //added for document checker
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::post('/document/approve/{player}/{document}', [DocumentCheckerController::class, 'approveDocument'])->name('document.approve');

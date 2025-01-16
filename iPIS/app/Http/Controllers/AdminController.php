@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class AdminController extends Controller
 {
@@ -684,6 +685,113 @@ public function search(Request $request)
         } catch (\Exception $e) {
             \Log::error('Search error: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+
+    //added for settings page
+    public function settings()
+    {
+        $admin = Auth::guard('admin')->user();
+        return view('admin.admin-sidebar.setting', compact('admin'));
+    }
+
+    public function updateSettings(Request $request)
+    {
+        try {
+            $admin = Auth::guard('admin')->user();
+            
+            // Prevent changing role if admin is SysAdmin
+            if ($admin->role === 'SysAdmin') {
+                $request->merge(['role' => 'SysAdmin']);
+            }
+            
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => ['required', 'email', 'max:255', Rule::unique('admins')->ignore($admin->id)],
+                'role' => 'required|string|max:50',
+            ]);
+    
+            $admin->fill($validated);
+            $admin->save();
+    
+            return response()->json([
+                'status' => 200,
+                'message' => 'Profile settings updated successfully',
+                'data' => $admin
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => 422,
+                'message' => 'Validation error',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Error updating settings: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updatePassword(Request $request)
+    {
+        try {
+            $request->validate([
+                'current_password' => 'required|string',
+                'password' => 'required|string|min:8|confirmed',
+            ]);
+
+            $admin = Auth::guard('admin')->user();
+
+            if (!Hash::check($request->current_password, $admin->password)) {
+                return response()->json([
+                    'status' => 422,
+                    'message' => 'Current password is incorrect'
+                ]);
+            }
+
+            $admin->password = Hash::make($request->password);
+            $admin->save();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Password updated successfully'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error updating admin password: ' . $e->getMessage());
+            return response()->json([
+                'status' => 500,
+                'message' => 'Error updating password: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    // Add method to get current password
+    public function getCurrentPassword(Request $request)
+    {
+        try {
+            $admin = Auth::guard('admin')->user();
+            if (!$admin) {
+                return response()->json([
+                    'status' => 404,
+                    'message' => 'Admin not found'
+                ]);
+            }
+
+            // Get the decrypted password from the database
+            $password = $request->input('current_password');
+            
+            return response()->json([
+                'status' => 200,
+                'password' => $password,
+                'message' => 'Password fetched successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Error fetching password: ' . $e->getMessage()
+            ]);
         }
     }
 }
