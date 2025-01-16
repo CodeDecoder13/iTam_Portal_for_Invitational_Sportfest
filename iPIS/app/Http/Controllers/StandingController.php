@@ -83,25 +83,25 @@ class StandingController extends Controller
         }
     }
     public function getSchoolsByCategory(Request $request)
-{
-    try {
-        \Log::info('Received request for sport category: ' . $request->sport_category);
-        
-        $teams = Team::with('coach')
-            ->where('sport_category', $request->sport_category)
-            ->get()
-            ->map(function ($team) {
-                return [
-                    'id' => $team->id,
-                    'school_name' => $team->coach->school_name
-                ];
-            });
+    {
+        try {
+            \Log::info('Received request for sport category: ' . $request->sport_category);
             
-        \Log::info('Found teams: ' . $teams->count());
-        return response()->json($teams);
-    } catch (\Exception $e) {
-        \Log::error('Error in getSchoolsByCategory: ' . $e->getMessage());
-        return response()->json(['error' => $e->getMessage()], 500);
+            $teams = Team::with('coach')
+                ->where('sport_category', $request->sport_category)
+                ->get()
+                ->map(function ($team) {
+                    return [
+                        'id' => $team->id,
+                        'school_name' => $team->coach->school_name
+                    ];
+                });
+                
+            \Log::info('Found teams: ' . $teams->count());
+            return response()->json($teams);
+        } catch (\Exception $e) {
+            \Log::error('Error in getSchoolsByCategory: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
-}
 }

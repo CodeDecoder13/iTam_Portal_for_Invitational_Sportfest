@@ -107,6 +107,8 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::delete('/standings/{id}', [StandingController::class, 'destroy'])->name('admin.standings.destroy');
     Route::get('/standings/schools-by-category', [StandingController::class, 'getSchoolsByCategory'])
     ->name('admin.standings.schools-by-category');
+
+    
 }); 
 
 // added for school management

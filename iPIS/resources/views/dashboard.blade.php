@@ -109,27 +109,28 @@
                     <div class="bg-green-800 text-white px-4 py-2 rounded-t-lg">
                         <h3 class="text-xl font-bold mb-2">Standing</h3>
                     </div>
-                    <div class="rounded-b-lg p-4 py-2">
-                        <ul type="1">
-                            <!--<li type="1" class="border text-xs flex w-full">
-                                <div class="bg-yellow-100 p-2 w-1/12">1</div>
-                                <div class="my-2 ps-2 w-6/12 border-e-2">FTICGC</div>
-                                <div class="p-2 w-3/12">Wins</div>
-                                <div class="p-2 w-2/12 font-bold">06</div>
-                            </li>
-                            <li type="1" class="border text-xs flex w-full">
-                                <div class="bg-slate-300 p-2 w-1/12">1</div>
-                                <div class="my-2 ps-2 w-6/12 border-e-2">FTICGC</div>
-                                <div class="p-2 w-3/12">Wins</div>
-                                <div class="p-2 w-2/12 font-bold">06</div>
-                            </li>
-                            <li type="1" class="border text-xs flex w-full">
-                                <div class="bg-red-100 p-2 w-1/12">1</div>
-                                <div class="my-2 ps-2 w-6/12 border-e-2">FTICGC</div>
-                                <div class="p-2 w-3/12">Wins</div>
-                                <div class="p-2 w-2/12 font-bold">06</div>
-                            </li> -->
-                        </ul>
+                    <div class="rounded-b-lg p-4 py-2 h-72 overflow-y-auto bg-white border border-gray-300">
+                        @forelse($standings as $category => $categoryStandings)
+                            <div class="mb-4">
+                                <h4 class="font-semibold text-gray-700 mb-2">{{ $category }}</h4>
+                                <ul>
+                                    @foreach($categoryStandings as $index => $standing)
+                                        <li class="border text-xs flex w-full mb-1">
+                                            <div class="{{ $index === 0 ? 'bg-yellow-100' : ($index === 1 ? 'bg-slate-300' : 'bg-red-100') }} p-2 w-1/12">
+                                                {{ $index + 1 }}
+                                            </div>
+                                            <div class="my-2 ps-2 w-6/12 border-e-2">
+                                                {{ $standing->team->coach->school_name }}
+                                            </div>
+                                            <div class="p-2 w-3/12">Wins</div>
+                                            <div class="p-2 w-2/12 font-bold">{{ $standing->wins }}</div>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @empty
+                            <p class="text-gray-500 text-center py-4">No standings available</p>
+                        @endforelse
                     </div>
                 </div>
 

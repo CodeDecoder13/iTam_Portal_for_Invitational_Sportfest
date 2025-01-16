@@ -7,6 +7,7 @@ use App\Models\Game;
 use App\Models\Team;
 use App\Models\User;
 use App\Models\Player;
+use App\Models\Standing;
 use App\Models\ActivityLog;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -75,9 +76,18 @@ class UserController extends Controller
             }
         })->filter();
 
+        // Get standings grouped by category
+        $standings = Standing::with(['team.coach'])
+        ->select('standings.*')
+        ->orderBy('wins', 'desc')
+        ->get()
+        ->groupBy('sport_category')
+        ->map(function ($categoryStandings) {
+            return $categoryStandings->take(3);
+        });                                       
 
     // Pass all data to the dashboard view
-    return view('dashboard', compact('teams', 'activities', 'upcomingGames'));
+    return view('dashboard', compact('teams', 'activities', 'upcomingGames','standings'));
 }
 
 
