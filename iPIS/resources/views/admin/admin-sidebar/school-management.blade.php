@@ -22,21 +22,22 @@
                 name="search" 
                 placeholder="Search schools..." 
                 value="{{ request('search') }}"
-                class="sm:max-w-[300px] p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="sm:max-w-[300px] p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-300 focus:border-green-300"
+                 
             />
             <div class="flex flex-1 gap-4">
                 <select 
                     name="sport" 
                     class="w-full sm:w-[150px] p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                    <option value="">Sports</option>
+                    <option value="">Sport Category</option>
                     <!-- Dynamically populate sports -->
                 </select>
                 <select 
                     name="team" 
                     class="w-full sm:w-[150px] p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                    <option value="">Team</option>
+                    <option value="">Team Name</option>
                     <!-- Dynamically populate teams -->
                 </select>
                 <select 
