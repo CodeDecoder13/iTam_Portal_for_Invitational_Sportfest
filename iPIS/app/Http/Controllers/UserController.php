@@ -16,7 +16,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -524,56 +526,77 @@ class UserController extends Controller
         return view('user-sidebar.add-teams');
     }
     public function storeTeam(Request $request)
-    {
-        
-
+{
+    try {
         $validator = Validator::make($request->all(), [
             'sport' => 'required|string',
             'team_name' => 'required|string|max:255',
-            'team_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:25600',
+            'team_logo' => 'required|image|mimes:jpeg,png,jpg,gif|max:25600',
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
+            ], 422);
         }
 
-        $coachId = auth()->user()->id;
-        $schoolName = auth()->user()->school_name;
-        $sportCategory = $request->input('sport');
+        $user = Auth::user();
+        $schoolName = Str::slug($user->school_name);
+        $sportCategory = Str::slug($request->input('sport'));
 
-        $teamFolderPath = "public/{$schoolName}/{$sportCategory}";
-
-        if (!Storage::exists($teamFolderPath)) {
-            Storage::makeDirectory($teamFolderPath);
-        }
-
-        $teamLogoPath = null;
-
+        // Build the storage path
+        $teamFolderPath = "teams/{$schoolName}/{$sportCategory}";
+        
+        // Handle logo upload
         if ($request->hasFile('team_logo')) {
-            $teamLogoPath = $request->file('team_logo')->store("{$teamFolderPath}/team_logos");
-            $teamLogoPath = str_replace('public/', '', $teamLogoPath);
+            $file = $request->file('team_logo');
+            $fileName = Str::slug($request->input('team_name')) . '.' . $file->getClientOriginalExtension();
+            $teamLogoPath = Storage::disk('public')->putFileAs(
+                $teamFolderPath,
+                $file,
+                $fileName
+            );
+
+            // Create or update team with team_logo field
+            $team = Team::updateOrCreate(
+                ['name' => $request->input('team_name')],
+                [
+                    'sport_category' => $request->input('sport'),
+                    'coach_id' => $user->id,
+                    'team_logo' => $teamLogoPath, // Changed from logo_path to team_logo
+                ]
+            );
+
+            // Log activity
+            ActivityLogHelper::logActivity(
+                $user,
+                'team_added',
+                "Added new team: {$team->name} ({$team->sport_category})"
+            );
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Team saved successfully!',
+                'team' => $team,
+                'logo_url' => Storage::url($teamLogoPath)
+            ]);
         }
 
-        $team = Team::updateOrCreate(
-            ['name' => $request->input('team_name')],
-            [
-                'sport_category' => $sportCategory,
-                'coach_id' => $coachId,
-                'logo_path' => $teamLogoPath,
-            ]
-        );
+        return response()->json([
+            'success' => false,
+            'message' => 'Team logo is required'
+        ], 422);
 
-         // Define the user variable
-         $user = Auth::user(); // Ensure this line is added
-         // Log the activity for team addition
-         ActivityLogHelper::logActivity(
-             $user,
-             'team_added',
-             sprintf('added a new team: %s (%s)', $team->name, $team->sport_category)
-         );
-
-        return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
+    } catch (\Exception $e) {
+        \Log::error('Team creation error: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Error creating team: ' . $e->getMessage()
+        ], 500);
     }
+}
 
 
     public function deletePlayer(Request $request)
@@ -836,4 +859,76 @@ class UserController extends Controller
             return response()->json(['status' => 400, 'message' => 'Error: ' . $e->getMessage()]);
         }
     }
+    //added for settings page
+    public function settings()
+    {
+        $user = Auth::user();
+        return view('user-sidebar.settings', compact('user'));
+    }
+    public function updateSettings(Request $request)
+{
+    try {
+        $user = Auth::user();
+        
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'role' => 'required|string|max:50',
+        ]);
+
+        $user->update($validated);
+
+        return response()->json([
+            'message' => 'Profile settings updated successfully',
+            'data' => $user
+        ]);
+        
+    } catch (ValidationException $e) {
+        return response()->json([
+            'message' => 'Validation error',
+            'errors' => $e->errors()
+        ], 422);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Error updating settings',
+            'errors' => [$e->getMessage()]
+        ], 500);
+    }
+}
+
+    public function updatePassword(Request $request)
+    {
+        try {
+            $request->validate([
+                'current_password' => 'required|string',
+                'password' => 'required|string|min:8|confirmed',
+            ]);
+
+            $user = Auth::user();
+
+            if (!Hash::check($request->current_password, $user->password)) {
+                return response()->json([
+                    'status' => 422,
+                    'message' => 'Current password is incorrect'
+                ]);
+            }
+
+            $user->password = Hash::make($request->password);
+            $user->save();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Password updated successfully'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error updating admin password: ' . $e->getMessage());
+            return response()->json([
+                'status' => 500,
+                'message' => 'Error updating password: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    
 }

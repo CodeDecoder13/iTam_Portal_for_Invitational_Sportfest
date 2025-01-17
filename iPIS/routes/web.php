@@ -55,6 +55,12 @@ Route::middleware(['auth','verified'])->group(function () {
     
     
 });
+// added for settings page user
+Route::middleware(['auth','verified'])->group(function () {
+    Route::get('/user-settings', [UserController::class, 'settings'])->name('settings');
+    Route::post('/user-settings/update', [UserController::class, 'updateSettings'])->name('settings.update');
+    Route::post('/user-settings/update-password', [UserController::class, 'updatePassword'])->name('settings.update-password');
+});
 // added for myteam page
 Route::middleware(['auth','verified'])->group(function () { 
     Route::get('/my-team', [UserController::class, 'myTeam'])->name('my-team');

@@ -9,5 +9,6 @@
             "username": "postgres",
             "database": "sadoDb"
         }
-    ]
+    ],
+    "CodeGPT.apiKey": "LM Studio"
 }

@@ -154,15 +154,15 @@
     @endif
     <hr class="my-6" />
    
-    <!--
+    
     <ul class="nav nav-pills flex-column mt-auto">
         <li>
-            <a href="#" class="nav-link text-white">
+            <a href="{{ route('settings') }}" class="nav-link text-white">
                 <ion-icon name="settings"></ion-icon>
                 Settings
             </a>
         </li>
-        -->
+        
         @if (Auth::user()->is_active)
         <li>
             <form method="POST" action="{{ route('logout') }}">

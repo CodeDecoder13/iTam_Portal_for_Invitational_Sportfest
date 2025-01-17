@@ -166,25 +166,35 @@ class AdminController extends Controller
 
     
     public function schoolManagement(Request $request)
-    {
-        $query = User::query(); // Start with all users
+{
+    $query = User::query(); // Start with all users
 
-        if ($request->has('search')) {
-            $query->where(function($q) use ($request) {
-                $q->where('first_name', 'like', '%' . $request->search . '%')
-                ->orWhere('last_name', 'like', '%' . $request->search . '%')
-                ->orWhere('school_name', 'like', '%' . $request->search . '%')
-                ->orWhere('email', 'like', '%' . $request->search . '%');
-            });
-        }
-
-        $users = $query->paginate(10);
-
-        // Debugging: Log the users data
-        \Log::info("Fetched users for school management:", $users->toArray());
-
-        return view('admin.admin-sidebar.school-management', compact('users'));
+    if ($request->has('search')) {
+        $query->where(function($q) use ($request) {
+            $q->where('first_name', 'like', '%' . $request->search . '%')
+            ->orWhere('last_name', 'like', '%' . $request->search . '%')
+            ->orWhere('school_name', 'like', '%' . $request->search . '%')
+            ->orWhere('email', 'like', '%' . $request->search . '%');
+        });
     }
+
+    $users = $query->paginate(10);
+
+    // Fetch team logos for each user
+    foreach ($users as $user) {
+        $team = Team::where('coach_id', $user->id)->first();
+        if ($team && $team->team_logo && Storage::disk('public')->exists($team->team_logo)) {
+            $user->logo_url = Storage::url($team->team_logo);
+        } else {
+            $user->logo_url = asset('images/placeholder.png');
+        }
+    }
+
+    // Debugging: Log the users data
+    \Log::info("Fetched users for school management:", $users->toArray());
+
+    return view('admin.admin-sidebar.school-management', compact('users'));
+}
         
 
 
@@ -551,15 +561,30 @@ public function search(Request $request)
     //card school management
     public function cardSchoolManagement($id)
     {
-        $user = User::findOrFail($id);
-        
-        // Fetch team and player information for the specific user
-        $team = Team::where('coach_id', $id)->first();
-        $players = $team ? Player::where('team_id', $team->id)->get() : collect();
-        
+        try {
+            $user = User::findOrFail($id);
+            
+            // Fetch team and player information for the specific user
+            $team = Team::where('coach_id', $id)->first();
+            
+            if ($team && $team->team_logo) {
+                // Ensure the logo path exists in storage
+                if (!Storage::disk('public')->exists($team->team_logo)) {
+                    \Log::warning("Team logo not found: {$team->team_logo}");
+                    $team->team_logo = null;
+                }
+            }
+            
+            $players = $team ? Player::where('team_id', $team->id)->get() : collect();
     
-
-        return view('admin.admin-sidebar.sub-school-management.card-school-management', compact('user', 'team', 'players'));
+            return view('admin.admin-sidebar.sub-school-management.card-school-management', 
+                compact('user', 'team', 'players')
+            );
+            
+        } catch (\Exception $e) {
+            \Log::error('Error in cardSchoolManagement: ' . $e->getMessage());
+            return back()->with('error', 'Unable to load school management card.');
+        }
     }
 
 

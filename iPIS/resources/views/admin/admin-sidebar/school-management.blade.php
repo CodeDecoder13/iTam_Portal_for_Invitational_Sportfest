@@ -50,49 +50,57 @@
         </form>
 
         <!-- Cards Section -->
-        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            @foreach ($users as $user)
-                <div class="border rounded-lg shadow-lg bg-white p-4">
-                    <div class="flex items-center gap-4">
-                        <div class="w-16 h-16 relative rounded-full overflow-hidden bg-gray-200">
-                            <!-- Add dynamic image if available -->
-                            <img 
-                                src="{{ $user->school_logo ?? '/placeholder.svg' }}" 
-                                alt="School logo" 
-                                class="w-full h-full object-cover"
-                            />
-                        </div>
-                        <h2 class="text-lg font-semibold">{{ $user->school_name ?? 'N/A' }}</h2>
-                    </div>
-                    <div class="space-y-2 mt-4">
-                        <div class="flex items-center gap-2 text-sm text-gray-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                            </svg>
-                            <span><strong>Coach:</strong> {{ $user->first_name . ' ' . $user->last_name }}</span>
-                        </div>
-                        <div class="flex items-center gap-2 text-sm text-gray-700">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm2-8h-4V7h4v2z" />
-                            </svg>
-                            <span><strong>Status:</strong> 
-                                <span class="px-2 py-1 rounded-full text-xs font-semibold {{ $user->is_active ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600' }}">
-                                    {{ $user->is_active ? 'Active' : 'Inactive' }}
-                                </span>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <a 
-                            href="{{ route('admin.card-school-management', $user->id) }}" 
-                            class="block w-full text-center bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded-lg font-semibold"
-                        >
-                            View Details
-                        </a>
-                    </div>
+<div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    @foreach ($users as $user)
+        <div class="border rounded-lg shadow-lg bg-white p-4">
+            <!-- Header with Logo and School Name -->
+            <div class="flex items-center gap-4 mb-4">
+                <div class="relative h-16 w-16">
+                    <img 
+                        src="{{ $user->logo_url }}"
+                        alt="{{ $user->school_name ?? 'School Logo' }}"
+                        class="w-full h-full object-contain"
+                        onerror="this.src='{{ asset('images/placeholder.png') }}'"
+                    />
                 </div>
-            @endforeach
+                <h2 class="text-lg font-semibold">{{ $user->school_name ?? 'N/A' }}</h2>
+            </div>
+
+            <!-- User Details -->
+            <div class="space-y-2">
+                <div class="flex items-center gap-2 text-sm text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                    </svg>
+                    <span><strong>Coach:</strong> {{ $user->first_name . ' ' . $user->last_name }}</span>
+                </div>
+
+                <div class="flex items-center gap-2 text-sm text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm2-8h-4V7h4v2z" />
+                    </svg>
+                    <span><strong>Status:</strong> 
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold {{ $user->is_active ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600' }}">
+                            {{ $user->is_active ? 'Active' : 'Inactive' }}
+                        </span>
+                    </span>
+                </div>
+
+                <!-- View Details Button -->
+                <div class="mt-4 flex justify-end">
+                    <a href="{{ route('admin.card-school-management', ['id' => $user->id]) }}" 
+                       class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        View Details
+                    </a>
+                </div>
+            </div>
         </div>
+    @endforeach
+</div>
 
         <!-- Pagination -->
         <div class="mt-4">

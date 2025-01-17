@@ -3,14 +3,21 @@
         <!-- Header section with Back button and School name -->
         <div class="flex justify-between items-center mb-8">
             <div class="flex items-center space-x-4">
-                <div class="relative h-16 w-16 overflow-hidden rounded-full">
-                    <img
-                    src="/placeholder.svg?height=64&width=64"
-                    alt="{{ $user->school_name ?? 'School Logo' }}"
-                    class="object-cover"
-                />
-                
-               
+                <div class="relative h-32 w-32"> <!-- Changed size to larger -->
+                    @if($team && $team->team_logo)
+                        <img 
+                            src="{{ Storage::url($team->team_logo) }}"
+                            alt="{{ $user->school_name ?? 'School Logo' }}"
+                            class="w-full h-full object-contain"
+                            onerror="this.src='{{ asset('images/placeholder.png') }}'"
+                        />
+                    @else
+                        <img
+                            src="{{ asset('images/placeholder.png') }}"
+                            alt="{{ $user->school_name ?? 'School Logo' }}"
+                            class="w-full h-full object-contain"
+                        />
+                    @endif
                 </div>
                 
                 
@@ -63,9 +70,12 @@
         <div class="p-5">
             <div class="text-gray-800 text-4xl mb-2">Player Management</div>
             <p class="text-gray-700 text-sm mb-4">Manage player information with Create, Read, Update, and Delete operations</p>
-            <button class="bg-white text-orange-500 font-bold py-2 px-4 rounded w-full">
-                <a href="{{ route('admin.player-management', ['id' => $user->id]) }}">Player Management</a>
-            </button>
+            
+                <a href="{{ route('admin.player-management', ['id' => $user->id]) }}"
+                    class="bg-white text-orange-500 font-bold py-2 px-4 rounded w-full">
+                    Player Management
+                </a>
+            
         </div>
     </div>
 
@@ -74,9 +84,10 @@
         <div class="p-5">
             <div class="text-gray-800 text-4xl mb-2">Team Management</div>
             <p class="text-gray-700 text-sm mb-4">Manage teams and oversee team-related operations efficiently.</p>
-            <button class="bg-white text-purple-500 font-bold py-2 px-4 rounded w-full">
-                <a href="{{ route('admin.team-management', ['id' => $user->id]) }}">View Team</a>
-            </button>
+            <a href="{{ route('admin.team-management', ['id' => $user->id]) }}" 
+                class="bg-white text-purple-500 font-bold py-2 px-4 rounded w-full inline-block text-center hover:bg-purple-50 transition-colors">
+                 View Team
+             </a>
         </div>
     </div>
 
