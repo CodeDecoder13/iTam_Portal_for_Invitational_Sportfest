@@ -700,13 +700,11 @@ class UserController extends Controller
     public function teamManagement($id)
     {
         $team = Team::with(['players', 'coach'])->findOrFail($id);
-        $user = $team->coach; // This assumes the coach is stored in the 'coach' relationship
+        $user = $team->coach; 
 
         // Get the count of active and inactive players
         $activePlayers = $team->players->where('is_active', true)->count();
         $inactivePlayers = $team->players->where('is_active', false)->count();
-
-    
 
         return view('user-sidebar.sub-team-management.team-management', compact('team', 'user', 'activePlayers', 'inactivePlayers'));
     }
