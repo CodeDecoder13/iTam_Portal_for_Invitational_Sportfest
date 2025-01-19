@@ -25,8 +25,9 @@
         
                 <!-- Add New Coach button -->
                 <li class="w-full sm:w-auto flex justify-end items-end">
-                    <button class="btn btn-success h-2/3" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                        <sup>+</sup>Add New Coach
+                  
+                    <button class= "py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-green-600 text-white hover:bg-green-800 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none data-bs-toggle="modal" data-bs-target="#addUserModal">
+                        Add New Coach
                     </button>
                 </li>
             </div>

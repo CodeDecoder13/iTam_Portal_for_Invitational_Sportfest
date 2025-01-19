@@ -8,8 +8,8 @@
             </div>
             <!-- Add User Button -->
             <div class="mt-4 flex justify-end">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                    Add User
+                <button class= "py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-green-600 text-white hover:bg-green-800 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none data-bs-toggle="modal" data-bs-target="#addUserModal">
+                    Add New Coach
                 </button>
             </div>
 
