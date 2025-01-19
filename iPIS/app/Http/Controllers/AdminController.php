@@ -190,9 +190,6 @@ class AdminController extends Controller
         }
     }
 
-    // Debugging: Log the users data
-    \Log::info("Fetched users for school management:", $users->toArray());
-
     return view('admin.admin-sidebar.school-management', compact('users'));
 }
         
@@ -818,5 +815,17 @@ public function search(Request $request)
                 'message' => 'Error fetching password: ' . $e->getMessage()
             ]);
         }
+    }
+
+    // search module in school management
+    public function searchModelUser(Request $request)
+    {
+        $searchTerm = $request->input('searchTerm');
+        $searchResults = User::where('first_name', 'LIKE', '%' . $searchTerm . '%')
+            ->orWhere('last_name', 'LIKE', '%' . $searchTerm . '%')
+            ->orWhere('email', 'LIKE', '%' . $searchTerm . '%')
+            ->get();
+
+        return view('admin.admin-sidebar.sub-school-management.card-school-management', compact('searchResults'));
     }
 }
