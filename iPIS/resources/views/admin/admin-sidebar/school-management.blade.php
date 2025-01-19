@@ -7,14 +7,14 @@
                 <p class="text-sm text-gray-600">Manage and Organize School Players</p>
             </div>
             <!-- Add User Button -->
-            <div class="mt-4 flex justify-end">
-                <button class= "py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-green-600 text-white hover:bg-green-800 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none data-bs-toggle="modal" data-bs-target="#addUserModal">
-                    Add New Coach
-                </button>
-            </div>
+         <div class="mt-4 flex justify-end">
+            <button type="button" class="btn btn-primary py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-green-600 text-white hover:bg-green-800 focus:outline-none focus:bg-green-700 disabled:opacity-50 disabled:pointer-events-none" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                Add A New Coach
+            </button>
+        </div>
 
-            <!-- Include the Add User Modal Component -->
-            <x-add-user-form />
+        <!-- Include the Add User Modal Component -->
+        <x-add-user-form />
         </div>
 
         <div class="mt-6">

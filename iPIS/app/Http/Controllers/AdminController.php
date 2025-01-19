@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
@@ -241,17 +242,18 @@ class AdminController extends Controller
             'role' => $request->role,
 
         ]);
-        Log::info($request->all());
-        // Fetch the school name from the user model
-        $schoolName = $user->school_name;
+        
+        $user = Auth::user();
+        $schoolName = Str::slug($user->school_name);
+        $sportCategory = Str::slug($request->input('sport'));
 
-        // Define the path for the school folder
-        $schoolFolderPath = "public/{$schoolName}";
+        // Build the storage path
+        $teamFolderPath = "teams/{$schoolName}/{$sportCategory}";
 
         // Check if the folder already exists
-        if (!Storage::exists($schoolFolderPath)) {
+        if (!Storage::exists($teamFolderPath)) {
             // Create the folder
-            Storage::makeDirectory($schoolFolderPath);
+            Storage::makeDirectory($teamFolderPath);
         }
 
         return response()->json(['message' => 'User added successfully', 'user' => $user], 200);
@@ -651,8 +653,12 @@ public function search(Request $request)
             ]
         );
 
-        // Define the path for the sport category folder
-        $teamFolderPath = "public/{$coach->school_name}/{$team->sport_category}";
+        $user = Auth::user();
+        $schoolName = Str::slug($user->school_name);
+        $sportCategory = Str::slug($request->input('sport'));
+
+        // Build the storage path
+        $teamFolderPath = "teams/{$schoolName}/{$sportCategory}";
 
         // Check if the folder already exists
         if (!Storage::exists($teamFolderPath)) {
