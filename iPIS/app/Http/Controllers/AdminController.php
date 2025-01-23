@@ -993,4 +993,40 @@ public function search(Request $request)
             ], 500);
         }
     }
+
+    public function searchUsersSchoolManagement(Request $request)
+    {
+        try {
+            $searchTerm = $request->input('term');
+            
+            $users = User::where(function($query) use ($searchTerm) {
+                $query->whereRaw('LOWER(first_name) LIKE ?', ['%' . strtolower($searchTerm) . '%'])
+                      ->orWhereRaw('LOWER(last_name) LIKE ?', ['%' . strtolower($searchTerm) . '%'])
+                      ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($searchTerm) . '%'])
+                      ->orWhereRaw('LOWER(school_name) LIKE ?', ['%' . strtolower($searchTerm) . '%']);
+            })->get();
+
+            // Add logo_url to each user
+            $users->each(function($user) {
+                $team = Team::where('coach_id', $user->id)->first();
+                if ($team && $team->team_logo && Storage::disk('public')->exists($team->team_logo)) {
+                    $user->logo_url = Storage::url($team->team_logo);
+                } else {
+                    $user->logo_url = asset('images/placeholder.png');
+                }
+            });
+
+            return response()->json([
+                'status' => 200,
+                'data' => $users
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Search error: ' . $e->getMessage());
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

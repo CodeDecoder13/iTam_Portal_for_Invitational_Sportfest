@@ -111,23 +111,14 @@
         const usersTable = document.querySelector('.grid');
         let searchTimeout;
 
-        // Add New Coach button HTML
-        const addNewCoachButton = `
-            <li class="w-full sm:w-auto flex justify-end items-end mb-4">
-                <button class="btn btn-success h-2/3" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                    <sup>+</sup>Add New Coach
-                </button>
-            </li>
-        `;
-
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
             const searchTerm = this.value.trim();
             
             if (searchTerm === '') {
-                resultsContainer.innerHTML = addNewCoachButton;
+                resultsContainer.innerHTML = '';
                 searchStatus.textContent = '';
-                usersTable.style.display = 'block';
+                usersTable.style.display = 'grid';
                 return;
             }
 
@@ -135,7 +126,7 @@
             searchStatus.textContent = 'Searching...';
             
             searchTimeout = setTimeout(() => {
-                fetch(`/admin/search-users?term=${encodeURIComponent(searchTerm)}`)
+                fetch(`/admin/search-users-schoolManagement?term=${encodeURIComponent(searchTerm)}`)
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Network response was not ok');
@@ -145,16 +136,20 @@
                     .then(response => {
                         const data = response.data || [];
                         searchStatus.textContent = `Found ${data.length} results`;
-                        resultsContainer.innerHTML = addNewCoachButton;
+                        resultsContainer.innerHTML = '';
 
                         if (data.length === 0) {
-                            resultsContainer.innerHTML += `
+                            resultsContainer.innerHTML = `
                                 <div class="p-4 bg-gray-50 rounded-lg">
                                     <p class="text-gray-500">No results found</p>
                                 </div>
                             `;
                             return;
                         }
+
+                        // Create a grid container for search results
+                        const gridContainer = document.createElement('div');
+                        gridContainer.className = 'grid gap-6 md:grid-cols-2 lg:grid-cols-3';
 
                         data.forEach(user => {
                             const resultCard = document.createElement('div');
@@ -163,13 +158,13 @@
                                 <div class="flex items-center gap-4 mb-4">
                                     <div class="relative h-16 w-16">
                                         <img 
-                                            src="${user.logo_url}"
-                                            alt="${user.school_name ?? 'School Logo'}"
+                                            src="${user.logo_url || '{{ asset('images/placeholder.png') }}'}"
+                                            alt="${user.school_name || 'School Logo'}"
                                             class="w-full h-full object-contain"
                                             onerror="this.src='{{ asset('images/placeholder.png') }}'"
                                         />
                                     </div>
-                                    <h2 class="text-lg font-semibold">${user.school_name ?? 'N/A'}</h2>
+                                    <h2 class="text-lg font-semibold">${user.school_name || 'N/A'}</h2>
                                 </div>
                                 <div class="space-y-2">
                                     <div class="flex items-center gap-2 text-sm text-gray-700">
@@ -189,7 +184,7 @@
                                         </span>
                                     </div>
                                     <div class="mt-4 flex justify-end">
-                                        <a href="{{ route('admin.card-school-management', ['id' => $user->id]) }}" 
+                                        <a href="/admin/school-management/card-school-management/${user.id}" 
                                         class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -200,8 +195,10 @@
                                     </div>
                                 </div>
                             `;
-                            resultsContainer.appendChild(resultCard);
+                            gridContainer.appendChild(resultCard);
                         });
+
+                        resultsContainer.appendChild(gridContainer);
                     })
                     .catch(error => {
                         console.error('Error fetching search results:', error);
