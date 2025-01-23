@@ -96,6 +96,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::post('/user-status/{id}', [LogsController::class, 'updateUserStatus'])->name('admin.user.status');
     Route::put('/user-update/{id}', [LogsController::class, 'updateUser'])->name('admin.user.update');
     Route::delete('/user-delete/{id}', [LogsController::class, 'deleteUser'])->name('admin.user.delete');
+    Route::get('/filter-documents', [AdminController::class, 'filterDocuments'])->name('admin.filter-documents');
 });
 //added for calendar
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {

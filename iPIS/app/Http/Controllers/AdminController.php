@@ -902,4 +902,95 @@ public function search(Request $request)
             ], 500);
         }
     }
+
+    public function filterDocuments(Request $request)
+    {
+        try {
+            $query = Player::with('team');
+
+            // Search functionality
+            if ($request->filled('search')) {
+                $searchTerm = $request->search;
+                $query->whereHas('team', function($q) use ($searchTerm) {
+                    $q->where('name', 'LIKE', "%{$searchTerm}%")
+                      ->orWhere('sport_category', 'LIKE', "%{$searchTerm}%");
+                });
+            }
+
+            // Sport category filter
+            if ($request->filled('sport_category')) {
+                $query->whereHas('team', function($q) use ($request) {
+                    $q->where('sport_category', $request->sport_category);
+                });
+            }
+
+            // Status filter
+            if ($request->filled('status')) {
+                switch ($request->status) {
+                    case 'Approved':
+                        $query->where(function($q) {
+                            $q->where('birth_certificate_status', 2)
+                              ->where('parental_consent_status', 2);
+                        });
+                        break;
+                    case 'For Review':
+                        $query->where(function($q) {
+                            $q->where('birth_certificate_status', 1)
+                              ->orWhere('parental_consent_status', 1);
+                        });
+                        break;
+                    case 'Rejected':
+                        $query->where(function($q) {
+                            $q->where('birth_certificate_status', 3)
+                              ->orWhere('parental_consent_status', 3);
+                        });
+                        break;
+                    case 'No File Attached':
+                        $query->where(function($q) {
+                            $q->where('birth_certificate_status', 0)
+                              ->orWhere('parental_consent_status', 0);
+                        });
+                        break;
+                }
+            }
+
+            $players = $query->get();
+            
+            // If no results found, return empty state message
+            if ($players->isEmpty()) {
+                return response()->json([
+                    'html' => view('admin.admin-sidebar.partials.documents-list-empty')->render(),
+                    'success' => true,
+                    'empty' => true
+                ]);
+            }
+            
+            // Group and sort the filtered results
+            $groupedPlayers = $players->groupBy(function ($player) {
+                return $player->team->sport_category . '|' . $player->team->name;
+            });
+
+            $sortedGroups = $groupedPlayers->sortByDesc(function($players) {
+                foreach ($players as $player) {
+                    if ($player->birth_certificate_status != 0 || $player->parental_consent_status != 0) {
+                        return 1;
+                    }
+                }
+                return 0;
+            });
+
+            // Render only the table body content
+            $html = view('admin.admin-sidebar.partials.documents-list', ['groupedPlayers' => $sortedGroups])->render();
+            
+            return response()->json(['html' => $html, 'success' => true]);
+
+        } catch (\Exception $e) {
+            \Log::error('Filter documents error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while filtering documents',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
