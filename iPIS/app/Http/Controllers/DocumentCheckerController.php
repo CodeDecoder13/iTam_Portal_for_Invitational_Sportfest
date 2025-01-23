@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Player;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -71,7 +72,8 @@ class DocumentCheckerController extends Controller
     public function updateDocument($playerId, $document, $type, $update)
     {
         $player = Player::findOrFail($playerId);
-        $filePath = 'public/' . $player->user->school_name . "/" . $player->team->sport_category . "/" . $player->team_id . "/" . $player->id . "/" . $document;
+        //$filePath = 'public/' . $player->user->school_name . "/" . $player->team->sport_category . "/" . $player->team_id . "/" . $player->id . "/" . $document;
+        $filePath = 'teams/' . Str::slug($player->user->school_name) . '/' . Str::slug($player->team->sport_category) . '/' . $player->team_id . '/players/' . $player->id . '/' . $document;
         $action = "";
         //will be used for the update of status
         $typeStatus = "";

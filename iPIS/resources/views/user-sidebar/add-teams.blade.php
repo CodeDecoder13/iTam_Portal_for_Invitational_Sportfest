@@ -31,10 +31,11 @@
                             <option value="Team D">Team D</option>
                         </select>
                     </div>
-                    
+            
+
                     <div class="mb-3">
                         <label for="team-logo" class="form-label">Please Provide School Logo (max of 25mb)</label>
-                        <input type="file" class="form-control" id="team-logo" name="team_logo" required>
+                        <input type="file" class="form-control" id="team-logo" name="team_logo" accept="image/*" required>
                     </div>
                     <div class="text-center">
                         <button type="submit" class="btn btn-success">Add Team</button>
@@ -45,32 +46,43 @@
     </div>
 
     <script>
-        document.getElementById('team-create-form').addEventListener('submit', function(e) {
+    document.getElementById('team-create-form').addEventListener('submit', function(e) {
     e.preventDefault();
-    var players = new FormData(this);
+    
+    const formData = new FormData(this);
     
     fetch("{{ route('store.team') }}", {
         method: 'POST',
-        body: players,
         headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-        }
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: formData
     })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(data => {
-                throw new Error(JSON.stringify(data.errors));
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: data.message
+            }).then(() => {
+                window.location.href = "{{ route('dashboard') }}";
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: data.message || 'An error occurred'
             });
         }
-        return response.json();
-    })
-    .then(data => {
-        alert(data.message);
-        window.location.href = "{{ route('dashboard') }}";
     })
     .catch(error => {
-        console.error('There was an error with the request:', error);
-        alert('Validation errors occurred: ' + error.message);
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while processing your request'
+        });
     });
 });
     </script>

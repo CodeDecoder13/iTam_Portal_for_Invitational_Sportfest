@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-
+use Carbon\Carbon;
 use App\Models\Game;
 use App\Models\Team;
 use App\Models\User;
 use App\Models\Player;
+use App\Models\Standing;
 use App\Models\ActivityLog;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -15,7 +16,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -26,31 +29,67 @@ class UserController extends Controller
     // Fetch teams associated with the coach
     $teams = Team::where('coach_id', $coachId)->get();
 
-    // Fetch recent activities for the logged-in coach, limit to 5 activities per page
-    $activities = ActivityLog::where('user_id', $coachId)
-        ->orderBy('created_at', 'desc')
-        ->paginate(5);
+    // Fetch recent activities for the logged-in coach with user details
+    $activities = ActivityLog::select([
+        'activity_logs.*',
+        'users.first_name',
+        'users.last_name',
+        'users.school_name',
+        'users.role'
+    ])
+    ->join('users', 'activity_logs.user_id', '=', 'users.id')
+    ->where('activity_logs.user_id', $coachId)
+    ->orderBy('activity_logs.created_at', 'desc')
+    ->limit(5)
+    ->get();
 
-    // Fetch upcoming games related to the teams of the logged-in coach
-    $teamIds = $teams->pluck('id'); // Get team IDs associated with the coach
+    // Fetch upcoming games
+        $teamIds = $teams->pluck('id');
 
-    $upcomingGames = Game::with(['team1.coach', 'team2.coach']) // Load coach relationship
-    ->whereIn('team1_id', $teamIds)
-    ->orWhereIn('team2_id', $teamIds)
-    ->orderBy('game_date', 'asc')
-    ->paginate(5); // Paginate the results (5 per page)
+        $upcomingGames = Game::with([
+            'team1.coach',
+            'team2.coach'
+        ])
+        ->where(function($query) use ($teamIds) {
+            $query->whereIn('team1_id', $teamIds)
+                ->orWhereIn('team2_id', $teamIds);
+        })
+        ->where('game_date', '>=', now())
+        ->orderBy('game_date', 'asc')
+        ->limit(5)
+        ->get();
 
-// Apply transformation to add school names
-$upcomingGames->getCollection()->transform(function ($game) {
-    // Fetch school names from the coach (User model)
-    $game->team1_school_name = $game->team1 && $game->team1->coach ? $game->team1->coach->school_name : 'N/A';
-    $game->team2_school_name = $game->team2 && $game->team2->coach ? $game->team2->coach->school_name : 'N/A';
-    return $game;
-}); 
+        // Transform games data with error handling
+        $upcomingGames->transform(function ($game) {
+            try {
+                return [
+                    'id' => $game->id,
+                    'team1_school_name' => $game->team1->coach->school_name ?? 'N/A',
+                    'team2_school_name' => $game->team2->coach->school_name ?? 'N/A',
+                    'sport_category' => $game->sport_category ?? 'N/A', // Use direct column
+                    'game_date' => Carbon::parse($game->game_date)->format('M d, Y, D '),
+                    'start_time' => Carbon::parse($game->start_time)->format('h:i A'),
+                    'team1_score' => $game->team1_score ?? 0,
+                    'team2_score' => $game->team2_score ?? 0
+                ];
+            } catch (\Exception $e) {
+                \Log::error('Game transformation error: ' . $e->getMessage());
+                return null;
+            }
+        })->filter();
 
+        // Get standings grouped by category
+        $standings = Standing::with(['team.coach'])
+        ->select('standings.*')
+        ->orderBy('wins', 'desc')
+        ->get()
+        ->groupBy('sport_category')
+        ->map(function ($categoryStandings) {
+            return $categoryStandings->take(3);
+        });                                       
 
     // Pass all data to the dashboard view
-    return view('dashboard', compact('teams', 'activities', 'upcomingGames'));
+    return view('dashboard', compact('teams', 'activities', 'upcomingGames','standings'));
 }
 
 
@@ -119,87 +158,103 @@ $upcomingGames->getCollection()->transform(function ($game) {
 
     // Method to create a folder for a newly created player
     public function createPlayerFolder(Player $player)
-    {
-        // Fetch the school name, team ID, and player ID
-        $team = $player->team;
-        $coach = $team->coach;
-        $schoolName = $coach->school_name;
-        $sportCategory = $team->sport_category;
-        $teamId = $team->id;
-        $playerId = $player->id;
+{
+    // Retrieve the team associated with the player
+    $team = $player->team;
 
-        // Define the path for the player's folder using school_name, team_id, and player_id
-        $playerFolderPath = "public/{$schoolName}/{$sportCategory}/{$teamId}/{$playerId}";
+    // Retrieve the coach associated with the team
+    $coach = $team->coach;
 
-        // Check if the folder already exists
-        if (!Storage::exists($playerFolderPath)) {
-            // Create the folder
-            Storage::makeDirectory($playerFolderPath);
-        }
+    // Generate slugified names for school and sport category
+    $schoolName = Str::slug($coach->school_name);
+    $sportCategory = Str::slug($team->sport_category);
+
+    // Build the folder path using team ID and player ID
+    $playerFolderPath = "teams/{$schoolName}/{$sportCategory}/{$team->id}/players/{$player->id}";
+
+    // Check if the folder already exists
+    if (!Storage::disk('public')->exists($playerFolderPath)) {
+        // Create the folder
+        Storage::disk('public')->makeDirectory($playerFolderPath);
     }
 
+    return $playerFolderPath;
+}
 
-    public function uploadPlayerDocuments(Request $request, $playerId)
-    {
-        $player = Player::findOrFail($playerId);
 
-        $team = $player->team;
-        $coach = $team->coach;
-        $schoolName = $coach->school_name;
-        $sportCategory = $team->sport_category;
-        $teamId = $team->id;
 
-        // Define the path for the player's folder
-        $playerFolderPath = "public/$schoolName/$sportCategory/$teamId/$playerId";
+public function uploadPlayerDocuments(Request $request, $playerId)
+{
+    $player = Player::findOrFail($playerId);
 
-        // Check if the folder already exists
-        if (!Storage::exists($playerFolderPath)) {
-            // Create the folder
-            Storage::makeDirectory($playerFolderPath);
-        }
+    $team = $player->team;
+    $coach = $team->coach;
 
-        $documentUploaded = false;
+    // Debug logging
+    \Log::info('Uploading document for player:', [
+        'playerId' => $playerId,
+        'teamId' => $team->id,
+        'schoolName' => $coach->school_name,
+        'sportCategory' => $team->sport_category
+    ]);
 
-        // Handle the upload of the birth certificate
-        if ($request->hasFile('birth_certificate')) {
-            $birthCertificate = $request->file('birth_certificate');
-            $birthCertificateName = 'birth_certificate.' . $birthCertificate->getClientOriginalExtension();
-            $birthCertificate->storeAs($playerFolderPath, $birthCertificateName);
-            $player->birth_certificate = $birthCertificateName;
-            $player->birth_certificate_status = 1; // Set status to "For Review"
-            $documentUploaded = true;
+    $schoolName = Str::slug($coach->school_name);
+    $sportCategory = Str::slug($team->sport_category);
+    $path = "teams/{$schoolName}/{$sportCategory}/{$team->id}/players/{$player->id}";
+    
+    \Log::info("Document storage path: {$path}");
 
-            // Log the activity for birth certificate upload
-            ActivityLogHelper::logActivity(
-                auth()->user(),
-                'Uploaded a document',
-                "Uploaded birth certificate for player {$player->first_name} {$player->last_name} in team {$team->name}."
-            );
-        }
-
-        // Handle the upload of the parental consent
-        if ($request->hasFile('parental_consent')) {
-            $parentalConsent = $request->file('parental_consent');
-            $parentalConsentName = 'parental_consent.' . $parentalConsent->getClientOriginalExtension();
-            $parentalConsent->storeAs($playerFolderPath, $parentalConsentName);
-            $player->parental_consent = $parentalConsentName;
-            $player->parental_consent_status = 1; // Set status to "For Review"
-            $documentUploaded = true;
-
-            // Log the activity for parental consent upload
-            ActivityLogHelper::logActivity(
-                auth()->user(),
-                'Uploaded a document',
-                "Uploaded parental consent for player {$player->first_name} {$player->last_name} in team {$team->name}."
-            );
-        }
-
-        // Save the player's updated information
-        $player->save();
-
-        // Return with a success message
-        return redirect()->back()->with('success', 'Documents uploaded successfully and status updated to "For Review".');
+    // Check if the folder already exists, create if not
+    if (!Storage::exists($path)) {
+        Storage::makeDirectory($path);
     }
+
+    $documentUploaded = false;
+
+    // Handle the upload of the birth certificate
+    if ($request->hasFile('birth_certificate')) {
+        $birthCertificate = $request->file('birth_certificate');
+        $birthCertificateName = 'birth_certificate.' . $birthCertificate->getClientOriginalExtension();
+        $birthCertificate->storeAs($path, $birthCertificateName);
+        $player->birth_certificate = $birthCertificateName;
+        $player->birth_certificate_status = 1; // Set status to "For Review"
+        $documentUploaded = true;
+
+        // Log the activity for birth certificate upload
+        ActivityLogHelper::logActivity(
+            auth()->user(),
+            'Uploaded a document',
+            "Uploaded birth certificate for player {$player->first_name} {$player->last_name} in team {$team->name}."
+        );
+    }
+
+    // Handle the upload of the parental consent
+    if ($request->hasFile('parental_consent')) {
+        $parentalConsent = $request->file('parental_consent');
+        $parentalConsentName = 'parental_consent.' . $parentalConsent->getClientOriginalExtension();
+        $parentalConsent->storeAs($path, $parentalConsentName);
+        $player->parental_consent = $parentalConsentName;
+        $player->parental_consent_status = 1; // Set status to "For Review"
+        $documentUploaded = true;
+
+        // Log the activity for parental consent upload
+        ActivityLogHelper::logActivity(
+            auth()->user(),
+            'Uploaded a document',
+            "Uploaded parental consent for player {$player->first_name} {$player->last_name} in team {$team->name}."
+        );
+    }
+
+    // Save the player's updated information
+    $player->save();
+
+    // Return with a success message
+    return redirect()->back()->with(
+        'success',
+        'Documents uploaded successfully and status updated to "For Review".'
+    );
+}
+
 
 
 
@@ -482,61 +537,99 @@ $upcomingGames->getCollection()->transform(function ($game) {
         return view('user-sidebar.my-players', compact('players', 'teams'));
     }
 
-    public function addTeams()
+    public function addTeams(Request $request)
     {
         return view('user-sidebar.add-teams');
     }
+
     public function storeTeam(Request $request)
     {
-        
+        try {
+            // Validate input
+            $validator = Validator::make($request->all(), [
+                'sport' => 'required|string',
+                'team_name' => 'required|string|max:255',
+                'team_logo' => 'required|image|mimes:jpeg,png,jpg,gif|max:25600',
+            ]);
 
-        $validator = Validator::make($request->all(), [
-            'sport' => 'required|string',
-            'team_name' => 'required|string|max:255',
-            'team_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:25600',
-        ]);
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
+            $user = Auth::user();
+            $schoolName = Str::slug($user->school_name);
+            $sportCategory = Str::slug($request->input('sport'));
+
+            // Create the team and retrieve its ID
+            $team = Team::create([
+                'name' => $request->input('team_name'),
+                'sport_category' => $request->input('sport'),
+                'coach_id' => $user->id,
+                'is_active' => true,
+            ]);
+
+            // Centralized storage path
+            $teamFolderPath = "teams/{$schoolName}/{$sportCategory}/{$team->id}";
+
+            // Handle logo upload
+            if ($request->hasFile('team_logo')) {
+                $file = $request->file('team_logo');
+                $fileName = Str::slug($request->input('team_name')) . '.' . $file->getClientOriginalExtension();
+                $teamLogoPath = $teamFolderPath . '/' . $fileName;
+
+                // Check if file already exists and handle duplicates if necessary
+                if (Storage::disk('public')->exists($teamLogoPath)) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'A logo with the same name already exists. Please rename your file.',
+                    ], 422);
+                }
+
+                // Save file
+                Storage::disk('public')->put($teamLogoPath, file_get_contents($file));
+
+                // Update or create team
+                $team = Team::updateOrCreate(
+                    ['name' => $request->input('team_name')],
+                    [
+                        'sport_category' => $request->input('sport'),
+                        'coach_id' => $user->id,
+                        'team_logo' => $teamLogoPath,
+                    ]
+                );
+
+                // Log activity
+                ActivityLogHelper::logActivity(
+                    $user,
+                    'team_added',
+                    "Added new team: {$team->name} ({$team->sport_category})"
+                );
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Team saved successfully!',
+                    'team' => $team,
+                    'logo_url' => Storage::url($teamLogoPath),
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Team logo is required',
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Team creation error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating team: ' . $e->getMessage(),
+            ], 500);
         }
-
-        $coachId = auth()->user()->id;
-        $schoolName = auth()->user()->school_name;
-        $sportCategory = $request->input('sport');
-
-        $teamFolderPath = "public/{$schoolName}/{$sportCategory}";
-
-        if (!Storage::exists($teamFolderPath)) {
-            Storage::makeDirectory($teamFolderPath);
-        }
-
-        $teamLogoPath = null;
-
-        if ($request->hasFile('team_logo')) {
-            $teamLogoPath = $request->file('team_logo')->store("{$teamFolderPath}/team_logos");
-            $teamLogoPath = str_replace('public/', '', $teamLogoPath);
-        }
-
-        $team = Team::updateOrCreate(
-            ['name' => $request->input('team_name')],
-            [
-                'sport_category' => $sportCategory,
-                'coach_id' => $coachId,
-                'logo_path' => $teamLogoPath,
-            ]
-        );
-
-         // Define the user variable
-         $user = Auth::user(); // Ensure this line is added
-         // Log the activity for team addition
-         ActivityLogHelper::logActivity(
-             $user,
-             'team_added',
-             sprintf('added a new team: %s (%s)', $team->name, $team->sport_category)
-         );
-
-        return response()->json(['message' => 'Team saved successfully!', 'team' => $team]);
     }
+
 
 
     public function deletePlayer(Request $request)
@@ -605,48 +698,68 @@ $upcomingGames->getCollection()->transform(function ($game) {
         return view('user-sidebar.my-team', compact('teams', 'sportCategories'));
     }
     public function storeMyTeam(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'sport' => 'required|string',
-            'team_name' => 'required|string|max:255',
-            
-        ]);
+{
+    // Validate the incoming request
+    $validator = Validator::make($request->all(), [
+        'sport' => 'required|string',
+        'team_name' => 'required|string|max:255',
+    ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
-      
-
-        $team = Team::create([
-            'name' => $request->team_name,
-            'sport_category' => $request->sport,
-            'coach_id' => Auth::id(),
-            'is_active' => true,
-        ]);
-
-         // Define the user variable
-        $user = Auth::user(); // Ensure this line is added
-        // Log the activity for team addition
-        ActivityLogHelper::logActivity(
-            $user,
-            'team_added',
-            sprintf('added a new team: %s (%s)', $team->name, $team->sport_category)
-        );
-
-        return response()->json(['success' => true, 'team' => $team]);
+    // Handle validation failure
+    if ($validator->fails()) {
+        return response()->json([
+            'errors' => $validator->errors(),
+        ], 422);
     }
+
+    // Get the authenticated user
+    $user = Auth::user();
+
+    // Prepare variables for centralized folder path
+    $schoolName = Str::slug($user->school_name);
+    $sportCategory = Str::slug($request->input('sport'));
+
+    // Create the team and retrieve its ID
+    $team = Team::create([
+        'name' => $request->input('team_name'),
+        'sport_category' => $request->input('sport'),
+        'coach_id' => $user->id,
+        'is_active' => true,
+    ]);
+
+    // Build the unique folder path using the team ID
+    $teamFolderPath = "teams/{$schoolName}/{$sportCategory}/{$team->id}";
+
+    // Ensure the folder exists
+    if (!Storage::disk('public')->exists($teamFolderPath)) {
+        Storage::disk('public')->makeDirectory($teamFolderPath);
+    }
+
+    // Log the activity for the team addition
+    ActivityLogHelper::logActivity(
+        $user,
+        'team_added',
+        sprintf('Added a new team: %s (%s)', $team->name, $team->sport_category)
+    );
+
+    // Return a success response with the created team and folder path
+    return response()->json([
+        'success' => true,
+        'team' => $team,
+        'folder_path' => $teamFolderPath,
+    ]);
+}
+
+
     //individual team management
     public function teamManagement($id)
     {
         $team = Team::with(['players', 'coach'])->findOrFail($id);
-        $user = $team->coach; // This assumes the coach is stored in the 'coach' relationship
+        $user = $team->coach; 
 
         // Get the count of active and inactive players
         $activePlayers = $team->players->where('is_active', true)->count();
         $inactivePlayers = $team->players->where('is_active', false)->count();
-
-    
 
         return view('user-sidebar.sub-team-management.team-management', compact('team', 'user', 'activePlayers', 'inactivePlayers'));
     }
@@ -799,4 +912,78 @@ $upcomingGames->getCollection()->transform(function ($game) {
             return response()->json(['status' => 400, 'message' => 'Error: ' . $e->getMessage()]);
         }
     }
+    //added for settings page
+    public function settings()
+    {
+        $user = Auth::user();
+        return view('user-sidebar.settings', compact('user'));
+    }
+    public function updateSettings(Request $request)
+{
+    try {
+        $user = Auth::user();
+        
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'role' => 'required|string|max:50',
+        ]);
+
+        $user->update($validated);
+
+        return response()->json([
+            'message' => 'Profile settings updated successfully',
+            'data' => $user
+        ]);
+        
+    } catch (ValidationException $e) {
+        return response()->json([
+            'message' => 'Validation error',
+            'errors' => $e->errors()
+        ], 422);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Error updating settings',
+            'errors' => [$e->getMessage()]
+        ], 500);
+    }
+}
+
+    public function updatePassword(Request $request)
+    {
+        try {
+            $request->validate([
+                'current_password' => 'required|string',
+                'password' => 'required|string|min:8|confirmed',
+            ]);
+
+            $user = Auth::user();
+
+            if (!Hash::check($request->current_password, $user->password)) {
+                return response()->json([
+                    'status' => 422,
+                    'message' => 'Current password is incorrect'
+                ]);
+            }
+
+            $user->password = Hash::make($request->password);
+            $user->save();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Password updated successfully'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error updating admin password: ' . $e->getMessage());
+            return response()->json([
+                'status' => 500,
+                'message' => 'Error updating password: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    
+
+    
 }

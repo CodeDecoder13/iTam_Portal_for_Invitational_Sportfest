@@ -13,37 +13,7 @@
             </a>
     </div>
 
-    <form method="GET" action="{{ route('admin.SummaryOfPlayers') }}" class="grid grid-cols-1 mt-5">
-        <div class="grid grid-cols-12 gap-4 px-4 py-3 rounded-lg bg-gray-100">
-            <div class="col-span-5">
-                <input type="text" name="search" placeholder="Search" value="{{ request('search') }}"
-                    class="w-8/12 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-            <div class="col-span-1 flex items-center">Filtered By:</div>
-            <div class="col-span-2">
-                <select name="sport"
-                    class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Sports Category</option>
-                    <!-- Add options dynamically or statically here -->
-                </select>
-            </div>
-            <div class="col-span-2">
-                <select name="team"
-                    class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Team Name</option>
-                    <!-- Add options dynamically or statically here -->
-                </select>
-            </div>
-            <div class="col-span-2">
-                <select name="status"
-                    class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">Status</option>
-                    <!-- Add options dynamically or statically here -->
-                </select>
-            </div>
-        </div>
-        <button type="submit" class="hidden"></button>
-    </form>
+    
 
     <div class="grid grid-cols-1 mt-5">
         <!-- Header Row -->
@@ -190,22 +160,45 @@
             var docType = button.data('doc');
             var playerId = button.data('player_id');
             var teamId = button.data('team_id');
-            var schoolName = button.data('school_name');
-            var sportCategory = button.data('sport_category');
+            var schoolName = button.data('school_name').toLowerCase().replace(/[^\w-]+/g, '-');
+            var sportCategory = button.data('sport_category').toLowerCase().replace(/[^\w-]+/g, '-');
             var status = button.data('status');
             var modal = $(this);
             var fileName = button.data('file_name');
 
-             // Update the location based on the new file structure
-            var location = `/storage/${schoolName}/${sportCategory}/${teamId}/${playerId}/`;
-            var iframeSrc = location + fileName;
+            // Use the new route for document viewing
+            var iframeSrc = `{{ url('storage') }}/teams/${encodeURIComponent(schoolName)}/${encodeURIComponent(sportCategory)}/${teamId}/players/${playerId}/${fileName}`; 
+            console.log('Document URL:', iframeSrc); // Debug log
 
             modal.find('.modal-title').text(docType);
-    var documentType = docType.toLowerCase().replace(' ', '_');
 
-            // Set the iframe source
-    modal.find('#iframecontent').attr('src', iframeSrc);
-
+            var contentStart = `
+            <div class="d-flex flex-column h-100">
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <iframe id="iframecontent" class="w-100" src="${iframeSrc}" style="height: 70vh;"></iframe>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Comments</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="commentsContainer">
+                                    <!-- Comments will be dynamically added here -->
+                                </div>
+                                <div class="form-group mt-3">
+                                    <textarea class="form-control" rows="3" placeholder="Post additional message to the thread."></textarea>
+                                </div>
+                                <button class="btn btn-success w-100 mt-2">Add Comment</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                    <!-- Buttons will go here -->
+                </div>
+            </div>`;
 
             var contentApproved = `
                 <div class="text-center">
@@ -215,79 +208,51 @@
                         @method('POST')
                         <button class="btn btn-primary">Download</button>
                     </form>
+                    <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/0" class="d-inline-block">
+                    @csrf
+                    @method('POST')
+                    <button class="btn btn-warning">Delete</button>
+                </form>
+
                 </div>`;
+
+
                 var contentReject = `
-<div class="text-center">
-    <h5 class="text-danger mb-3">File Rejected</h5>
-    <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/2" class="d-inline-block me-2">
-        @csrf
-        <button class="btn btn-success">Approve</button>
-    </form>
-    <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/4" class="d-inline-block me-2">
-        @csrf
-        @method('POST')
-        <button class="btn btn-primary">Download</button>
-    </form>
-    <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/0" class="d-inline-block">
-        @csrf
-        @method('POST')
-        <button class="btn btn-warning">Delete</button>
-    </form>
-</div>`;
+                <div class="text-center">
+                    <h5 class="text-danger mb-3">File Rejected</h5>
+                    <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/2" class="d-inline-block me-2">
+                        @csrf
+                        <button class="btn btn-success">Approve</button>
+                    </form>
+                    <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/4" class="d-inline-block me-2">
+                        @csrf
+                        @method('POST')
+                        <button class="btn btn-primary">Download</button>
+                    </form>
+                </div>`;
 
-var contentDefault = `
-<div class="text-center">
-    <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/2" class="d-inline-block me-2">
-        @csrf
-        <button class="btn btn-success">Approve</button>
-    </form>
-    <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/3" class="d-inline-block me-2">
-        @csrf
-        <button class="btn btn-danger">Reject</button>
-    </form>
-    <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/4" class="d-inline-block me-2">
-        @csrf
-        @method('POST')
-        <button class="btn btn-primary">Download</button>
-    </form>
-    <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/0" class="d-inline-block">
-        @csrf
-        @method('POST')
-        <button class="btn btn-warning">Delete</button>
-    </form>
-</div>`;
+            var contentDefault = `
+            <div class="text-center">
+                <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/2" class="d-inline-block me-2">
+                    @csrf
+                    <button class="btn btn-success">Approve</button>
+                </form>
+                <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/3" class="d-inline-block me-2">
+                    @csrf
+                    <button class="btn btn-danger">Reject</button>
+                </form>
+                <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/4" class="d-inline-block me-2">
+                    @csrf
+                    @method('POST')
+                    <button class="btn btn-primary">Download</button>
+                </form>
+                <form method="POST" action="/admin/document/update/${playerId}/${fileName}/${docType}/0" class="d-inline-block">
+                    @csrf
+                    @method('POST')
+                    <button class="btn btn-warning">Delete</button>
+                </form>
+            </div>`;
            
-var contentStart = `
-<div class="d-flex flex-column h-100">
-    <div class="row">
-        <div class="col-md-8 mb-3">
-            <iframe id="iframecontent" class="w-100" src="${iframeSrc}" style="height: 70vh;"></iframe>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Comments</h5>
-                </div>
-                <div class="card-body">
-                    <div id="commentsContainer">
-                        <!-- Comments will be dynamically added here -->
-                    </div>
-                    <div class="form-group mt-3">
-                        <textarea class="form-control" rows="3" placeholder="Post additional message to the thread."></textarea>
-                    </div>
-                    <button class="btn btn-success w-100 mt-2">Add Comment</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="d-flex justify-content-center mt-3">
-        <!-- Buttons will go here -->
-    </div>
-</div>`;
-
-
-
-
             checkUrl(iframeSrc, function(exists) {
                 if (exists && status == 2) {
                     content = contentStart + contentApproved;

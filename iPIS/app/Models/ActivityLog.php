@@ -17,4 +17,8 @@ class ActivityLog extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function team()
+    {
+        return $this->belongsTo(Team::class, 'team_id');
+    }
 }

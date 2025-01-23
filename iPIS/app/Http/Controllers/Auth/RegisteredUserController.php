@@ -15,7 +15,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Storage;
 use App\Helpers\ActivityLogHelper;
 
-class RegisteredUserController extends Controller
+class RegisteredUserController extends Controller 
 {
     /**
      * Display the registration view.
@@ -55,17 +55,6 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
             'is_active' => false,
         ]);
-        // Fetch the school name from the user model
-        $schoolName = $user->school_name;
-
-        // Define the path for the school folder
-        $schoolFolderPath = "public/{$schoolName}";
-
-        // Check if the folder already exists
-        if (!Storage::exists($schoolFolderPath)) {
-            // Create the folder
-            Storage::makeDirectory($schoolFolderPath);
-        }
 
        // After user is successfully created
         ActivityLogHelper::logActivity($user, 'user_registered', 'registered a new user');
@@ -74,6 +63,7 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+       // return redirect()->route('dashboard');
         return redirect(route('dashboard', absolute: false));
     }
 }

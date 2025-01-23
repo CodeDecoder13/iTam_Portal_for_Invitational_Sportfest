@@ -1,213 +1,198 @@
-@php
-    /*
-    Note:
-   
-    changes
-    1. this blade
-    2. db for documents suggest
-        column name (document type) int;
-            values (0-> no file,1-> file submited, 2 -> approved, 3-> reject )
-    3. file saving storage/team_id/player_id/doc_type
-        sample storage/1/1/birth_certificate 
-    4. new route line 79 web.ph for all types of button here
-    5. file checker and enlarge modal
-
-
-     this blade may not work anymore
-    use SummaryOfPlayers_suggested.blade then delete this file if not needed anymore
-    */
-
-    $location = "storage/Men's Basketball Competitive (C)/Andrei Garcia/";
-@endphp
 <x-app-layout>
-    <section class="grid grid-cols-1">
+
+    <div class="grid grid-cols-1">
         <h1 class="font-bold mb-2 text-3xl">Summary Of Players</h1>
         <h3>Fill in player's summary to complete your requirements.</h3>
+    </div>
 
-        <form method="GET" action="{{ route('admin.SummaryOfPlayers') }}" class="grid grid-cols-1 mt-5">
-            <div class="grid grid-cols-12 gap-4 px-4 py-3 rounded-lg bg-gray-100">
-                <div class="col-span-5">
-                    <input type="text" name="search" placeholder="Search" value="{{ request('search') }}"
-                        class="w-8/12 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="col-span-1 flex items-center">Filtered By:</div>
-                <div class="col-span-2">
-                    <select name="sport"
-                        class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">Sports Category</option>
-                        <!-- Add options dynamically or statically here -->
-                    </select>
-                </div>
-                <div class="col-span-2">
-                    <select name="team"
-                        class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">Team Name</option>
-                        <!-- Add options dynamically or statically here -->
-                    </select>
-                </div>
-                <div class="col-span-2">
-                    <select name="status"
-                        class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="">Status</option>
-                        <!-- Add options dynamically or statically here -->
-                    </select>
-                </div>
-            </div>
-            <button type="submit" class="hidden"></button>
-        </form>
-        <div class="grid grid-cols-1 mt-5">
-            <div class="grid grid-cols-12 px-4 py-3 bg-green-700 text-white rounded-lg border">
-                <div class="font-bold col-span-2">Given Name</div>
-                <div class="font-bold col-span-2">School name</div>
-                <div class="font-bold col-span-2">Sport Category</div>
-                <div class="font-bold col-span-2">Team Name</div>
-                <div class="font-bold col-span-2">Status</div>
-                <div class="font-bold col-span-2">Action</div>
-            </div>
-            @foreach ($players as $player)
-                <div class="grid grid-cols-12 px-4 py-3 bg-white rounded-lg border mt-3">
-                    <div class="col-span-2">{{ $player->first_name }} {{ $player->last_name }}</div>
-                    <div class="col-span-2">
-                        @if ($player->user)
-                            {{ $player->user->school_name }}
-                        @else
-                            N/A
-                        @endif
-                    </div>
-                    <div class="col-span-2">{{ $player->team->sport_category }}</div>
-                    <div class="col-span-2">{{ $player->team->name }}</div>
-                    <div class="col-span-2">{{ $player->status }}</div>
-                    <div class="col-span-2 text-white-700">
-                        <button
-                            class="bg-green-500 hover:bg-green-400 mb-2 w-full text-white font-bold py-2 px-4 rounded"
-                            data-toggle="modal" data-target="#documentModal" data-doc="Parental Consent" data-player_id="{{$player->id}}">
-                            View Parental Consent
-                        </button>
-                        <button class="bg-blue-500 hover:bg-blue-400 w-full text-white font-bold py-2 px-4 rounded"
-                            data-toggle="modal" data-target="#documentModal" data-doc="Birth Certificate" data-player_id="{{$player->id}}">
-                            View Birth Certificate
-                        </button>
-                    </div>
+    <div class="w-full flex flex-col items-end justify-end space-y-2">
+        <a href="{{ route('admin.documents') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Go Back
+            </a>
+    </div>
 
-                </div>
-            @endforeach
+    <div class="grid grid-cols-1 mt-5">
+        <!-- Header Row -->
+        <div class="grid grid-cols-12 px-4 py-3 bg-green-700 text-white rounded-lg border">
+            <div class="font-bold col-span-2">Given Name</div>
+            <div class="font-bold col-span-2">School Name</div>
+            <div class="font-bold col-span-2">Sport Category</div>
+            <div class="font-bold col-span-2">Team Name</div>
+            <div class="font-bold col-span-2">Status</div>
+            <div class="font-bold col-span-2">Action</div>
         </div>
-    </section>
+    
+        <!-- Player Rows -->
+        @foreach ($players as $player)
+            <div class="grid grid-cols-12 px-4 py-3 bg-white rounded-lg border mt-3">
+                <div class="col-span-2">{{ $player->first_name }} {{ $player->last_name }}</div>
+                <div class="col-span-2">
+                    {{ $player->user ? $player->user->school_name : 'N/A' }}
+                </div>
+                <div class="col-span-2">{{ $player->team->sport_category }}</div>
+                <div class="col-span-2">{{ $player->team->name }}</div>
+                <div class="col-span-2">
+                    @php
+                        $status = 'No File Attached'; // Default status
+                        if ($player->birth_certificate_status == 3 || $player->parental_consent_status == 3) {
+                            $status = 'Rejected';
+                        } elseif (
+                            $player->birth_certificate_status == 2 &&
+                            $player->parental_consent_status == 2
+                        ) {
+                            $status = 'Approved';
+                        } elseif (
+                            $player->birth_certificate_status == 1 ||
+                            $player->parental_consent_status == 1
+                        ) {
+                            $status = 'For Review';
+                        }
+                    @endphp
+    
+                    @switch($status)
+                        @case('Approved')
+                            <span class="text-green-500">Approved</span>
+                        @break
+    
+                        @case('For Review')
+                            <span class="text-yellow-500">For Review</span>
+                        @break
+    
+                        @case('Rejected')
+                            <span class="text-red-500">Rejected</span>
+                        @break
+    
+                        @case('No File Attached')
+                            <span class="text-gray-500">No File Attached</span>
+                        @break
+                    @endswitch
+                </div>
+    
+                <div class="col-span-2">
+                    <div class="flex flex-col gap-2">
+                        <!-- Consent Button -->
+                        <button
+                            class="flex items-center gap-1 text-emerald-600 border-emerald-600 hover:bg-emerald-100 w-full font-bold py-2 px-4 rounded border"
+                            data-toggle="modal" data-target="#documentModal" data-doc="Parental Consent"
+                            data-team_id="{{ $player->team_id }}" data-player_id="{{ $player->id }}"
+                            data-school_name="{{ $player->user->school_name }}"
+                            data-sport_category="{{ $player->team->sport_category }}"
+                            data-status="{{ $player->parental_consent_status }}"
+                            data-file_name="{{ $player->parental_consent }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 11l3 3L22 4"></path>
+                                <path d="M21 21H3V7a4 4 0 014-4h10a4 4 0 014 4z"></path>
+                            </svg>
+                            Consent
+                        </button>
+    
+                        <!-- Certificate Button -->
+                        <button
+                            class="flex items-center gap-1 text-blue-600 border-blue-600 hover:bg-blue-100 w-full font-bold py-2 px-4 rounded border"
+                            data-toggle="modal" data-target="#documentModal" data-doc="Birth Certificate"
+                            data-team_id="{{ $player->team_id }}" data-player_id="{{ $player->id }}"
+                            data-school_name="{{ $player->user->school_name }}"
+                            data-sport_category="{{ $player->team->sport_category }}"
+                            data-status="{{ $player->birth_certificate_status }}"
+                            data-file_name="{{ $player->birth_certificate }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 4h16v16H4z"></path>
+                                <path d="M4 9h16"></path>
+                                <path d="M9 4v16"></path>
+                            </svg>
+                            Certificate
+                        </button>
+                    </div>
+                </div>
+            </div>
+        @endforeach
+    </div>
 
+    <!-- Modal -->
+<div id="documentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-4xl">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between p-4 border-b">
+                <h3 class="text-xl font-semibold text-gray-900" id="modalTitle">Document Details</h3>
+                <button type="button" class="close-modal text-gray-400 hover:text-gray-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
 
+            <!-- Modal Body -->
+            <div class="p-6">
+                <div id="documentDisplay" class="mt-4">
+                    <div id="loadingState" class="text-center py-12 hidden">
+                        <svg class="animate-spin h-8 w-8 mx-auto text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </div>
+                    <div id="documentContent" class="hidden">
+                        <iframe id="documentViewer" class="w-full h-[500px] border-0"></iframe>
+                    </div>
+                    <div id="errorState" class="text-center py-12 hidden">
+                        <p class="text-red-500">Unable to load document</p>
+                    </div>
+                </div>
+            </div>
 
-    <!-- Bootstrap Modal -->
-    <div class="modal fade" id="documentModal" tabindex="-1" role="dialog" aria-labelledby="documentModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content ">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="documentModalLabel">Document Approval</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+            <!-- Modal Footer -->
+            <div class="flex items-center justify-between p-4 border-t">
+                <div class="flex gap-2">
+                    <button id="approveBtn" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+                        Approve
+                    </button>
+                    <button id="declineBtn" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">
+                        Decline
+                    </button>
+                    <button id="deleteBtn" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                        Delete
                     </button>
                 </div>
-                <div class="modal-body min-h-96">
-                    <div class="container min-h-fit">
-                        <!-- Document 1 Section -->
-                        <div id="documentContent"></div>
-                    </div>
+                <div class="flex gap-2">
+                    <button class="close-modal px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
+                        Close
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-
-
-
-    <!-- Include Bootstrap JS and jQuery -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-    <script>
-        $('#documentModal').on('show.bs.modal', function(event) {
-            var button = $(event.relatedTarget);
-            var docType = button.data('doc');
-            var player_id = button.data('player_id');
-            var modal = $(this);
-            var location = "";
-            modal.find('.modal-title').text(docType);
-            var content = '';
-            if (docType === 'Parental Consent') {
-                content = `<!-- Parental Consent HTML Section -->
-                    <div class="row mb-4">
-                        <div class="col-md-8">
-                            <h5>Document: Parental Consent</h5>
-                                @if (file_exists(public_path($location . $player->parental_consent)))
-                                    <iframe id="iframecontent"  class="w-full min-h-96" 
-                                        src="{{ asset($location . 'parental_consent.png') }}"></iframe>
-                                @else
-                                    <div class="text-danger">Pending Parental Consent</div>
-                                @endif
-                        </div>
-                        @if (file_exists(public_path($location . 'parental_consent.png')))
-                            <div class="col-md-4 d-flex flex-column justify-content-center">
-                                <form method="POST"
-                                    action="{{ route('document.approve', ['player' => $player->id, 'document' => 'parental_consent']) }}">
-                                    @csrf
-                                    <button class="btn btn-success mb-2 w-full">Approve</button>
-                                </form>
-                                <form method="POST"
-                                    action="{{ route('document.reject', ['player' => $player->id, 'document' => 'parental_consent']) }}">
-                                    @csrf
-                                    <button class="btn btn-danger mb-2 w-full">Reject</button>
-                                </form>
-                                <a href="{{ route('document.download', ['player' => $player->id, 'document' => 'parental_consent']) }}"
-                                    class="btn btn-secondary mb-2">Download PDF</a>
-                                <form method="POST"
-                                    action="{{ route('document.delete', ['player' => $player->id, 'document' => 'parental_consent']) }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-warning w-full">Delete</button>
-                                </form>
-                            </div>
-                        @endif
-                    </div>`;
-            } else if (docType === 'Birth Certificate') {
-                content = `<!-- Birth Certificate HTML Section -->
-                    <div class="row mb-4">
-                        <div class="col-md-8">
-                            <h5>Document: Birth Certificate</h5>
-                                @if (file_exists(public_path($location . $player->birth_certificate)))
-                                    <iframe id="iframecontent"  class="w-full min-h-96" 
-                                        src="{{ asset($location . 'birth_certificate.png') }}"></iframe>
-                                @else
-                                    <div class="text-danger">Pending Birth Certificate</div>
-                                @endif
-                        </div>
-                        @if (file_exists(public_path($location . $player->birth_certificate)))
-                            <div class="col-md-4 d-flex flex-column justify-content-center">
-                                <form method="POST"
-                                    action="{{ route('document.approve', ['player' => $player->id, 'document' => 'birth_certificate']) }}">
-                                    @csrf
-                                    <button class="btn btn-success mb-2 w-full">Approve</button>
-                                </form>
-                                <form method="POST"
-                                    action="{{ route('document.reject', ['player' => $player->id, 'document' => 'birth_certificate']) }}">
-                                    @csrf
-                                    <button class="btn btn-danger mb-2 w-full">Reject</button>
-                                </form>
-                                <a href="{{ route('document.download', ['player' => $player->id, 'document' => 'birth_certificate']) }}"
-                                    class="btn btn-secondary mb-2">Download PDF</a>
-                                <form method="POST"
-                                    action="{{ route('document.delete', ['player' => $player->id, 'document' => 'birth_certificate']) }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-warning w-full">Delete</button>
-                                </form>
-                            </div>
-                        @endif
-                    </div>`;
-            }
-            modal.find('#documentContent').html(content);
-        });
-        
-    </script>
+</div>
 
 
 </x-app-layout>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('documentModal');
+        const buttons = document.querySelectorAll('[data-toggle="modal"]');
+        const closeButtons = document.querySelectorAll('.close-modal');
+    
+        // Show modal when buttons are clicked
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                modal.classList.remove('hidden');
+            });
+        });
+    
+        // Close modal functionality
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+        });
+    
+        // Close on outside click
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+            }
+        });
+    });
+    </script>

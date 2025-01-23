@@ -22,25 +22,6 @@
         </div>
         
 
-        <!--
-        <div class="flex justify-between items-center mb-6">
-            <div class="relative">
-                <input type="text" placeholder="Search..." class="border rounded-md py-2 px-4 pr-10">
-                <svg class="w-5 h-5 text-gray-500 absolute right-3 top-3" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-            </div>
-            <div class="flex items-center">
-                <span class="mr-2">View Filter</span>
-                <select class="border rounded-md py-2 px-4">
-                    <option>Monthly</option>
-                </select>
-            </div>
-        </div>
-                -->
-
         <div id="calendar"></div>
     </div>
 
@@ -155,12 +136,9 @@
                         Scores</button>
                     <button id="setDefaultBtn" class="bg-yellow-500 text-white px-3 py-1 rounded-md text-sm mr-2">Set
                         Default</button>
-                        @foreach($games as $game)
-                            <button id="deleteMatchBtn" data-id="{{ $game->id }}" class="bg-red-500 text-white px-3 py-1 rounded-md text-sm delete-btn">
-                                Delete Match </button>
-
-                                
-                        @endforeach
+                    <button id="deleteMatchBtn" class="bg-red-500 text-white px-3 py-1 rounded-md text-sm delete-btn">
+                        Delete Match
+                    </button>
                 </div>
             </div>
 
@@ -544,29 +522,29 @@
     </script>
     <script>
         $(document).on('click', '.delete-btn', function() {
-    var gameId = $(this).data('id'); // Get the player ID from the button
-    if (confirm('Are you sure you want to delete this Game Match?')) {
-        $.ajax({
-            url: '{{ route('admin.delete.game') }}', // Route for deleting player
-            type: 'DELETE',
-            data: { id: gameId }, // Player ID being sent to the server
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // CSRF token for security
-            },
-            success: function(response) {
-                if (response.status === 200) {
-                    alert(response.message); // Show success message
-                    location.reload(); // Reload the page to reflect changes
-                } else {
-                    alert(response.message); // Show error message if any
-                }
-            },
-            error: function(xhr, status, error) {
-                alert('Error: ' + error); // Show generic error message
+            var gameId = window.currentGameId; // Use the stored current game ID
+            if (confirm('Are you sure you want to delete this Game Match?')) {
+                $.ajax({
+                    url: '{{ route('admin.delete.game') }}',
+                    type: 'DELETE',
+                    data: { id: gameId },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.status === 200) {
+                            alert(response.message);
+                            location.reload();
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error: ' + error);
+                    }
+                });
             }
         });
-    }
-});
     </script>
     
 </x-app-layout>
