@@ -15,7 +15,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Storage;
 use App\Helpers\ActivityLogHelper;
 
-class RegisteredUserController extends Controller
+class RegisteredUserController extends Controller 
 {
     /**
      * Display the registration view.
@@ -59,11 +59,11 @@ class RegisteredUserController extends Controller
        // After user is successfully created
         ActivityLogHelper::logActivity($user, 'user_registered', 'registered a new user');
 
-        //event(new Registered($user));
+        event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect()->route('dashboard');
-        //return redirect(route('dashboard', absolute: false));
+       // return redirect()->route('dashboard');
+        return redirect(route('dashboard', absolute: false));
     }
 }
