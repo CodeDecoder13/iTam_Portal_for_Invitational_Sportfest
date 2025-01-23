@@ -94,6 +94,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/document/comments/{player}/{document}', [DocumentManagementController::class, 'getComments'])
         ->name('document.comments')
         ->where(['player' => '[0-9]+', 'document' => '[-a-z]+']);
+    Route::get('/search-admins', [AdminController::class, 'searchAdmins'])->name('admin.search.admins');
 });
 //added for calendar
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {

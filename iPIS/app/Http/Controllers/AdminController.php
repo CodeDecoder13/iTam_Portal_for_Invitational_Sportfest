@@ -875,4 +875,31 @@ public function search(Request $request)
         // Return the file response
         return response()->file($path);
     }
+
+    // Add this new search method while keeping existing methods
+    public function searchAdmins(Request $request)
+    {
+        try {
+            $searchTerm = $request->input('term');
+            
+            $admins = Admin::where(function($query) use ($searchTerm) {
+                $query->where('name', 'LIKE', '%' . $searchTerm . '%')
+                      ->orWhere('email', 'LIKE', '%' . $searchTerm . '%')
+                      ->orWhere('role', 'LIKE', '%' . $searchTerm . '%');
+            })->get();
+
+            return response()->json([
+                'status' => 200,
+                'data' => $admins,
+                'count' => $admins->count()
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Search error: ' . $e->getMessage());
+            return response()->json([
+                'status' => 500,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

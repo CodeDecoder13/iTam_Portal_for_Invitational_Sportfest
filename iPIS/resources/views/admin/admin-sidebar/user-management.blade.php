@@ -1,28 +1,26 @@
 <x-app-layout>
-
-    <!-- User and Admin Management Section -->
-    <div class="grid grid-cols-1">
-        <h1 class="font-bold mb-2 text-3xl">User Management</h1>
-        <h3>Manage and Organize Admins Access</h3>
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="font-bold mb-2 text-3xl">User Management</h1>
+            <h3>Manage and Organize Admins Access</h3>
+        </div>
+        <!-- Add Admin Button -->
+        <div class="mt-4 flex justify-end">
+            <button class="btn btn-success h-2/3" data-bs-toggle="modal" data-bs-target="#addAdminModal">
+                <sup>+</sup>Add New Account
+            </button>
+        </div>
     </div>
 
-
-    <li class="w-full flex justify-end items-end">
-
-        <button class="btn btn-success h-2/3" data-bs-toggle="modal" data-bs-target="#addAdminModal">
-            <sup>+</sup>Add New Account
-        </button>
-    </li>
-
-
-    <div class="grid grid-cols-1 mt-5">
+    <div class="p-6">
+        <!-- Search Section -->
         <div class="mt-6">
-            <!-- Search bar -->
             <div class="relative w-full sm:w-96">
                 <input 
                     type="text" 
                     class="pl-10 pr-4 py-2 w-full bg-white rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-300 focus:border-green-300" 
-                    placeholder="Search by name, email, or school..."
+                    placeholder="Search by name, email, or role..."
                     id="searchTerm"
                 />
                 <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -33,32 +31,82 @@
         
             <!-- Results container -->
             <div id="searchResults" class="mt-4 space-y-2">
-        
             </div>
         </div>
 
+        <!-- Admins Table -->
+        <div id="adminsTable" class="mt-6">
+            <div class="space-y-4">
+                @foreach ($data['admins'] as $admin)
+                @if ($admin->role !== 'SysAdmin')
+                    <div class="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold text-lg">{{ $admin->name }}</h3>
+                                <p class="text-gray-600">{{ $admin->email }}</p>
+                                <p class="text-gray-500 text-sm">Created: {{ $admin->created_at->format('F d, Y') }}</p>
+                            </div>
+                            <div class="flex flex-col items-end gap-2">
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $admin->role === 'SADO' ? 'bg-blue-100 text-blue-800' : ($admin->role === 'RAC OFFICER' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800') }}">
+                                    {{ $admin->role }}
+                                </span>
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $admin->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                    {{ $admin->is_active ? 'Active' : 'Inactive' }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mt-2 flex justify-end gap-2">
+                            <button class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+                                onclick="openModal({{ $admin->is_active ? 'true' : 'false' }}, 
+                                    '{{ $admin->name }}',
+                                    '{{ $admin->email }}',
+                                    '{{ $admin->role }}',
+                                    '{{ $admin->created_at->format('F d, Y') }}',
+                                    {{ $admin->id }})">
+                                View Details
+                            </button>
+                            <button class="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editAdminModal"
+                                data-admin-id="{{ $admin->id }}"
+                                data-admin-name="{{ $admin->name }}"
+                                data-admin-email="{{ $admin->email }}"
+                                data-admin-role="{{ $admin->role }}">
+                                Edit
+                            </button>
+                        </div>
+                    </div>
+                @endif
+                @endforeach
+            </div>
+        </div>
+    </div>
 
-        <!-- Loop through Admins -->
-        @foreach ($data['admins'] as $admin)
-        @if ($admin->role !== 'SysAdmin')
-            <div class="grid grid-cols-12 px-4 py-3 rounded-lg border mt-2">
-                <div class="col-span-3">{{ $admin->created_at->format('F d, Y') }}</div>
-                <div class="col-span-3">{{ $admin->name }}</div>
-                <div class="col-span-3">{{ $admin->email }}</div>
-                <div class="col-span-1">{{ $admin->role }}</div>
-                <div class="col-span-1">{{ $admin->is_active ? 'Active' : 'Inactive' }}</div>
-                <div class="col-span-1">
-                    <button class="bg-green-700 text-white px-2 py-1 rounded-lg" data-bs-toggle="modal"
-                        data-bs-target="#editAdminModal" data-admin-id="{{ $admin->id }}"
-                        data-admin-name="{{ $admin->name }}"
-                        data-admin-email="{{ $admin->email }}"
-                        data-admin-role="{{ $admin->role }}">
-                        Edit
-                    </button>
+    <!-- View Details Modal -->
+    <div id="userModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+        <div class="bg-black opacity-50 absolute inset-0"></div>
+        <div class="bg-white rounded-lg p-6 z-10 w-11/12 md:w-1/3 relative">
+            <button class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-3xl p-2" onclick="closeModal()">&times;</button>
+            
+            <h2 class="font-bold text-2xl mb-4 inline-flex items-center" id="modalUserName"></h2>
+            <span id="activationBadge" class="inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full ml-2"></span>
+            
+            <p class="font-semibold">Email</p>
+            <p id="modalUserEmail" class="mb-3"></p>
+            
+            <p class="font-semibold">Role</p>
+            <p id="modalUserRole" class="mb-2"></p>
+            
+            <p class="font-semibold">Created Date</p>
+            <p id="modalUserCreated" class="mb-2"></p>
+
+            <div class="flex flex-col">
+                <div class="self-end">
+                    <button class="bg-green-700 hover:bg-green-800 text-white px-2 py-1 rounded-lg mr-2" id="activateButton">Activate</button>
+                    <button class="bg-red-700 hover:bg-red-800 text-white px-2 py-1 rounded-lg" id="deactivateButton">Deactivate</button>
                 </div>
             </div>
-        @endif
-        @endforeach
+        </div>
     </div>
 
     <!-- Add Admin Modal -->
@@ -211,12 +259,6 @@
             </div>
         </div>
     </div>
-
-
-
-
-
-
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.x.x/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons/ionicons.esm.js"></script>
@@ -373,10 +415,165 @@
                 }
             });
 
+        function closeModal() {
+            document.getElementById('userModal').classList.add('hidden');
+        }
+
+        function openModal(is_active, name, email, role, created_date, userId) {
+            document.getElementById('modalUserName').innerText = name;
+            document.getElementById('modalUserEmail').innerText = email;
+            document.getElementById('modalUserRole').innerText = role;
+            document.getElementById('modalUserCreated').innerText = created_date;
+
+            let activationBadge = document.getElementById('activationBadge');
+            if (is_active) {
+                activationBadge.classList.add('bg-green-100', 'text-green-800');
+                activationBadge.classList.remove('bg-red-100', 'text-red-800');
+                activationBadge.innerHTML = `<span class="w-2 h-2 me-1 bg-green-500 rounded-full"></span> Active`;
+            } else {
+                activationBadge.classList.add('bg-red-100', 'text-red-800');
+                activationBadge.classList.remove('bg-green-100', 'text-green-800');
+                activationBadge.innerHTML = `<span class="w-2 h-2 me-1 bg-red-500 rounded-full"></span> Inactive`;
+            }
+
+            document.getElementById('activateButton').onclick = function() { updateStatus(userId, 'activate'); };
+            document.getElementById('deactivateButton').onclick = function() { updateStatus(userId, 'deactivate'); };
+
+            document.getElementById('userModal').classList.remove('hidden');
+        }
+
+        const searchInput = document.getElementById('searchTerm');
+        const resultsContainer = document.getElementById('searchResults');
+        const searchStatus = document.getElementById('searchStatus');
+        const adminsTable = document.getElementById('adminsTable');
+        let searchTimeout;
+
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const searchTerm = this.value.trim();
             
+            if (searchTerm === '') {
+                // Show original content, hide search results
+                resultsContainer.innerHTML = '';
+                adminsTable.style.display = 'block';
+                searchStatus.textContent = '';
+                return;
+            }
 
-                
+            // Hide original content, prepare for search results
+            adminsTable.style.display = 'none';
+            searchStatus.textContent = 'Searching...';
+            
+            searchTimeout = setTimeout(() => {
+                fetch(`{{ route('admin.search.admins') }}?term=${encodeURIComponent(searchTerm)}`, {
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(response => {
+                    const data = response.data || [];
+                    searchStatus.textContent = `Found ${data.length} results`;
+
+                    if (data.length === 0) {
+                        resultsContainer.innerHTML = `
+                            <div class="p-4 bg-gray-50 rounded-lg">
+                                <p class="text-gray-500">No results found</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    resultsContainer.innerHTML = '';
+                    data.forEach(admin => {
+                        if (admin.role !== 'SysAdmin') {
+                            const resultCard = document.createElement('div');
+                            resultCard.className = 'p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow';
+                            resultCard.innerHTML = `
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="font-semibold text-lg">${admin.name}</h3>
+                                        <p class="text-gray-600">${admin.email}</p>
+                                        <p class="text-gray-500 text-sm">Created: ${new Date(admin.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                                    </div>
+                                    <div class="flex flex-col items-end gap-2">
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full ${
+                                            admin.role === 'SADO' ? 'bg-blue-100 text-blue-800' :
+                                            admin.role === 'RAC OFFICER' ? 'bg-purple-100 text-purple-800' :
+                                            'bg-gray-100 text-gray-800'
+                                        }">${admin.role}</span>
+                                        <span class="px-2 py-1 text-xs font-semibold rounded-full ${
+                                            admin.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                        }">${admin.is_active ? 'Active' : 'Inactive'}</span>
+                                    </div>
+                                </div>
+                                <div class="mt-2 flex justify-end gap-2">
+                                    <button class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+                                        onclick="openModal(${admin.is_active}, 
+                                            '${admin.name}',
+                                            '${admin.email}',
+                                            '${admin.role}',
+                                            '${new Date(admin.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}',
+                                            ${admin.id})">
+                                        View Details
+                                    </button>
+                                    <button class="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editAdminModal"
+                                        data-admin-id="${admin.id}"
+                                        data-admin-name="${admin.name}"
+                                        data-admin-email="${admin.email}"
+                                        data-admin-role="${admin.role}">
+                                        Edit
+                                    </button>
+                                </div>
+                            `;
+                            resultsContainer.appendChild(resultCard);
+                        }
+                    });
+
+                    // Reattach event listeners for edit buttons
+                    attachEditButtonListeners();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    searchStatus.textContent = 'Error occurred while searching';
+                    resultsContainer.innerHTML = `
+                        <div class="p-4 bg-red-50 rounded-lg">
+                            <p class="text-red-500">An error occurred while searching. Please try again.</p>
+                        </div>
+                    `;
+                });
+        }, 300);
+    });
+
+    // Function to attach event listeners to edit buttons
+    function attachEditButtonListeners() {
+        document.querySelectorAll('[data-bs-target="#editAdminModal"]').forEach(button => {
+            button.addEventListener('click', function() {
+                const adminId = this.getAttribute('data-admin-id');
+                const adminName = this.getAttribute('data-admin-name');
+                const adminEmail = this.getAttribute('data-admin-email');
+                const adminRole = this.getAttribute('data-admin-role');
+
+                document.getElementById('adminid').value = adminId;
+                document.getElementById('editName').value = adminName;
+                document.getElementById('editEmail').value = adminEmail;
+                document.getElementById('editRole').value = adminRole;
+
+                document.getElementById('editPassword').value = '';
+                document.getElementById('editConfirmPassword').value = '';
+            });
+        });
+    }
+
+    // Initial attachment of event listeners
+    attachEditButtonListeners();
     </script>
-
-
 </x-app-layout>
