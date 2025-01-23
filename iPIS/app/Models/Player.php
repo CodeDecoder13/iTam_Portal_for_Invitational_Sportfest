@@ -25,6 +25,12 @@ class Player extends Model
         'status',
         'birth_certificate_comments',
         'parental_consent_comments',
+        'birth_date',
+    ];
+
+    protected $casts = [
+        'birth_certificate_comments' => 'array',
+        'parental_consent_comments' => 'array'
     ];
 
     public function team()

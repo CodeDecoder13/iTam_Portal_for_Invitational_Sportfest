@@ -11,16 +11,22 @@
                 <div>
                     <p><strong>Document Status:</strong></p>
                     <p class="mb-1">Birth Certificate:
+                        @php
+                            $bcRejectedCount = $team->players->where('birth_certificate_status', '3')->count();
+                            $bcApprovedCount = $team->players->where('birth_certificate_status', '2')->count();
+                            $bcSubmittedCount = $team->players->where('birth_certificate_status', '1')->count();
+                            $bcTotalPlayers = $team->players->count();
+                        @endphp
                         @if ($team->players->whereIn('birth_certificate_status', ['1', '2', '3'])->count() > 0)
-                            @if ($team->players->where('birth_certificate_status', '3')->count() > 0)
-                                <span class="text-red-500">Rejected</span>
-                            @elseif ($team->players->where('birth_certificate_status', '2')->count() > 0)
-                                <span class="text-green-500">Approved</span>
-                            @elseif ($team->players->where('birth_certificate_status', '1')->count() > 0)
-                                <span class="text-primary">Submitted</span>
+                            @if ($bcRejectedCount > 0)
+                                <span class="text-red-500">Rejected ({{ $bcRejectedCount }}/{{ $bcTotalPlayers }})</span>
+                            @elseif ($bcApprovedCount > 0)
+                                <span class="text-green-500">Approved ({{ $bcApprovedCount }}/{{ $bcTotalPlayers }})</span>
+                            @elseif ($bcSubmittedCount > 0)
+                                <span class="text-primary">Submitted ({{ $bcSubmittedCount }}/{{ $bcTotalPlayers }})</span>
                             @endif
                         @else
-                            <span class="text-muted">Not Submitted</span>
+                            <span class="text-muted">Not Submitted (0/{{ $bcTotalPlayers }})</span>
                         @endif
                     </p>
                     <p class="mb-1">Parental Consent:

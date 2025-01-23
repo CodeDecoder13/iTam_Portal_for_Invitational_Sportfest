@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DocumentManagementController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
@@ -7,10 +8,14 @@ use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TestingController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\StandingController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\UserActivityController;
 use App\Http\Controllers\PlayerDocumentController;
 use App\Http\Controllers\DocumentCheckerController;
+use App\Http\Controllers\DocumentActionController;
+use App\Http\Controllers\LogsController;
+
 Route::get('/', function () {
     return view('auth.login');
 });
@@ -50,9 +55,12 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::delete('/delete/player/birth_certificate/{id}', [UserController::class, 'deleteBirthCertificate'])->name('delete.player.birth_certificate');
     Route::delete('/delete/player/parental_consent/{id}', [UserController::class, 'deleteParentalConsent'])->name('delete.player.parental_consent');
     Route::get('/player/{playerId}/download-document', [UserController::class, 'downloadDocument'])->name('download.player.document');
-
-    
-    
+});
+// added for settings page user
+Route::middleware(['auth','verified'])->group(function () {
+    Route::get('/user-settings', [UserController::class, 'settings'])->name('settings');
+    Route::post('/user-settings/update', [UserController::class, 'updateSettings'])->name('settings.update');
+    Route::post('/user-settings/update-password', [UserController::class, 'updatePassword'])->name('settings.update-password');
 });
 // added for myteam page
 Route::middleware(['auth','verified'])->group(function () { 
@@ -63,8 +71,6 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::post('/store-sub-players', [UserController::class, 'storeSubPlayers'])->name('store.sub-players');
     Route::post('/update-sub-players', [UserController::class, 'updateSubPlayers'])->name('update.sub-players');
     Route::get('/my-team/team-management/sub-documents-management/{id}', [UserController::class, 'subDocumentsManagement'])->name('sub-documents-management');
-
-    
 });
 
 // added for admin sidebar
@@ -75,13 +81,24 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/school-management', [AdminController::class, 'schoolManagement'])->name('admin.school-management');
     Route::get('/user-management', [AdminController::class, 'usersManagement'])->name('admin.user-management');
     Route::get('/coach-approval', [AdminController::class, 'coachApproval'])->name('admin.coach-approval');
-    Route::get('/logs-system', [AdminController::class, 'logSystem'])->name('admin.logs-system');
+    Route::get('/logs-system', [LogsController::class, 'logSystem'])->name('admin.logs-system');
     Route::post('/update-status/{id}', [AdminController::class, 'updateStatus'])->name('admin.update-status');
     Route::get('/teams/{id}', [AdminController::class, 'showteam'])->name('admin.showteams');
     Route::get('/players-team-documents', [AdminController::class, 'teamdocuments'])->name('admin.playersTeamDocuments');
-    Route::get('/summary-of-players', [AdminController::class, 'documentChecker'])->name('admin.SummaryOfPlayers');
     Route::get('/activities', [ActivityLogController::class, 'getLatestActivities'])->name('admin.getLatestActivities');
     
+    Route::get('/get-document', [DocumentManagementController::class, 'getDocument'])->name('admin.get-document');
+    Route::get('/document/comments/{player}/{document}', [DocumentManagementController::class, 'getComments'])
+        ->name('document.comments')
+        ->where(['player' => '[0-9]+', 'document' => '[-a-z]+']);
+    Route::get('/search-admins', [AdminController::class, 'searchAdmins'])->name('admin.search.admins');
+    Route::get('/user-details/{id}', [LogsController::class, 'getUserDetails'])->name('admin.user.details');
+    Route::post('/user-status/{id}', [LogsController::class, 'updateUserStatus'])->name('admin.user.status');
+    Route::put('/user-update/{id}', [LogsController::class, 'updateUser'])->name('admin.user.update');
+    Route::delete('/user-delete/{id}', [LogsController::class, 'deleteUser'])->name('admin.user.delete');
+    Route::get('/filter-documents', [AdminController::class, 'filterDocuments'])->name('admin.filter-documents');
+    Route::get('/search-users-schoolManagement', [AdminController::class, 'searchUsersSchoolManagement'])
+        ->name('admin.search-users-schoolManagement');
 });
 //added for calendar
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
@@ -91,21 +108,28 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/official-game/{id}', [CalendarController::class, 'fetchEventsGames'])->name('admin.official-game');
     Route::post('/admin/comments', [CalendarController::class, 'addComment'])->name('admin.add.comment');
     Route::delete('/delete-game', [CalendarController::class, 'deleteGame'])->name('admin.delete.game');
-
-    
-
 });
+
+//game standing
+Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
+    Route::get('/standings', [AdminController::class, 'standing'])->name('admin.standing');
+    Route::post('/standings', [StandingController::class, 'store'])->name('admin.standings.store');
+    Route::get('/standings/{id}/edit', [StandingController::class, 'edit'])->name('admin.standings.edit');
+    Route::put('/standings/{id}', [StandingController::class, 'update'])->name('admin.standings.update');
+    Route::delete('/standings/{id}', [StandingController::class, 'destroy'])->name('admin.standings.destroy');
+    Route::get('/standings/schools-by-category', [StandingController::class, 'getSchoolsByCategory'])
+    ->name('admin.standings.schools-by-category');
+}); 
 
 // added for school management
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/school-management/card-school-management/{id}', [AdminController::class, 'cardSchoolManagement'])->name('admin.card-school-management');
     Route::get('/player-management/{id}', [AdminController::class, 'playerManagement'])->name('admin.player-management');
     Route::get('/team-management/{id}', [AdminController::class, 'teamManagement'])->name('admin.team-management');
-    Route::get('/document-management', [AdminController::class, 'documentManagement'])->name('admin.document-management');
+    Route::get('/document-management/{id}', [AdminController::class, 'documentManagement'])->name('admin.document-management');
     Route::post('/store-team/{id}', [AdminController::class, 'storeTeam'])->name('admin.store-team');
     Route::delete('/delete-team/{id}', [AdminController::class, 'deleteTeam'])->name('admin.delete-team');
-    Route::get('/logs-management/{id}', [AdminController::class, 'logsManagement'])->name('admin.logs-management');
-    Route::get('/document-management/{id}', [AdminController::class, 'documentManagement'])->name('admin.document-management.show');
+    Route::get('/logs-management/{id}', [LogsController::class, 'index'])->name('admin.logs-management');
 });
 // usermanagement routes
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
@@ -119,8 +143,9 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::post('/admin/coach/update', [AdminController::class, 'updateUser'])->name('admin.users.update');
     Route::delete('/admin/delete-coach', [AdminController::class, 'deleteCoach'])->name('admin.delete.coach');
     Route::post('/store-user-accounts', [AdminController::class, 'storeUser'])->name('admin.store-user');
-    Route::get('/search-coaches', [AdminController::class, 'coachApproval'])->name('search.coaches');
-
+    Route::get('/search-coaches', [AdminController::class, 'searchCoaches'])->name('admin.search.coaches');
+    Route::get('/search-modules', [AdminController::class, 'Searchmodule'])->name('admin.search.module'); 
+    Route::get('/search-users', [AdminController::class, 'searchUsers'])->name('admin.search.users');
 });
 // added for Document Module
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {     
@@ -132,17 +157,22 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () { 
 
 });
+
+// added for setting page
+Route::prefix('admin')->middleware(['auth:admin'])->group(function () { 
+    Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
+    Route::post('/settings/update', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
+    Route::post('/settings/update-password', [AdminController::class, 'updatePassword'])->name('admin.settings.update-password');
+    Route::get('/settings/get-current-password', [AdminController::class, 'getCurrentPassword'])->name('admin.settings.get-current-password');
+});
 //added for document checker
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
-    Route::post('/document/approve/{player}/{document}', [DocumentCheckerController::class, 'approveDocument'])->name('document.approve');
-    Route::post('/document/reject/{player}/{document}', [DocumentCheckerController::class, 'rejectDocument'])->name('document.reject');
+    Route::post('/document/approve/{player}/{document}', [DocumentActionController::class, 'approve'])->name('document.approve');
+    Route::post('/document/reject/{player}/{document}', [DocumentActionController::class, 'reject'])->name('document.reject');
+    Route::delete('/document/delete/{player}/{document}', [DocumentActionController::class, 'delete'])->name('document.delete');
     Route::get('/document/download/{player}/{document}', [DocumentCheckerController::class, 'downloadDocument'])->name('document.download');
-    Route::delete('/document/delete/{player}/{document}', [DocumentCheckerController::class, 'deleteDocument'])->name('document.delete');
-
-    //suggest Dwei: para di crowded route and functions
-    Route::post('/document/update/{player}/{document}/{type}/{update}', [DocumentCheckerController::class, 'updateDocument'])->name('document.update');
     Route::get('/summary-of-players', [AdminController::class, 'documentCheckerFilter'])->name('admin.SummaryOfPlayers');
-
+    Route::get('/view-document/{schoolName}/{sportCategory}/{teamId}/players/{playerId}/{filename}', [AdminController::class, 'viewDocument'])->name('admin.view-document');
 });
 // route for myplayer page
 Route::middleware(['auth','verified'])->group(function () {

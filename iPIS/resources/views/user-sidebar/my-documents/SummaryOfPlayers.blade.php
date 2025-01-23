@@ -154,7 +154,6 @@
                 </div>
 
 
-                <!-- Default to View Birth Certificate Modal if uploaded -->
                 @if ($player->birth_certificate_status != 0)
                     <div class="modal fade" id="viewBirthCertificateModal-{{ $player->id }}" tabindex="-1"
                         aria-labelledby="viewBirthCertificateModalLabel-{{ $player->id }}" aria-hidden="true">
@@ -163,8 +162,7 @@
                                 <div class="modal-header border-0">
                                     <h5 class="modal-title" id="viewBirthCertificateModalLabel-{{ $player->id }}">
                                         View PSA Birth Certificate</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body text-center">
                                     <p class="mb-1">Status:
@@ -181,21 +179,23 @@
                                     <div class="scrollable-content mx-auto my-3">
                                         <div class="mb-4">
                                             <iframe id="iframecontent" class="w-full min-h-96"
-                                                src="{{ asset('storage/' . $player->user->school_name . '/' . $player->team->sport_category . '/' . $player->team_id . '/' . $player->id . '/' . $player->birth_certificate) }}"></iframe>
-
+                                                src="{{ asset('storage/teams/' . Str::slug($player->user->school_name) . '/' . Str::slug($player->team->sport_category) . '/' . $player->team_id . '/players/' . $player->id . '/' . $player->birth_certificate) }}"></iframe>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer border-0 justify-content-center">
-                                   <!--  <form action="{{ route('delete.player.birth_certificate', $player->id) }}"
-                                        method="POST" style="display:inline;">
+                                    <!-- Option to Delete Birth Certificate (Commented Out) -->
+                                    <!-- 
+                                    <form action="{{ route('delete.player.birth_certificate', $player->id) }}" method="POST" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-link text-danger">Delete</button>
                                     </form>
                                     -->
 
-                                    <button type="button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full transition duration-300 ease-in-out" data-bs-toggle="modal"
+                                    <button type="button"
+                                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full transition duration-300 ease-in-out"
+                                        data-bs-toggle="modal"
                                         data-bs-target="#uploadBirthCertificateModal-{{ $player->id }}">
                                         Change
                                     </button>
@@ -205,55 +205,52 @@
                     </div>
                 @endif
 
+
                 <!-- Default to View Parental Consent Modal if uploaded -->
                 @if ($player->parental_consent_status != 0)
-                    <div class="modal fade" id="viewParentalConsentModal-{{ $player->id }}" tabindex="-1"
-                        aria-labelledby="viewParentalConsentModalLabel-{{ $player->id }}" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <div class="modal-header border-0">
-                                    <h5 class="modal-title" id="viewParentalConsentModalLabel-{{ $player->id }}">
-                                        Parental Consent</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body text-center">
-                                    <p class="mb-1">Status:
-                                        @if ($player->parental_consent_status == '1')
-                                            <span class="text-primary">Submitted</span>
-                                        @elseif ($player->parental_consent_status == '2')
-                                            <span class="text-green-500">Approved</span>
-                                        @elseif ($player->parental_consent_status == '3')
-                                            <span class="text-red-500">Rejected</span>
-                                        @else
-                                            <span class="text-muted">Not Submitted</span>
-                                        @endif
-                                    </p>
-                                    <div class="scrollable-content mx-auto my-3">
-                                        <div class="mb-4">
-                                            <iframe id="iframecontent" class="w-full min-h-96"
-                                                src="{{ asset('storage/' . $player->user->school_name . '/' . $player->team->sport_category . '/' . $player->team_id . '/' . $player->id . '/' . $player->parental_consent) }}"></iframe>
-
-                                        </div>
+                <div class="modal fade" id="viewParentalConsentModal-{{ $player->id }}" tabindex="-1"
+                    aria-labelledby="viewParentalConsentModalLabel-{{ $player->id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header border-0">
+                                <h5 class="modal-title" id="viewParentalConsentModalLabel-{{ $player->id }}">
+                                    Parental Consent</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center">
+                                <p class="mb-1">Status:
+                                    @if ($player->parental_consent_status == '1')
+                                        <span class="text-primary">Submitted</span>
+                                    @elseif ($player->parental_consent_status == '2')
+                                        <span class="text-green-500">Approved</span>
+                                    @elseif ($player->parental_consent_status == '3')
+                                        <span class="text-red-500">Rejected</span>
+                                    @else
+                                        <span class="text-muted">Not Submitted</span>
+                                    @endif
+                                </p>
+                                <div class="scrollable-content mx-auto my-3">
+                                    <div class="mb-4">
+                                        <iframe id="iframecontent" class="w-full min-h-96"
+                                            src="{{ asset('storage/teams/' . Str::slug($player->team->coach->school_name) . '/' . Str::slug($player->team->sport_category) . '/' . $player->team->id . '/players/' . $player->id . '/' . $player->parental_consent) }}">
+                                        </iframe>
                                     </div>
                                 </div>
-                                <div class="modal-footer border-0 justify-content-center">
-                                   <!--  <form action="{{ route('delete.player.parental_consent', $player->id) }}"
-                                        method="POST" style="display:inline;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-link text-danger">Delete</button>
-                                    </form> -->
-                                    <button type="button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full transition duration-300 ease-in-out" data-bs-toggle="modal"
-                                        data-bs-target="#uploadParentalConsentModal-{{ $player->id }}">
-                                        Change
-                                    </button>
-                                </div>
+                            </div>
+                            <div class="modal-footer border-0 justify-content-center">
+                                <button type="button"
+                                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full transition duration-300 ease-in-out"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#uploadParentalConsentModal-{{ $player->id }}">
+                                    Change
+                                </button>
                             </div>
                         </div>
                     </div>
-                @endif
-            @endforeach
+                </div>
+            @endif
+        @endforeach
         </div>
         
     </section>

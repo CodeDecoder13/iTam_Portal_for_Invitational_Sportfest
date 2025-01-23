@@ -7,10 +7,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+//class User extends Authenticatable
+
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
     protected $guard = 'web';
+
+    const ROLE_COACH = 'Coach';
+    const ROLE_CAPTAIN = 'Captain';
+    const ROLE_REPRESENTATIVE = 'School Representative';
 
     /**
      * The attributes that are mass assignable.
