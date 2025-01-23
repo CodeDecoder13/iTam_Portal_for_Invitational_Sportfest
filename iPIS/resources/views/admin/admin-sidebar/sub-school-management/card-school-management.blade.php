@@ -91,14 +91,16 @@
         </div>
     </div>
 
-    <!-- Document Management Card 
+    <!-- Document Management Card  -->
     <div class="bg-blue-300 rounded-lg shadow-lg overflow-hidden">
         <div class="p-5">
             <div class="text-gray-800 text-4xl mb-2">Document Management</div>
             <p class="text-gray-700 text-sm mb-4">Manage and organize documents, including player Birth certificate, Parental Consent, and team records.</p>
-            <button class="bg-white text-blue-500 font-bold py-2 px-4 rounded w-full">
-                <a href="{{ route('admin.document-management', ['id' => $user->id]) }}">View Document</a>
-            </button>
+             
+                <a href="{{ route('admin.document-management', ['id' => $user->id]) }}"
+                    class="bg-white text-blue-500 font-bold py-2 px-4 rounded w-full"
+                    >View Document</a>
+            
         </div>
     </div> -->
 

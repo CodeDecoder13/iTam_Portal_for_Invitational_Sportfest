@@ -133,39 +133,53 @@ class AdminController extends Controller
         $users = User::all();
 
         $query = Player::query();
-
-        // Filtering based on search input
-        if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('first_name', 'like', '%' . $request->search . '%')
-                    ->orWhere('last_name', 'like', '%' . $request->search . '%');
-            });
-        }
-
-        // Filtering by sport
-        if ($request->filled('sport_category')) {
-            $query->whereHas('team', function ($q) use ($request) {
-                $q->where('sport_category', $request->input('sport_category'));
-            });
-        }
-
-        // Filtering by team
-        if ($request->filled('team')) {
-            $query->where('team_id', $request->team);
-        }
-
-        // Filtering by status
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
         $players = $query->get();
 
+        //return view('admin.admin-sidebar.team-documents.SummaryOfPlayers', compact('players', 'teams', 'users'));
         return view('admin.admin-sidebar.team-documents.SummaryOfPlayers_suggested', compact('players', 'teams', 'users'));
     }
     //return view('admin.admin-sidebar.team-documents.SummaryOfPlayers', compact('players', 'teams', 'users'));
 
-    
+
+    public function deleteDocument($player, $filename, $type, $status)
+{
+    try {
+        $player = Player::findOrFail($player);
+        
+        // Determine which field to update based on document type
+        $field = str_contains(strtolower($type), 'consent') ? 'parental_consent' : 'birth_certificate';
+        $statusField = $field . '_status';
+        
+        // Get file path
+        $schoolName = Str::slug($player->team->user->school_name);
+        $sportCategory = Str::slug($player->team->sport_category);
+        $path = "teams/{$schoolName}/{$sportCategory}/{$player->team_id}/players/{$player->id}/{$filename}";
+
+        // Delete file from storage if it exists
+        if (Storage::exists($path)) {
+            Storage::delete($path);
+        }
+
+        // Update database record
+        $player->update([
+            $field => null,
+            $statusField => 0
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Document deleted successfully'
+        ]);
+
+    } catch (\Exception $e) {
+        \Log::error('Document deletion error: ' . $e->getMessage());
+        return response()->json([
+            'success' => false,
+            'message' => 'Error deleting document'
+        ], 500);
+    }
+}
+
     public function schoolManagement(Request $request)
 {
     $query = User::query(); // Start with all users
@@ -687,10 +701,23 @@ public function search(Request $request)
         return view('admin.admin-sidebar.sub-school-management.logs-management');
     }
      //document management
-     public function documentManagement()
-     {
-         return view('admin.admin-sidebar.sub-school-management.document-management');
-     }
+     public function documentManagement($id)
+    {
+        // Fetch the user (coach/admin) by ID
+        $user = User::findOrFail($id);
+
+        // Fetch all teams coached by this user
+        $teams = Team::where('coach_id', $id)->get();
+
+        // Fetch all players for these teams, including related data
+        $players = Player::with(['team', 'user']) // Include relationships to avoid N+1 queries
+            ->whereIn('team_id', $teams->pluck('id'))
+            ->get();
+
+        // Return the Blade view with compacted data
+        return view('admin.admin-sidebar.sub-school-management.document-management', compact('players', 'teams', 'user'));
+    }
+
       
     public function searchUsers(Request $request)
     {
@@ -833,5 +860,19 @@ public function search(Request $request)
             ->get();
 
         return view('admin.admin-sidebar.sub-school-management.card-school-management', compact('searchResults'));
+    }
+
+    public function viewDocument($schoolName, $sportCategory, $teamId, $playerId, $filename)
+    {
+        // Construct the path to the document
+        $path = storage_path("app/public/documents/{$schoolName}/{$sportCategory}/team_{$teamId}/player_{$playerId}/{$filename}");
+
+        // Check if file exists
+        if (!file_exists($path)) {
+            abort(404, 'Document not found');
+        }
+
+        // Return the file response
+        return response()->file($path);
     }
 }

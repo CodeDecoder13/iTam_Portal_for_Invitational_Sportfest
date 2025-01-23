@@ -190,17 +190,23 @@ public function uploadPlayerDocuments(Request $request, $playerId)
     $team = $player->team;
     $coach = $team->coach;
 
-    // Define the sanitized folder path using the centralized logic
+    // Debug logging
+    \Log::info('Uploading document for player:', [
+        'playerId' => $playerId,
+        'teamId' => $team->id,
+        'schoolName' => $coach->school_name,
+        'sportCategory' => $team->sport_category
+    ]);
+
     $schoolName = Str::slug($coach->school_name);
     $sportCategory = Str::slug($team->sport_category);
-    $teamId = $team->id;
-    $playerId = $player->id;
-
-    $playerFolderPath = "public/teams/{$schoolName}/{$sportCategory}/{$teamId}/players/{$playerId}";
+    $path = "teams/{$schoolName}/{$sportCategory}/{$team->id}/players/{$player->id}";
+    
+    \Log::info("Document storage path: {$path}");
 
     // Check if the folder already exists, create if not
-    if (!Storage::exists($playerFolderPath)) {
-        Storage::makeDirectory($playerFolderPath);
+    if (!Storage::exists($path)) {
+        Storage::makeDirectory($path);
     }
 
     $documentUploaded = false;
@@ -209,7 +215,7 @@ public function uploadPlayerDocuments(Request $request, $playerId)
     if ($request->hasFile('birth_certificate')) {
         $birthCertificate = $request->file('birth_certificate');
         $birthCertificateName = 'birth_certificate.' . $birthCertificate->getClientOriginalExtension();
-        $birthCertificate->storeAs($playerFolderPath, $birthCertificateName);
+        $birthCertificate->storeAs($path, $birthCertificateName);
         $player->birth_certificate = $birthCertificateName;
         $player->birth_certificate_status = 1; // Set status to "For Review"
         $documentUploaded = true;
@@ -226,7 +232,7 @@ public function uploadPlayerDocuments(Request $request, $playerId)
     if ($request->hasFile('parental_consent')) {
         $parentalConsent = $request->file('parental_consent');
         $parentalConsentName = 'parental_consent.' . $parentalConsent->getClientOriginalExtension();
-        $parentalConsent->storeAs($playerFolderPath, $parentalConsentName);
+        $parentalConsent->storeAs($path, $parentalConsentName);
         $player->parental_consent = $parentalConsentName;
         $player->parental_consent_status = 1; // Set status to "For Review"
         $documentUploaded = true;
