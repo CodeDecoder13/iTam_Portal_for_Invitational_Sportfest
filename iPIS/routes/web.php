@@ -14,6 +14,8 @@ use App\Http\Controllers\UserActivityController;
 use App\Http\Controllers\PlayerDocumentController;
 use App\Http\Controllers\DocumentCheckerController;
 use App\Http\Controllers\DocumentActionController;
+use App\Http\Controllers\LogsController;
+
 Route::get('/', function () {
     return view('auth.login');
 });
@@ -53,9 +55,6 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::delete('/delete/player/birth_certificate/{id}', [UserController::class, 'deleteBirthCertificate'])->name('delete.player.birth_certificate');
     Route::delete('/delete/player/parental_consent/{id}', [UserController::class, 'deleteParentalConsent'])->name('delete.player.parental_consent');
     Route::get('/player/{playerId}/download-document', [UserController::class, 'downloadDocument'])->name('download.player.document');
-
-    
-    
 });
 // added for settings page user
 Route::middleware(['auth','verified'])->group(function () {
@@ -72,8 +71,6 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::post('/store-sub-players', [UserController::class, 'storeSubPlayers'])->name('store.sub-players');
     Route::post('/update-sub-players', [UserController::class, 'updateSubPlayers'])->name('update.sub-players');
     Route::get('/my-team/team-management/sub-documents-management/{id}', [UserController::class, 'subDocumentsManagement'])->name('sub-documents-management');
-
-    
 });
 
 // added for admin sidebar
@@ -84,7 +81,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/school-management', [AdminController::class, 'schoolManagement'])->name('admin.school-management');
     Route::get('/user-management', [AdminController::class, 'usersManagement'])->name('admin.user-management');
     Route::get('/coach-approval', [AdminController::class, 'coachApproval'])->name('admin.coach-approval');
-    Route::get('/logs-system', [AdminController::class, 'logSystem'])->name('admin.logs-system');
+    Route::get('/logs-system', [LogsController::class, 'logSystem'])->name('admin.logs-system');
     Route::post('/update-status/{id}', [AdminController::class, 'updateStatus'])->name('admin.update-status');
     Route::get('/teams/{id}', [AdminController::class, 'showteam'])->name('admin.showteams');
     Route::get('/players-team-documents', [AdminController::class, 'teamdocuments'])->name('admin.playersTeamDocuments');
@@ -95,6 +92,10 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
         ->name('document.comments')
         ->where(['player' => '[0-9]+', 'document' => '[-a-z]+']);
     Route::get('/search-admins', [AdminController::class, 'searchAdmins'])->name('admin.search.admins');
+    Route::get('/user-details/{id}', [LogsController::class, 'getUserDetails'])->name('admin.user.details');
+    Route::post('/user-status/{id}', [LogsController::class, 'updateUserStatus'])->name('admin.user.status');
+    Route::put('/user-update/{id}', [LogsController::class, 'updateUser'])->name('admin.user.update');
+    Route::delete('/user-delete/{id}', [LogsController::class, 'deleteUser'])->name('admin.user.delete');
 });
 //added for calendar
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
@@ -104,9 +105,6 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/official-game/{id}', [CalendarController::class, 'fetchEventsGames'])->name('admin.official-game');
     Route::post('/admin/comments', [CalendarController::class, 'addComment'])->name('admin.add.comment');
     Route::delete('/delete-game', [CalendarController::class, 'deleteGame'])->name('admin.delete.game');
-
-    
-
 });
 
 //game standing
@@ -118,8 +116,6 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::delete('/standings/{id}', [StandingController::class, 'destroy'])->name('admin.standings.destroy');
     Route::get('/standings/schools-by-category', [StandingController::class, 'getSchoolsByCategory'])
     ->name('admin.standings.schools-by-category');
-
-    
 }); 
 
 // added for school management
@@ -130,7 +126,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/document-management/{id}', [AdminController::class, 'documentManagement'])->name('admin.document-management');
     Route::post('/store-team/{id}', [AdminController::class, 'storeTeam'])->name('admin.store-team');
     Route::delete('/delete-team/{id}', [AdminController::class, 'deleteTeam'])->name('admin.delete-team');
-    Route::get('/logs-management/{id}', [AdminController::class, 'logsManagement'])->name('admin.logs-management');
+    Route::get('/logs-management/{id}', [LogsController::class, 'index'])->name('admin.logs-management');
 });
 // usermanagement routes
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
