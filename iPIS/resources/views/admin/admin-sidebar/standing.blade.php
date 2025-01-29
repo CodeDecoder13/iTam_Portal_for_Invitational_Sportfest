@@ -57,7 +57,7 @@
                                     @foreach($categoryStandings as $index => $standing)
                                         <tr>
                                             <td class="px-6 py-4 whitespace-nowrap">{{ $index + 1 }}</td>
-                                            <td class="px-6 py-4 whitespace-nowrap">{{ $standing->team->coach->school_name }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">{{ $standing->team->coach->school_name }} - {{ $standing->team->name }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap">{{ $standing->sport_category }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap">{{ $standing->wins }}</td>
                                             <td class="px-6 py-4 whitespace-nowrap">

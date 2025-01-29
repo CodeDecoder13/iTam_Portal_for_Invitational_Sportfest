@@ -93,7 +93,7 @@ class StandingController extends Controller
                 ->map(function ($team) {
                     return [
                         'id' => $team->id,
-                        'school_name' => $team->coach->school_name
+                        'school_name' => $team->coach->school_name . ' - ' . $team->name
                     ];
                 });
                 
