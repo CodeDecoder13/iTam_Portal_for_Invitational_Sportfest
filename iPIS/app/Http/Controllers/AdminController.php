@@ -1029,4 +1029,16 @@ public function search(Request $request)
             ], 500);
         }
     }
+
+    public function deleteSelectedUsers(Request $request)
+    {
+        $userIds = $request->input('ids');
+
+        if (is_array($userIds) && count($userIds) > 0) {
+            User::whereIn('id', $userIds)->delete();
+            return response()->json(['status' => 200, 'message' => 'Selected users deleted successfully.']);
+        }
+
+        return response()->json(['status' => 400, 'message' => 'No users selected for deletion.']);
+    }
 }

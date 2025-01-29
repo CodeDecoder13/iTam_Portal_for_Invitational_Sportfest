@@ -15,8 +15,8 @@
         <!-- Include the Add User Modal Component -->
         <x-add-user-form />
     </div>
-    <div class="p-6">
 
+    <div class="p-6">
         <div class="mt-6">
             <!-- Search bar -->
             <div class="relative w-full sm:w-96">
@@ -38,237 +38,251 @@
             </div>
         </div>
 
-      <!-- Users table -->
-      <div id="usersTable" class="mt-6">
-        <div class="space-y-4">
-            @foreach ($data['users'] as $user) 
-                @php
-                    $userTeams = $data['teams']->where('coach_id', $user->id);
-                    $sports = $userTeams->pluck('sport_category')->unique();
-                    $teams = $userTeams->pluck('name')->unique();
-                @endphp
-                <div class="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="font-semibold text-lg">{{ $user->first_name }} {{ $user->last_name }}</h3>
-                            <p class="text-gray-600">{{ $user->email }}</p>
-                            <p class="text-gray-500 text-sm">School: {{ $user->school_name ?? 'N/A' }}</p>
+        <!-- Bulk Actions Container -->
+        <div class="flex items-center justify-between mb-4 hidden" id="bulkActionsContainer">
+            <div class="flex items-center gap-3">
+                <button type="button" id="deleteSelected" 
+                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium transition-colors">
+                    Delete Selected (<span id="selectedCount">0</span>)
+                </button>
+                <button type="button" id="selectAllBtn" 
+                        class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm font-medium transition-colors">
+                    Select All
+                </button>
+            </div>
+        </div>
+
+        <!-- Users table -->
+        <div id="usersTable" class="mt-6">
+            <div class="space-y-4">
+                @foreach ($data['users'] as $user) 
+                    @php
+                        $userTeams = $data['teams']->where('coach_id', $user->id);
+                        $sports = $userTeams->pluck('sport_category')->unique();
+                        $teams = $userTeams->pluck('name')->unique();
+                    @endphp
+                    <div class="user-card p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow relative" data-user-id="{{ $user->id }}">
+                        <!-- Checkbox -->
+                        <div class="absolute top-4 left-4">
+                            <input type="checkbox" 
+                                   class="user-checkbox rounded border-gray-300 text-green-600 shadow-sm focus:ring-green-500">
                         </div>
-                        <div class="flex flex-col items-end gap-2">
-                            <span class="px-2 py-1 text-xs font-semibold rounded-full {{ ($user->role === 'coach') ? 'bg-blue-100 text-blue-800' : ($user->role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800') }}">
-                                {{ $user->role ?? 'user' }}
-                            </span>
-                            <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $user->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                {{ $user->is_active ? 'Active' : 'Inactive' }}
-                            </span>
+
+                        <div class="flex justify-between items-start ml-6">
+                            <div>
+                                <h3 class="font-semibold text-lg">{{ $user->first_name }} {{ $user->last_name }}</h3>
+                                <p class="text-gray-600">{{ $user->email }}</p>
+                                <p class="text-gray-500 text-sm">School: {{ $user->school_name ?? 'N/A' }}</p>
+                            </div>
+                            <div class="flex flex-col items-end gap-2">
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full {{ ($user->role === 'coach') ? 'bg-blue-100 text-blue-800' : ($user->role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800') }}">
+                                    {{ $user->role ?? 'user' }}
+                                </span>
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full {{ $user->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                    {{ $user->is_active ? 'Active' : 'Inactive' }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mt-2 flex justify-end gap-2">
+                            <button class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
+                                onclick="openModal({{ $user->is_active ? 'true' : 'false' }}, 
+                                    '{{ $user->first_name }}', 
+                                    '{{ $user->last_name }}', 
+                                    '{{ $user->school_name ?? 'N/A' }}', 
+                                    '{{ $user->role ?? 'N/A' }}', 
+                                    '{{ $sports->isNotEmpty() ? $sports->implode(', ') : 'N/A' }}', 
+                                    '{{ $teams->isNotEmpty() ? $teams->implode(', ') : 'N/A' }}', 
+                                    '{{ $sports->isNotEmpty() ? $sports->implode(', ') : 'N/A' }}', 
+                                    '{{ $teams->isNotEmpty() ? $teams->implode(', ') : 'N/A' }}', 
+                                    '{{ $user->birth_date }}', 
+                                    '{{ $user->gender }}', 
+                                    {{ $user->id }})">
+                                View Details
+                            </button>
+                            <button class="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
+                                data-bs-toggle="modal" 
+                                data-bs-target="#editUserModal" 
+                                data-user-id="{{ $user->id }}" 
+                                data-user-firstname="{{ $user->first_name }}" 
+                                data-user-lastname="{{ $user->last_name }}" 
+                                data-user-email="{{ $user->email }}" 
+                                data-user-role="{{ $user->role }}" 
+                                data-user-schoolname="{{ $user->school_name }}">
+                                Edit
+                            </button>
                         </div>
                     </div>
-                    <div class="mt-2 flex justify-end gap-2">
-                        <button class="px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
-                            onclick="openModal({{ $user->is_active ? 'true' : 'false' }}, 
-                                '{{ $user->first_name }}', 
-                                '{{ $user->last_name }}', 
-                                '{{ $user->school_name ?? 'N/A' }}', 
-                                '{{ $user->role ?? 'N/A' }}', 
-                                '{{ $sports->isNotEmpty() ? $sports->implode(', ') : 'N/A' }}', 
-                                '{{ $teams->isNotEmpty() ? $teams->implode(', ') : 'N/A' }}', 
-                                '{{ $sports->isNotEmpty() ? $sports->implode(', ') : 'N/A' }}', 
-                                '{{ $teams->isNotEmpty() ? $teams->implode(', ') : 'N/A' }}', 
-                                '{{ $user->birth_date }}', 
-                                '{{ $user->gender }}', 
-                                {{ $user->id }})">
-                            View Details
-                        </button>
-                        <button class="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
-                            data-bs-toggle="modal" 
-                            data-bs-target="#editUserModal" 
-                            data-user-id="{{ $user->id }}" 
-                            data-user-firstname="{{ $user->first_name }}" 
-                            data-user-lastname="{{ $user->last_name }}" 
-                            data-user-email="{{ $user->email }}" 
-                            data-user-role="{{ $user->role }}" 
-                            data-user-schoolname="{{ $user->school_name }}">
-                            Edit
-                        </button>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- modals area-->
+        <div id="userModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
+            <div class="bg-black opacity-50 absolute inset-0"></div>
+            <div class="bg-white rounded-lg p-6 z-10 w-11/12 md:w-1/3 relative">
+                <button class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-3xl p-2" onclick="closeModal()">&times;</button>
+        
+                <!-- Name and Role -->
+                <h2 class="font-bold text-2xl mb-4 inline-flex items-center" id="modalUserName"></h2> 
+                
+                <!-- Activation Badge -->
+                <span id="activationBadge" class="inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full ml-2"></span>
+                
+                <p class="font-semibold">School Name</p>
+                <p id="modalUserSchool" class="mb-3"></p>
+                
+                <p class="font-semibold">Sport Category</p>
+                <p id="modalUserSportCategory" class="mb-2"></p>
+                
+                <p class="font-semibold">Team Name</p>
+                <p id="modalUserTeamName" class="mb-2"></p>
+                
+                <p class="font-semibold">Birth Date</p>
+                <p id="modalUserBirthDate" class="mb-2"></p>
+                
+                <p class="font-semibold">Gender</p>
+                <p id="modalUserGender" class="mb-2"></p>
+        
+                <div class="flex flex-col">
+                    <div class="self-end">
+                        <button class="bg-green-700 hover:bg-green-800 text-white px-2 py-1 rounded-lg mr-2" id="activateButton">Activate</button>
+                        <button class="bg-red-700 hover:bg-red-800 text-white px-2 py-1 rounded-lg" id="deactivateButton">Deactivate</button>
                     </div>
                 </div>
-            @endforeach
-        </div>
-    </div>
-
-    <!-- modals area-->
-    <div id="userModal" class="fixed inset-0 flex items-center justify-center z-50 hidden">
-        <div class="bg-black opacity-50 absolute inset-0"></div>
-        <div class="bg-white rounded-lg p-6 z-10 w-11/12 md:w-1/3 relative">
-            <button class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-3xl p-2" onclick="closeModal()">&times;</button>
-    
-          
-    
-            <!-- Name and Role -->
-            <h2 class="font-bold text-2xl mb-4 inline-flex items-center" id="modalUserName"></h2> 
-            
-            <!-- Activation Badge -->
-            <span id="activationBadge" class="inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full ml-2"></span>
-            
-            <p class="font-semibold">School Name</p>
-            <p id="modalUserSchool" class="mb-3"></p>
-            
-            <p class="font-semibold">Sport Category</p>
-            <p id="modalUserSportCategory" class="mb-2"></p>
-            
-            <p class="font-semibold">Team Name</p>
-            <p id="modalUserTeamName" class="mb-2"></p>
-            
-            <p class="font-semibold">Birth Date</p>
-            <p id="modalUserBirthDate" class="mb-2"></p>
-            
-            <p class="font-semibold">Gender</p>
-            <p id="modalUserGender" class="mb-2"></p>
-    
-            <div class="flex flex-col">
-                <div class="self-end">
-                     <!-- Change here: Add userId to the buttons -->
-                    <button class="bg-green-700 hover:bg-green-800 text-white px-2 py-1 rounded-lg mr-2" id="activateButton">Activate</button>
-                    <button class="bg-red-700 hover:bg-red-800 text-white px-2 py-1 rounded-lg" id="deactivateButton">Deactivate</button>
-                </div>
+                
             </div>
-            
         </div>
-    </div>
 
-    
-
-    <!-- edit modal area -->
-    <!-- Bootstrap Modal for Editing Users -->
-<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editUserModalLabel">Edit User Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editUserForm">
-                    @csrf
-                    <input type="hidden" id="edituserid" name="userid" value="">
-                    
-                    <!-- First Name -->
-                    <div class="mb-4">
-                        <label for="editFirstName" class="form-label">First Name</label>
-                        <input type="text" id="editFirstName" name="first_name" class="form-control">
+        <!-- edit modal area -->
+        <!-- Bootstrap Modal for Editing Users -->
+        <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editUserModalLabel">Edit User Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
+                    <div class="modal-body">
+                        <form id="editUserForm">
+                            @csrf
+                            <input type="hidden" id="edituserid" name="userid" value="">
+                            
+                            <!-- First Name -->
+                            <div class="mb-4">
+                                <label for="editFirstName" class="form-label">First Name</label>
+                                <input type="text" id="editFirstName" name="first_name" class="form-control">
+                            </div>
 
-                    <!-- Last Name -->
-                    <div class="mb-4">
-                        <label for="editLastName" class="form-label">Last Name</label>
-                        <input type="text" id="editLastName" name="last_name" class="form-control">
-                    </div>
+                            <!-- Last Name -->
+                            <div class="mb-4">
+                                <label for="editLastName" class="form-label">Last Name</label>
+                                <input type="text" id="editLastName" name="last_name" class="form-control">
+                            </div>
 
-                    <!-- Email -->
-                    <div class="mb-4">
-                        <label for="editEmail" class="form-label">Email</label>
-                        <input type="text" id="editEmail" name="email" class="form-control">
-                    </div>
+                            <!-- Email -->
+                            <div class="mb-4">
+                                <label for="editEmail" class="form-label">Email</label>
+                                <input type="text" id="editEmail" name="email" class="form-control">
+                            </div>
 
-                    <!-- Role -->
-                    <div class="mb-4">
-                        <label for="editRole" class="form-label">Role</label>
-                        <select id="editRole" name="role" class="form-control" required>
-                            <option value="" disabled selected>Select Role</option>
+                            <!-- Role -->
+                            <div class="mb-4">
+                                <label for="editRole" class="form-label">Role</label>
+                                <select id="editRole" name="role" class="form-control" required>
+                                    <option value="" disabled selected>Select Role</option>
                                     <option value="Captain" {{ old('role') == 'Captain' ? 'selected' : '' }}> Captain</option>
                                     <option value="Coach" {{ old('role') == 'Coach' ? 'selected' : '' }}>Coach</option>
                                     <option value="School Representative" {{ old('role') == 'School Representative' ? 'selected' : '' }}> School Representative</option>
                                     <option value="Guest Account" {{ old('role') == 'Guest Account' ? 'selected' : '' }}>Guest Account</option>
-                        </select>
-                    </div>
-
-                    <!-- School Name -->
-                    <div class="mb-4">
-                        <label for="editSchoolName" class="form-label">School Name</label>
-                        <select id="editSchoolName" name="school_name" class="form-control" required>
-                            <option value="" disabled selected>School Name</option>
-
-                                            <option value="Ilaya Barangka Elementary School" {{ old('school_name') == 'Ilaya Barangka Elementary School' ? 'selected' : '' }}>Ilaya Barangka Elementary School</option>
-                                            <option value="Aquinas School" {{ old('school_name') == 'Aquinas School' ? 'selected' : '' }}>Aquinas School</option>
-                                            <option value="Assemblywoman Felicita G. Berdino Memorial Trade School" {{ old('school_name') == 'Assemblywoman Felicita G. Berdino Memorial Trade School' ? 'selected' : '' }}>Assemblywoman Felicita G. Berdino Memorial Trade School</option>
-                                            <option value="Batasan National High School" {{ old('school_name') == 'Batasan National High School' ? 'selected' : '' }}>Batasan National High School</option>
-                                            <option value="Canossa Academy Lipa" {{ old('school_name') == 'Canossa Academy Lipa' ? 'selected' : '' }}>Canossa Academy Lipa</option>
-                                            <option value="Catmon Integrated School" {{ old('school_name') == 'Catmon Integrated School' ? 'selected' : '' }}>Catmon Integrated School</option>
-                                            <option value="Chiang Kai Shek College" {{ old('school_name') == 'Chiang Kai Shek College' ? 'selected' : '' }}>Chiang Kai Shek College</option>
-                                            <option value="College of St. Catherine, Quezon City" {{ old('school_name') == 'College of St. Catherine, Quezon City' ? 'selected' : '' }}>College of St. Catherine, Quezon City</option>
-                                            <option value="Community Learning Academy of San Jose" {{ old('school_name') == 'Community Learning Academy of San Jose' ? 'selected' : '' }}>Community Learning Academy of San Jose</option>
-                                            <option value="De La Salle Araneta University" {{ old('school_name') == 'De La Salle Araneta University' ? 'selected' : '' }}>De La Salle Araneta University</option>
-                                            <option value="Dominican School, Manila" {{ old('school_name') == 'Dominican School, Manila' ? 'selected' : '' }}>Dominican School, Manila</option>
-                                            <option value="Domuschola International School" {{ old('school_name') == 'Domuschola International School' ? 'selected' : '' }}>Domuschola International School</option>
-                                            <option value="Don Antonio De Zuzuarregui Sr Memorial Academy" {{ old('school_name') == 'Don Antonio De Zuzuarregui Sr Memorial Academy' ? 'selected' : '' }}>Don Antonio De Zuzuarregui Sr Memorial Academy</option>
-                                            <option value="Emilio Aguinaldo College, Manila" {{ old('school_name') == 'Emilio Aguinaldo College, Manila' ? 'selected' : '' }}>Emilio Aguinaldo College, Manila</option>
-                                            <option value="Ernesto Rondon High School" {{ old('school_name') == 'Ernesto Rondon High School' ? 'selected' : '' }}>Ernesto Rondon High School</option>
-                                            <option value="Escuela De Sophia School of Caloocan Inc." {{ old('school_name') == 'Escuela De Sophia School of Caloocan Inc.' ? 'selected' : '' }}>Escuela De Sophia School of Caloocan Inc.</option>
-                                            <option value="FEU Diliman" {{ old('school_name') == 'FEU Diliman' ? 'selected' : '' }}>FEU Diliman</option>
-                                            <option value="FEU Roosevelt Marikina" {{ old('school_name') == 'FEU Roosevelt Marikina' ? 'selected' : '' }}>FEU Roosevelt Marikina</option>
-                                            <option value="FEU Roosevelt Rodriguez" {{ old('school_name') == 'FEU Roosevelt Rodriguez' ? 'selected' : '' }}>FEU Roosevelt Rodriguez</option>
-                                            <option value="Gracel Christian College Foundation" {{ old('school_name') == 'Gracel Christian College Foundation' ? 'selected' : '' }}>Gracel Christian College Foundation</option>
-                                            <option value="Grant Cecilia Integrated School" {{ old('school_name') == 'Grant Cecilia Integrated School' ? 'selected' : '' }}>Grant Cecilia Integrated School</option>
-                                            <option value="Holy Angel School of Caloocan Inc." {{ old('school_name') == 'Holy Angel School of Caloocan Inc.' ? 'selected' : '' }}>Holy Angel School of Caloocan Inc.</option>
-                                            <option value="Holy Infant Montessori Center" {{ old('school_name') == 'Holy Infant Montessori Center' ? 'selected' : '' }}>Holy Infant Montessori Center</option>
-                                            <option value="Holy Trinity Academy" {{ old('school_name') == 'Holy Trinity Academy' ? 'selected' : '' }}>Holy Trinity Academy</option>
-                                            <option value="HSL-Braille College Inc." {{ old('school_name') == 'HSL-Braille College Inc.' ? 'selected' : '' }}>HSL-Braille College Inc.</option>
-                                            <option value="Integrated School of Science/AIMS" {{ old('school_name') == 'Integrated School of Science/AIMS' ? 'selected' : '' }}>Integrated School of Science/AIMS</option>
-                                            <option value="Jaime Cardinal Sin Learning Center" {{ old('school_name') == 'Jaime Cardinal Sin Learning Center' ? 'selected' : '' }}>Jaime Cardinal Sin Learning Center</option>
-                                            <option value="Jesus Christ Saves Global Outreach Christian Academy" {{ old('school_name') == 'Jesus Christ Saves Global Outreach Christian Academy' ? 'selected' : '' }}>Jesus Christ Saves Global Outreach Christian Academy</option>
-                                            <option value="Jesus is Lord College Foundation" {{ old('school_name') == 'Jesus is Lord College Foundation' ? 'selected' : '' }}>Jesus is Lord College Foundation</option>
-                                            <option value="Jesus Reigns Christian Academy" {{ old('school_name') == 'Jesus Reigns Christian Academy' ? 'selected' : '' }}>Jesus Reigns Christian Academy</option>
-                                            <option value="Juan R. Liwag Memorial High School" {{ old('school_name') == 'Juan R. Liwag Memorial High School' ? 'selected' : '' }}>Juan R. Liwag Memorial High School</option>
-                                            <option value="Justice Cecilia Munoz Palma High School" {{ old('school_name') == 'Justice Cecilia Munoz Palma High School' ? 'selected' : '' }}>Justice Cecilia Munoz Palma High School</option>
-                                            <option value="Kings Montessori School" {{ old('school_name') == 'Kings Montessori School' ? 'selected' : '' }}>Kings Montessori School</option>
-                                            <option value="Lakandula High School" {{ old('school_name') == 'Lakandula High School' ? 'selected' : '' }}>Lakandula High School</option>
-                                            <option value="Leandro Locsin Integrated School" {{ old('school_name') == 'Leandro Locsin Integrated School' ? 'selected' : '' }}>Leandro Locsin Integrated School</option>
-                                            <option value="Malabon National High School" {{ old('school_name') == 'Malabon National High School' ? 'selected' : '' }}>Malabon National High School</option>
-                                            <option value="Manggahan High School" {{ old('school_name') == 'Manggahan High School' ? 'selected' : '' }}>Manggahan High School</option>
-                                            <option value="Manila Cathedral School" {{ old('school_name') == 'Manila Cathedral School' ? 'selected' : '' }}>Manila Cathedral School</option>
-                                            <option value="Manuel G. Araullo High School" {{ old('school_name') == 'Manuel G. Araullo High School' ? 'selected' : '' }}>Manuel G. Araullo High School</option>
-                                            <option value="Milestone Innovative Academy" {{ old('school_name') == 'Milestone Innovative Academy' ? 'selected' : '' }}>Milestone Innovative Academy</option>
-                                            <option value="Moreh Academy Inc." {{ old('school_name') == 'Moreh Academy Inc.' ? 'selected' : '' }}>Moreh Academy Inc.</option>
-                                            <option value="Mother of Perpetual Help School, Inc." {{ old('school_name') == 'Mother of Perpetual Help School, Inc.' ? 'selected' : '' }}>Mother of Perpetual Help School, Inc.</option>
-                                            <option value="Mystical Rose School of Bulacan, Inc." {{ old('school_name') == 'Mystical Rose School of Bulacan, Inc.' ? 'selected' : '' }}>Mystical Rose School of Bulacan, Inc.</option>                                                
-                                            <option value="Mystical Rose School of Caloocan, Inc." {{ old('school_name') == 'Mystical Rose School of Caloocan, Inc.' ? 'selected' : '' }}>Mystical Rose School of Caloocan, Inc.</option>
-                                            <option value="Nazarene Catholic School" {{ old('school_name') == 'Nazarene Catholic School' ? 'selected' : '' }}>Nazarene Catholic School</option>
-                                            <option value="New Era High School" {{ old('school_name') == 'New Era High School' ? 'selected' : '' }}>New Era High School</option>
-                                            <option value="New Prodon Academy of Valenzuela" {{ old('school_name') == 'New Prodon Academy of Valenzuela' ? 'selected' : '' }}>New Prodon Academy of Valenzuela</option>
-                                            <option value="Northern Rizal Yorklin School" {{ old('school_name') == 'Northern Rizal Yorklin School' ? 'selected' : '' }}>Northern Rizal Yorklin School</option>
-                                            <option value="Nuestra Senora De Guia Academy" {{ old('school_name') == 'Nuestra Senora De Guia Academy' ? 'selected' : '' }}>Nuestra Senora De Guia Academy</option>
-                                            <option value="Nuestra Senora Del Carmen Institute" {{ old('school_name') == 'Nuestra Senora Del Carmen Institute' ? 'selected' : '' }}>Nuestra Senora Del Carmen Institute</option>
-                                            <option value="Our Lady of Fatima Catholic School, Bacood" {{ old('school_name') == 'Our Lady of Fatima Catholic School, Bacood' ? 'selected' : '' }}>Our Lady of Fatima Catholic School, Bacood</option>
-                                            <option value="Our Lady of Fatima University Quezon City" {{ old('school_name') == 'Our Lady of Fatima University Quezon City' ? 'selected' : '' }}>Our Lady of Fatima University Quezon City</option>
-                                            <option value="Our Lady of Fatima University Valenzuela" {{ old('school_name') == 'Our Lady of Fatima University Valenzuela' ? 'selected' : '' }}>Our Lady of Fatima University Valenzuela</option>
-                                            <option value="Our Lady of Peace School" {{ old('school_name') == 'Our Lady of Peace School' ? 'selected' : '' }}>Our Lady of Peace School</option>
-                                            <option value="PAREF Rosehill" {{ old('school_name') == 'PAREF Rosehill' ? 'selected' : '' }}>PAREF Rosehill</option>
-                                            <option value="Philippine Academy of Sakya" {{ old('school_name') == 'Philippine Academy of Sakya' ? 'selected' : '' }}>Philippine Academy of Sakya</option>
-                                            <option value="Riveridge School Inc." {{ old('school_name') == 'Riveridge School Inc.' ? 'selected' : '' }}>Riveridge School Inc.</option>
-                                            <option value="Rizal High School" {{ old('school_name') == 'Rizal High School' ? 'selected' : '' }}>Rizal High School</option>
-                                            <option value="Sacred Heart Academy of Novaliches" {{ old('school_name') == 'Sacred Heart Academy of Novaliches' ? 'selected' : '' }}>Sacred Heart Academy of Novaliches</option>
-                                            <option value="Sacred Heart of Jesus Catholic School" {{ old('school_name') == 'Sacred Heart of Jesus Catholic School' ? 'selected' : '' }}>Sacred Heart of Jesus Catholic School</option>
-                                            <option value="Sampaguita High School" {{ old('school_name') == 'Sampaguita High School' ? 'selected' : '' }}>Sampaguita High School</option>
-                                            <option value="San Felipe Neri Catholic School" {{ old('school_name') == 'San Felipe Neri Catholic School' ? 'selected' : '' }}>San Felipe Neri Catholic School</option>
-                                            <option value="St. Benedict School of Novaliches" {{ old('school_name') == 'St. Benedict School of Novaliches' ? 'selected' : '' }}>St. Benedict School of Novaliches</option>
-                                            <option value="St. John's Wort Montessori School" {{ old('school_name') == 'St. John Wort Montessori School' ? 'selected' : '' }}>St. John's Wort Montessori School</option>
-                                            <option value="St. Louis College Valenzuela" {{ old('school_name') == 'St. Louis College Valenzuela' ? 'selected' : '' }}>St. Louis College Valenzuela</option>
-                                            <option value="St. Mary's Angel College - Valenzuela" {{ old('school_name') == 'St. Marys Angel College - Valenzuela' ? 'selected' : '' }}>St. Mary's Angel College - Valenzuela</option>
-                                            <option value="St. Patrick School of Quezon City" {{ old('school_name') == 'St. Patrick School of Quezon City' ? 'selected' : '' }}>St. Patrick School of Quezon City</option>
-                                            <option value="St. Stephen High School" {{ old('school_name') == 'St. Stephen High School' ? 'selected' : '' }}>St. Stephen High School</option>
-                                            <option value="St. Theresa's College, Quezon City" {{ old('school_name') == 'St. Theresas College, Quezon City' ? 'selected' : '' }}>St. Theresa's College, Quezon City</option>
-                                            <option value="System Plus Computer College - Caloocan Campus" {{ old('school_name') == 'System Plus Computer College - Caloocan Campus' ? 'selected' : '' }}>System Plus Computer College - Caloocan Campus</option>
-                                            <option value="The Cardinal Academy Inc." {{ old('school_name') == 'The Cardinal Academy Inc.' ? 'selected' : '' }}>The Cardinal Academy Inc.</option>
-                                            <option value="Trinitas College" {{ old('school_name') == 'Trinitas College' ? 'selected' : '' }}>Trinitas College</option>
-                                            <option value="Trinitas School of Sta Maria" {{ old('school_name') == 'Trinitas School of Sta Maria' ? 'selected' : '' }}>Trinitas School of Sta Maria</option>
-                                            <option value="UST Angelicum College" {{ old('school_name') == 'UST Angelicum College' ? 'selected' : '' }}>UST Angelicum College</option>
-                                            <option value="Villagers Montessori College" {{ old('school_name') == 'Villagers Montessori College' ? 'selected' : '' }}>Villagers Montessori College</option>
-                                            <option value="Young Achievers School of Caloocan Inc." {{ old('school_name') == 'Young Achievers School of Caloocan Inc.' ? 'selected' : '' }}>Young Achievers School of Caloocan Inc.</option>
-                                            
-                                        </select>
+                                </select>
                             </div>
 
-                                <!-- Password -->
+                            <!-- School Name -->
+                            <div class="mb-4">
+                                <label for="editSchoolName" class="form-label">School Name</label>
+                                <select id="editSchoolName" name="school_name" class="form-control" required>
+                                    <option value="" disabled selected>School Name</option>
+                                    <option value="Ilaya Barangka Elementary School" {{ old('school_name') == 'Ilaya Barangka Elementary School' ? 'selected' : '' }}>Ilaya Barangka Elementary School</option>
+                                    <option value="Aquinas School" {{ old('school_name') == 'Aquinas School' ? 'selected' : '' }}>Aquinas School</option>
+                                    <option value="Assemblywoman Felicita G. Berdino Memorial Trade School" {{ old('school_name') == 'Assemblywoman Felicita G. Berdino Memorial Trade School' ? 'selected' : '' }}>Assemblywoman Felicita G. Berdino Memorial Trade School</option>
+                                    <option value="Batasan National High School" {{ old('school_name') == 'Batasan National High School' ? 'selected' : '' }}>Batasan National High School</option>
+                                    <option value="Canossa Academy Lipa" {{ old('school_name') == 'Canossa Academy Lipa' ? 'selected' : '' }}>Canossa Academy Lipa</option>
+                                    <option value="Catmon Integrated School" {{ old('school_name') == 'Catmon Integrated School' ? 'selected' : '' }}>Catmon Integrated School</option>
+                                    <option value="Chiang Kai Shek College" {{ old('school_name') == 'Chiang Kai Shek College' ? 'selected' : '' }}>Chiang Kai Shek College</option>
+                                    <option value="College of St. Catherine, Quezon City" {{ old('school_name') == 'College of St. Catherine, Quezon City' ? 'selected' : '' }}>College of St. Catherine, Quezon City</option>
+                                    <option value="Community Learning Academy of San Jose" {{ old('school_name') == 'Community Learning Academy of San Jose' ? 'selected' : '' }}>Community Learning Academy of San Jose</option>
+                                    <option value="De La Salle Araneta University" {{ old('school_name') == 'De La Salle Araneta University' ? 'selected' : '' }}>De La Salle Araneta University</option>
+                                    <option value="Dominican School, Manila" {{ old('school_name') == 'Dominican School, Manila' ? 'selected' : '' }}>Dominican School, Manila</option>
+                                    <option value="Domuschola International School" {{ old('school_name') == 'Domuschola International School' ? 'selected' : '' }}>Domuschola International School</option>
+                                    <option value="Don Antonio De Zuzuarregui Sr Memorial Academy" {{ old('school_name') == 'Don Antonio De Zuzuarregui Sr Memorial Academy' ? 'selected' : '' }}>Don Antonio De Zuzuarregui Sr Memorial Academy</option>
+                                    <option value="Emilio Aguinaldo College, Manila" {{ old('school_name') == 'Emilio Aguinaldo College, Manila' ? 'selected' : '' }}>Emilio Aguinaldo College, Manila</option>
+                                    <option value="Ernesto Rondon High School" {{ old('school_name') == 'Ernesto Rondon High School' ? 'selected' : '' }}>Ernesto Rondon High School</option>
+                                    <option value="Escuela De Sophia School of Caloocan Inc." {{ old('school_name') == 'Escuela De Sophia School of Caloocan Inc.' ? 'selected' : '' }}>Escuela De Sophia School of Caloocan Inc.</option>
+                                    <option value="FEU Diliman" {{ old('school_name') == 'FEU Diliman' ? 'selected' : '' }}>FEU Diliman</option>
+                                    <option value="FEU Roosevelt Marikina" {{ old('school_name') == 'FEU Roosevelt Marikina' ? 'selected' : '' }}>FEU Roosevelt Marikina</option>
+                                    <option value="FEU Roosevelt Rodriguez" {{ old('school_name') == 'FEU Roosevelt Rodriguez' ? 'selected' : '' }}>FEU Roosevelt Rodriguez</option>
+                                    <option value="Gracel Christian College Foundation" {{ old('school_name') == 'Gracel Christian College Foundation' ? 'selected' : '' }}>Gracel Christian College Foundation</option>
+                                    <option value="Grant Cecilia Integrated School" {{ old('school_name') == 'Grant Cecilia Integrated School' ? 'selected' : '' }}>Grant Cecilia Integrated School</option>
+                                    <option value="Holy Angel School of Caloocan Inc." {{ old('school_name') == 'Holy Angel School of Caloocan Inc.' ? 'selected' : '' }}>Holy Angel School of Caloocan Inc.</option>
+                                    <option value="Holy Infant Montessori Center" {{ old('school_name') == 'Holy Infant Montessori Center' ? 'selected' : '' }}>Holy Infant Montessori Center</option>
+                                    <option value="Holy Trinity Academy" {{ old('school_name') == 'Holy Trinity Academy' ? 'selected' : '' }}>Holy Trinity Academy</option>
+                                    <option value="HSL-Braille College Inc." {{ old('school_name') == 'HSL-Braille College Inc.' ? 'selected' : '' }}>HSL-Braille College Inc.</option>
+                                    <option value="Integrated School of Science/AIMS" {{ old('school_name') == 'Integrated School of Science/AIMS' ? 'selected' : '' }}>Integrated School of Science/AIMS</option>
+                                    <option value="Jaime Cardinal Sin Learning Center" {{ old('school_name') == 'Jaime Cardinal Sin Learning Center' ? 'selected' : '' }}>Jaime Cardinal Sin Learning Center</option>
+                                    <option value="Jesus Christ Saves Global Outreach Christian Academy" {{ old('school_name') == 'Jesus Christ Saves Global Outreach Christian Academy' ? 'selected' : '' }}>Jesus Christ Saves Global Outreach Christian Academy</option>
+                                    <option value="Jesus is Lord College Foundation" {{ old('school_name') == 'Jesus is Lord College Foundation' ? 'selected' : '' }}>Jesus is Lord College Foundation</option>
+                                    <option value="Jesus Reigns Christian Academy" {{ old('school_name') == 'Jesus Reigns Christian Academy' ? 'selected' : '' }}>Jesus Reigns Christian Academy</option>
+                                    <option value="Juan R. Liwag Memorial High School" {{ old('school_name') == 'Juan R. Liwag Memorial High School' ? 'selected' : '' }}>Juan R. Liwag Memorial High School</option>
+                                    <option value="Justice Cecilia Munoz Palma High School" {{ old('school_name') == 'Justice Cecilia Munoz Palma High School' ? 'selected' : '' }}>Justice Cecilia Munoz Palma High School</option>
+                                    <option value="Kings Montessori School" {{ old('school_name') == 'Kings Montessori School' ? 'selected' : '' }}>Kings Montessori School</option>
+                                    <option value="Lakandula High School" {{ old('school_name') == 'Lakandula High School' ? 'selected' : '' }}>Lakandula High School</option>
+                                    <option value="Leandro Locsin Integrated School" {{ old('school_name') == 'Leandro Locsin Integrated School' ? 'selected' : '' }}>Leandro Locsin Integrated School</option>
+                                    <option value="Malabon National High School" {{ old('school_name') == 'Malabon National High School' ? 'selected' : '' }}>Malabon National High School</option>
+                                    <option value="Manggahan High School" {{ old('school_name') == 'Manggahan High School' ? 'selected' : '' }}>Manggahan High School</option>
+                                    <option value="Manila Cathedral School" {{ old('school_name') == 'Manila Cathedral School' ? 'selected' : '' }}>Manila Cathedral School</option>
+                                    <option value="Manuel G. Araullo High School" {{ old('school_name') == 'Manuel G. Araullo High School' ? 'selected' : '' }}>Manuel G. Araullo High School</option>
+                                    <option value="Milestone Innovative Academy" {{ old('school_name') == 'Milestone Innovative Academy' ? 'selected' : '' }}>Milestone Innovative Academy</option>
+                                    <option value="Moreh Academy Inc." {{ old('school_name') == 'Moreh Academy Inc.' ? 'selected' : '' }}>Moreh Academy Inc.</option>
+                                    <option value="Mother of Perpetual Help School, Inc." {{ old('school_name') == 'Mother of Perpetual Help School, Inc.' ? 'selected' : '' }}>Mother of Perpetual Help School, Inc.</option>
+                                    <option value="Mystical Rose School of Bulacan, Inc." {{ old('school_name') == 'Mystical Rose School of Bulacan, Inc.' ? 'selected' : '' }}>Mystical Rose School of Bulacan, Inc.</option>                                                
+                                    <option value="Mystical Rose School of Caloocan, Inc." {{ old('school_name') == 'Mystical Rose School of Caloocan, Inc.' ? 'selected' : '' }}>Mystical Rose School of Caloocan, Inc.</option>
+                                    <option value="Nazarene Catholic School" {{ old('school_name') == 'Nazarene Catholic School' ? 'selected' : '' }}>Nazarene Catholic School</option>
+                                    <option value="New Era High School" {{ old('school_name') == 'New Era High School' ? 'selected' : '' }}>New Era High School</option>
+                                    <option value="New Prodon Academy of Valenzuela" {{ old('school_name') == 'New Prodon Academy of Valenzuela' ? 'selected' : '' }}>New Prodon Academy of Valenzuela</option>
+                                    <option value="Northern Rizal Yorklin School" {{ old('school_name') == 'Northern Rizal Yorklin School' ? 'selected' : '' }}>Northern Rizal Yorklin School</option>
+                                    <option value="Nuestra Senora De Guia Academy" {{ old('school_name') == 'Nuestra Senora De Guia Academy' ? 'selected' : '' }}>Nuestra Senora De Guia Academy</option>
+                                    <option value="Nuestra Senora Del Carmen Institute" {{ old('school_name') == 'Nuestra Senora Del Carmen Institute' ? 'selected' : '' }}>Nuestra Senora Del Carmen Institute</option>
+                                    <option value="Our Lady of Fatima Catholic School, Bacood" {{ old('school_name') == 'Our Lady of Fatima Catholic School, Bacood' ? 'selected' : '' }}>Our Lady of Fatima Catholic School, Bacood</option>
+                                    <option value="Our Lady of Fatima University Quezon City" {{ old('school_name') == 'Our Lady of Fatima University Quezon City' ? 'selected' : '' }}>Our Lady of Fatima University Quezon City</option>
+                                    <option value="Our Lady of Fatima University Valenzuela" {{ old('school_name') == 'Our Lady of Fatima University Valenzuela' ? 'selected' : '' }}>Our Lady of Fatima University Valenzuela</option>
+                                    <option value="Our Lady of Peace School" {{ old('school_name') == 'Our Lady of Peace School' ? 'selected' : '' }}>Our Lady of Peace School</option>
+                                    <option value="PAREF Rosehill" {{ old('school_name') == 'PAREF Rosehill' ? 'selected' : '' }}>PAREF Rosehill</option>
+                                    <option value="Philippine Academy of Sakya" {{ old('school_name') == 'Philippine Academy of Sakya' ? 'selected' : '' }}>Philippine Academy of Sakya</option>
+                                    <option value="Riveridge School Inc." {{ old('school_name') == 'Riveridge School Inc.' ? 'selected' : '' }}>Riveridge School Inc.</option>
+                                    <option value="Rizal High School" {{ old('school_name') == 'Rizal High School' ? 'selected' : '' }}>Rizal High School</option>
+                                    <option value="Sacred Heart Academy of Novaliches" {{ old('school_name') == 'Sacred Heart Academy of Novaliches' ? 'selected' : '' }}>Sacred Heart Academy of Novaliches</option>
+                                    <option value="Sacred Heart of Jesus Catholic School" {{ old('school_name') == 'Sacred Heart of Jesus Catholic School' ? 'selected' : '' }}>Sacred Heart of Jesus Catholic School</option>
+                                    <option value="Sampaguita High School" {{ old('school_name') == 'Sampaguita High School' ? 'selected' : '' }}>Sampaguita High School</option>
+                                    <option value="San Felipe Neri Catholic School" {{ old('school_name') == 'San Felipe Neri Catholic School' ? 'selected' : '' }}>San Felipe Neri Catholic School</option>
+                                    <option value="St. Benedict School of Novaliches" {{ old('school_name') == 'St. Benedict School of Novaliches' ? 'selected' : '' }}>St. Benedict School of Novaliches</option>
+                                    <option value="St. John's Wort Montessori School" {{ old('school_name') == 'St. John Wort Montessori School' ? 'selected' : '' }}>St. John's Wort Montessori School</option>
+                                    <option value="St. Louis College Valenzuela" {{ old('school_name') == 'St. Louis College Valenzuela' ? 'selected' : '' }}>St. Louis College Valenzuela</option>
+                                    <option value="St. Mary's Angel College - Valenzuela" {{ old('school_name') == 'St. Marys Angel College - Valenzuela' ? 'selected' : '' }}>St. Mary's Angel College - Valenzuela</option>
+                                    <option value="St. Patrick School of Quezon City" {{ old('school_name') == 'St. Patrick School of Quezon City' ? 'selected' : '' }}>St. Patrick School of Quezon City</option>
+                                    <option value="St. Stephen High School" {{ old('school_name') == 'St. Stephen High School' ? 'selected' : '' }}>St. Stephen High School</option>
+                                    <option value="St. Theresa's College, Quezon City" {{ old('school_name') == 'St. Theresas College, Quezon City' ? 'selected' : '' }}>St. Theresa's College, Quezon City</option>
+                                    <option value="System Plus Computer College - Caloocan Campus" {{ old('school_name') == 'System Plus Computer College - Caloocan Campus' ? 'selected' : '' }}>System Plus Computer College - Caloocan Campus</option>
+                                    <option value="The Cardinal Academy Inc." {{ old('school_name') == 'The Cardinal Academy Inc.' ? 'selected' : '' }}>The Cardinal Academy Inc.</option>
+                                    <option value="Trinitas College" {{ old('school_name') == 'Trinitas College' ? 'selected' : '' }}>Trinitas College</option>
+                                    <option value="Trinitas School of Sta Maria" {{ old('school_name') == 'Trinitas School of Sta Maria' ? 'selected' : '' }}>Trinitas School of Sta Maria</option>
+                                    <option value="UST Angelicum College" {{ old('school_name') == 'UST Angelicum College' ? 'selected' : '' }}>UST Angelicum College</option>
+                                    <option value="Villagers Montessori College" {{ old('school_name') == 'Villagers Montessori College' ? 'selected' : '' }}>Villagers Montessori College</option>
+                                    <option value="Young Achievers School of Caloocan Inc." {{ old('school_name') == 'Young Achievers School of Caloocan Inc.' ? 'selected' : '' }}>Young Achievers School of Caloocan Inc.</option>
+                                    
+                                </select>
+                            </div>
+
+                            <!-- Password -->
                             <div class="mb-4">
                                 <label for="editPassword" class="form-label">Password</label>
                                 <input type="password" id="editPassword" name="password" class="form-control">
@@ -648,6 +662,71 @@
                 });
             }
         });
+
+        // User card click event to select checkbox
+        document.querySelectorAll('.user-card').forEach(card => {
+            card.addEventListener('click', function(event) {
+                if (!event.target.closest('button')) {
+                    const checkbox = this.querySelector('.user-checkbox');
+                    checkbox.checked = !checkbox.checked;
+                    toggleBulkActions();
+                }
+            });
+        });
+
+        // Select all functionality
+        document.getElementById('selectAllBtn').addEventListener('click', function() {
+            const checkboxes = document.querySelectorAll('.user-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            toggleBulkActions();
+        });
+
+        // Delete selected functionality
+        document.getElementById('deleteSelected').addEventListener('click', function() {
+            const selectedIds = Array.from(document.querySelectorAll('.user-checkbox:checked'))
+                .map(checkbox => checkbox.closest('.user-card').dataset.userId);
+
+            if (selectedIds.length > 0 && confirm('Are you sure you want to delete the selected users?')) {
+                $.ajax({
+                    url: '{{ route('admin.delete.selected.users') }}', // Use the new route for deleting selected users
+                    type: 'DELETE',
+                    data: { ids: selectedIds },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Include CSRF token
+                    },
+                    success: function(response) {
+                        if (response.status === 200) {
+                            alert(response.message);
+                            selectedIds.forEach(id => {
+                                document.querySelector(`div[data-user-id="${id}"]`).remove();
+                            });
+                            toggleBulkActions();
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Delete error:', xhr.responseText);
+                        alert('Error: ' + error);
+                    }
+                });
+            }
+        });
+
+        // Toggle bulk actions container visibility
+        function toggleBulkActions() {
+            const selectedCount = document.querySelectorAll('.user-checkbox:checked').length;
+            const bulkActionsContainer = document.getElementById('bulkActionsContainer');
+            if (selectedCount > 0) {
+                bulkActionsContainer.classList.remove('hidden');
+                document.getElementById('selectedCount').textContent = selectedCount;
+            } else {
+                bulkActionsContainer.classList.add('hidden');
+                document.getElementById('selectedCount').textContent = 0;
+            }
+        }
     </script>
 
     </x-app-layout>

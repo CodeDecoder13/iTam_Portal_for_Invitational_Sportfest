@@ -146,6 +146,7 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     Route::get('/search-coaches', [AdminController::class, 'searchCoaches'])->name('admin.search.coaches');
     Route::get('/search-modules', [AdminController::class, 'Searchmodule'])->name('admin.search.module'); 
     Route::get('/search-users', [AdminController::class, 'searchUsers'])->name('admin.search.users');
+    Route::delete('/delete-selected-users', [AdminController::class, 'deleteSelectedUsers'])->name('admin.delete.selected.users');
 });
 // added for Document Module
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {     
