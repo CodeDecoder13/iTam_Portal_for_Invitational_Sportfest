@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+
+    
     public function dashboard()
 {
     $coachId = Auth::user()->id;
@@ -97,21 +99,21 @@ class UserController extends Controller
 
 
     public function myDocuments()
-{
-    $coachId = Auth::user()->id;
+    {
+        $coachId = Auth::user()->id;
 
-    // Fetch players associated with the logged-in coach and eager load the 'team' relationship
-    $players = Player::where('coach_id', $coachId)
-        ->with('team')
-        ->get();
+        // Fetch players associated with the logged-in coach and eager load the 'team' relationship
+        $players = Player::where('coach_id', $coachId)
+            ->with('team')
+            ->get();
 
-    // Group players by sport_category and team name to avoid repetition
-    $groupedPlayers = $players->groupBy(function ($player) {
-        return $player->team->sport_category . '|' . $player->team->name;
-    });
+        // Group players by sport_category and team name to avoid repetition
+        $groupedPlayers = $players->groupBy(function ($player) {
+            return $player->team->sport_category . '|' . $player->team->name;
+        });
 
-    return view('user-sidebar.my-documents', compact('groupedPlayers'));
-}
+        return view('user-sidebar.my-documents', compact('groupedPlayers'));
+    }
 
 
     public function selectTeam()
